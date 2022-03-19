@@ -1,5 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
+group = "me.cjcrafter"
+version = "1.0.0"
+
 plugins {
     `java-library`
     `maven-publish`
@@ -26,11 +29,20 @@ repositories {
     maven {
         url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
     }
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
+        credentials {
+            username = "CJCrafter"
+            password = "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" // this is a public token
+        }
+    }
 }
 
 dependencies {
     api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:1.1.1-BETA")
+    compileOnly("me.deecaad:mechanicscore:1.1.1-BETA-DEV")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -60,6 +72,3 @@ tasks {
         filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
     }
 }
-
-group = "me.cjcrafter"
-version = "1.0.0"
