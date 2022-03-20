@@ -1,0 +1,5 @@
+Scuba:
+  Potion_Effects:
+    - water_breathing
+  Immune_Potions:
+    - poison

@@ -42,7 +42,8 @@ repositories {
 
 dependencies {
     api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:1.1.1-BETA-DEV")
+    compileOnly("me.deecaad:mechanicscore:+")
+    compileOnly("me.deecaad:weaponmechanics:+")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
