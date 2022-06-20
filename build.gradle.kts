@@ -20,7 +20,8 @@ bukkit {
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
-    softDepend = listOf("MechanicsCore")
+    depend = listOf("MechanicsCore")
+    softDepend = listOf("WeaponMechanics")
 }
 
 repositories {
@@ -35,7 +36,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
         credentials {
             username = "CJCrafter"
-            password = "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" // this is a public token
+            password = "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" // this is a public token created in CJCrafter's name which will never expire
         }
     }
 }
@@ -47,6 +48,7 @@ dependencies {
 }
 
 tasks.named<ShadowJar>("shadowJar") {
+    classifier = null
     archiveFileName.set("ArmorMechanics-${project.version}.jar")
     configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
 }
