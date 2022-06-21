@@ -1,14 +1,19 @@
 package me.cjcrafter.armormechanics.listeners;
 
+import me.cjcrafter.armormechanics.ArmorMechanics;
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI;
+import me.cjcrafter.armormechanics.ArmorSet;
+import me.cjcrafter.armormechanics.BonusEffect;
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.events.EntityEquipmentEvent;
-import me.deecaad.core.utils.ReflectionUtil;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+
+import static me.cjcrafter.armormechanics.ArmorMechanicsAPI.getArmorTitle;
 
 public class ArmorEquipListener implements Listener {
 
@@ -19,32 +24,23 @@ public class ArmorEquipListener implements Listener {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
         ItemStack item = event.getEquipped();
-        String str = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "potion-effects");
+        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "armor-title");
 
-        // String being empty is actually an error made by another plugin
-        // modifying the tag, that should never happen. Null tag means no
-        // potions.
-        if (str == null || str.isEmpty())
+        // When the equipped armor is not from ArmorMechanics, skip
+        if (title == null || title.isEmpty())
             return;
 
-        String[] potions = str.split(",");
-        for (String pot : potions) {
-            String[] split = pot.split("~");
+        BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
+        ArmorSet set = ArmorMechanicsAPI.getSet(entity);
 
-            PotionEffectType potionEffectType = PotionEffectType.getByName(split[0]);
-            int amplifier = Integer.parseInt(split[1]) - 1;
-            boolean ambient = split.length > 2 ? Boolean.parseBoolean(split[2]) : false;
-            boolean hide = split.length > 3 ? Boolean.parseBoolean(split[3]) : true;
-            boolean icon = split.length > 4 ? Boolean.parseBoolean(split[4]) : false;
+        if (bonus != null) {
+            for (PotionEffect potion : bonus.getPotions())
+                entity.addPotionEffect(potion);
+        }
 
-            PotionEffect effect;
-            if (ReflectionUtil.getMCVersion() < 14)
-                effect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, amplifier, ambient, hide);
-            else
-                effect = new PotionEffect(potionEffectType, Integer.MAX_VALUE, amplifier, ambient, hide, icon);
-
-
-            entity.addPotionEffect(effect);
+        if (set != null && set.getBonus() != null) {
+            for (PotionEffect potion : ArmorMechanics.INSTANCE.effects.get(set.getBonus()).getPotions())
+                entity.addPotionEffect(potion);
         }
     }
 
@@ -55,20 +51,55 @@ public class ArmorEquipListener implements Listener {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
         ItemStack item = event.getDequipped();
-        String str = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "potion-effects");
+        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "armor-title");
 
-        // String being empty is actually an error made by another plugin
-        // modifying the tag, that should never happen. Null tag means no
-        // potions.
-        if (str == null || str.isEmpty())
+        // When the equipped armor is not from ArmorMechanics, skip
+        if (title == null || title.isEmpty())
             return;
 
-        String[] potions = str.split(",");
-        for (String pot : potions) {
-            String[] split = pot.split("~");
+        BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
 
-            PotionEffectType potionEffectType = PotionEffectType.getByName(split[0]);
-            entity.removePotionEffect(potionEffectType);
+        // Set bonus is a little weird, as we need to check if the user
+        // previously had a set bonus, and if it needs to be removed.
+        EntityEquipment equipment = entity.getEquipment();
+        String helmet = getArmorTitle(equipment.getHelmet());
+        String chestplate = getArmorTitle(equipment.getChestplate());
+        String leggings = getArmorTitle(equipment.getLeggings());
+        String boots = getArmorTitle(equipment.getBoots());
+
+        if (bonus != null) {
+            for (PotionEffect potion : bonus.getPotions())
+                entity.removePotionEffect(potion.getType());
         }
+
+        ArmorSet oldSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
+        if (oldSet == null)
+            return;
+
+        switch (event.getSlot()) {
+            case HEAD:
+                helmet = null;
+                break;
+            case CHEST:
+                chestplate = null;
+                break;
+            case LEGS:
+                leggings = null;
+                break;
+            case FEET:
+                boots =  null;
+                break;
+            default:
+                throw new IllegalStateException("NOOOOOOOOOOO, that's not true, that's impossible!");
+        }
+
+        ArmorSet newSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
+
+        if (oldSet != newSet) {
+            for (PotionEffect potion : ArmorMechanics.INSTANCE.effects.get(oldSet.getBonus()).getPotions())
+                entity.removePotionEffect(potion.getType());
+        }
+
+
     }
 }

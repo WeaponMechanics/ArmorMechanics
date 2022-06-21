@@ -1,44 +1,213 @@
-# me.deecaad.core.file.serializer.ItemSerializer
-Armor:
-  Type: <Material>:<Data>
-  Name: <name>
-  Lore:
-    - <Lore line>
-    - <etc.>
-  Durability: <durability>
-  Unbreakable: <true/false>
-  Custom_Model_Data: <custom model data number>
-  Hide_Flags: <true/false>
-  Enchantments:
-    - <Enchantment>-<Level>
-  Skull_Owning_Player: <UUID of player or name of player>
-  Potion_Color: <ColorSerializer>
-  Attributes:
-    - <Attribute>-<Amount>
-  Leather_Color: <ColorSerializer>
-  Firework:
-    Power: <firework power>
-    Effects:
-      - <Firework.Type>-<ColorSerializer>
-      - <Firework.Type>-<ColorSerializer>-<Trail>-<Flicker>
-      - <Firework.Type>-<ColorSerializer>-<Trail>-<Flicker>-<fade ColorSerializer>
-      - <etc.>
-  Deny_Use_In_Crafting: <true/false>
-  #notice we removed potion_effects
-  Recipe:
-    Shape:
-      - "012"
-      - "345"
-      - "678"
-    Ingredients:
-      '0': <ItemSerializer>
-      '1': <ItemSerializer>
+###########################################################
+# SCUBA SET
+#
+# Overall weak set, but increases mobility when in water
+# When wearing the full set, the user never needs to emerge
+# to breath.
+###########################################################
 
-  # From armormechanics
+Scuba_Helmet:
+  Type: LEATHER_HELMET
+  Name: "&bScuba Mask"
+  Lore:
+    - "&7Darth Vader sounds not included"
+    - ""
+    - " &8[&a+&8] &7Increases breath under water"
+    - " &8[&a+&8] &7Improves vision while under water"
+    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " "
+    - "&6Full Set Bonus: &iWater Breathing"
+    - "&7Allows infinite breath under water"
+  Hide_Flags: true
+  Enchantments:
+    - RESPIRATION 3
+    - AQUA_INFINITY 1
+  Attributes:
+    - GENERIC_MOVEMENT_SPEED -0.003 HEAD
+  Leather_Color: "#0000F0"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Scuba_Chestplate:
+  Type: LEATHER_CHESTPLATE
+  Name: "&bScuba Chestplate"
+  Lore:
+    - "&7Please no do not bring this Armor into a fight"
+    - " "
+    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " "
+    - "&6Full Set Bonus: &iWater Breathing"
+    - "&7Allows infinite breath under water"
+  Hide_Flags: true
+  Attributes:
+    - GENERIC_MOVEMENT_SPEED -0.003 CHEST
+  Leather_Color: "#0000F0"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Scuba_Leggings:
+  Type: LEATHER_LEGGINGS
+  Name: "&bScuba Leggings"
+  Lore:
+    - "&7Doesn't offer much protection, but hey, swim"
+    - " "
+    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " "
+    - "&6Full Set Bonus: &iWater Breathing"
+    - "&7Allows infinite breath under water"
+  Hide_Flags: true
+  Attributes:
+    - GENERIC_MOVEMENT_SPEED -0.003 LEGS
+  Leather_Color: "#0000F0"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Scuba_Boots:
+  Type: LEATHER_BOOTS
+  Name: "&bScuba Flippers"
+  Lore:
+    - "&7How the hell are you supposed to run in these?"
+    - ""
+    - " &8[&a+&8] &7Increases movement speed under water"
+    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " "
+    - "&6Full Set Bonus: &iWater Breathing"
+    - "&7Allows infinite breath under water"
+  Hide_Flags: true
+  Enchantments:
+    - DEPTH_STRIDER 4
+  Attributes:
+    - GENERIC_MOVEMENT_SPEED -0.003 FEET
+  Leather_Color: "#0000F0"
+  Deny_Use_In_Crafting: true # prevents rename
+
+###########################################################
+# TACTICAL SET
+#
+# This armor is not so strong against vanilla Minecraft
+# attacks, but it does well against bullets from WeaponMechanics
+# https://www.spigotmc.org/resources/.99913/
+###########################################################
+
+Tactical_Helmet:
+  Type: LEATHER_HELMET
+  Name: "&eTactical Helmet"
+  Lore:
+    - "&7Now with night vision goggles!"
+    - ""
+    - " &8[&a+&8] &7See in the dark"
+    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " "
+    - "&6Full Set Bonus: &iNone"
+    - "&7It's just cloth... What did you expect?"
+  Hide_Flags: true
+  Enchantments:
+    - NIGHT_VISION 1
+  Leather_Color: "#4b5320"
+  Deny_Use_In_Crafting: true # prevents rename
   Bonus_Effects:
-    Potion_Effects:
-      - <PotionEffectType>-<amplifier>
-      - <PotionEffectType>-<amplifier>-<ambient>-<hideparticles>-<icon>
-    Immune_Potion:
-      - <PotionEffectType>
-    Bullet_Resistance: <Double>
+    Bullet_Resistance: 0.04
+
+Tactical_Chestplate:
+  Type: LEATHER_CHESTPLATE
+  Name: "&eTactical Chestplate"
+  Lore:
+    - "&7Surprisingly ineffective against knives"
+    - ""
+    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " "
+    - "&6Full Set Bonus: &iNone"
+    - "&7It's just cloth... What did you expect?"
+  Hide_Flags: true
+  Leather_Color: "#4b5320"
+  Deny_Use_In_Crafting: true # prevents rename
+  Bonus_Effects:
+    Bullet_Resistance: 0.07
+
+Tactical_Leggings:
+  Type: LEATHER_LEGGINGS
+  Name: "&eTactical Leggings"
+  Lore:
+    - "&7Getting shot in the leg hurts, so wear this"
+    - ""
+    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " "
+    - "&6Full Set Bonus: &iNone"
+    - "&7It's just cloth... What did you expect?"
+  Hide_Flags: true
+  Leather_Color: "#4b5320"
+  Deny_Use_In_Crafting: true # prevents rename
+  Bonus_Effects:
+    Bullet_Resistance: 0.05
+
+Tactical_Boots:
+  Type: LEATHER_BOOTS
+  Name: "&eTactical Boots"
+  Lore:
+    - "&7SOMEHOW faster then wearing nothing at all!"
+    - ""
+    - " &8[&a+&8] &7Increased movement speed"
+    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " "
+    - "&6Full Set Bonus: &iNone"
+    - "&7It's just cloth... What did you expect?"
+  Hide_Flags: true
+  Leather_Color: "#4b5320"
+  Deny_Use_In_Crafting: true # prevents rename
+  Attributes:
+    - GENERIC_MOVEMENT_SPEED 0.002 FEET
+  Bonus_Effects:
+    Bullet_Resistance: 0.04
+
+###########################################################
+# Radiation Suit
+#
+# Weak against literally everything, but hey, no poison or
+# wither debuffs (only when wearing full set)!
+###########################################################
+
+Radiation_Helmet:
+  Type: LEATHER_HELMET
+  Name: "&bGas Mask"
+  Lore:
+    - "&7Wait, you're supposed to clean these?"
+    - " "
+    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Leather_Color: "#fafa00"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Radiation_Chestplate:
+  Type: LEATHER_CHESTPLATE
+  Name: "&bRad Suit Chestplate"
+  Lore:
+    - "&7I'm pretty sure this is just plastic?"
+    - " "
+    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Leather_Color: "#fafa00"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Radiation_Leggings:
+  Type: LEATHER_LEGGINS
+  Name: "&bRad Suit Leggings"
+  Lore:
+    - "&7Go to the bathroom before wearing"
+    - " "
+    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Leather_Color: "#fafa00"
+  Deny_Use_In_Crafting: true # prevents rename
+
+Radiation_Boots:
+  Type: LEATHER_BOOTS
+  Name: "&bRad Suit Boots"
+  Lore:
+    - "&7Don't step on anything sharp"
+    - " "
+    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Leather_Color: "#fafa00"
+  Deny_Use_In_Crafting: true # prevents rename
+

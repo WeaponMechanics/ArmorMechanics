@@ -1,1 +1,18 @@
 Scuba_Set:
+  Helmet: "Scuba_Helmet"
+  Chestplate: "Scuba_Chestplate"
+  Leggings: "Scuba_Leggings"
+  #Boots: "Scuba_Boots"  # Just as a demo, lets say we don't need flippers to be considered a "full set"
+  Bonus_Effects:
+    Potion_Effects:
+      - WATER_BREATHING-1-false-true
+
+Radiation_Set:
+  Helmet: "Radiation_Helmet"
+  Chestplate: "Radiation_Chestplate"
+  Leggings: "Radiation_Leggings"
+  Boots: "Radiation_Boots"
+  Bonus_Effects:
+    Immune_Potion:
+      - POISON
+      - WITHER

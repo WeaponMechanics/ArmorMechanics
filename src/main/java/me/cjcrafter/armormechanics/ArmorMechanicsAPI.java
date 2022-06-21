@@ -14,6 +14,8 @@ public class ArmorMechanicsAPI {
 
     private static ArmorMechanics plugin;
 
+
+
     public static String getArmorTitle(ItemStack armor) {
         if (armor == null || !armor.hasItemMeta())
             return null;
