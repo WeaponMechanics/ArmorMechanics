@@ -16,12 +16,12 @@ Scuba_Helmet:
     - " &8[&a+&8] &7Improves vision while under water"
     - " &8[&c-&8] &7Decreased movement speed on land"
     - " "
-    - "&6Full Set Bonus: &iWater Breathing"
+    - "&6Full Set Bonus: &oWater Breathing"
     - "&7Allows infinite breath under water"
   Hide_Flags: true
   Enchantments:
     - RESPIRATION 3
-    - AQUA_INFINITY 1
+    - AQUA_AFFINITY 1
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 HEAD
   Leather_Color: "#0000F0"
@@ -35,7 +35,7 @@ Scuba_Chestplate:
     - " "
     - " &8[&c-&8] &7Decreased movement speed on land"
     - " "
-    - "&6Full Set Bonus: &iWater Breathing"
+    - "&6Full Set Bonus: &oWater Breathing"
     - "&7Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
@@ -51,7 +51,7 @@ Scuba_Leggings:
     - " "
     - " &8[&c-&8] &7Decreased movement speed on land"
     - " "
-    - "&6Full Set Bonus: &iWater Breathing"
+    - "&6Full Set Bonus: &oWater Breathing"
     - "&7Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
@@ -68,7 +68,7 @@ Scuba_Boots:
     - " &8[&a+&8] &7Increases movement speed under water"
     - " &8[&c-&8] &7Decreased movement speed on land"
     - " "
-    - "&6Full Set Bonus: &iWater Breathing"
+    - "&6Full Set Bonus: &oWater Breathing"
     - "&7Allows infinite breath under water"
   Hide_Flags: true
   Enchantments:
@@ -95,15 +95,15 @@ Tactical_Helmet:
     - " &8[&a+&8] &7See in the dark"
     - " &8[&a+&8] &7Decreased damage from bullets"
     - " "
-    - "&6Full Set Bonus: &iNone"
+    - "&6Full Set Bonus: &oNone"
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
-  Enchantments:
-    - NIGHT_VISION 1
   Leather_Color: "#4b5320"
   Deny_Use_In_Crafting: true # prevents rename
   Bonus_Effects:
     Bullet_Resistance: 0.04
+    Potion_Effects:
+      - NIGHT_VISION 1
 
 Tactical_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -113,7 +113,7 @@ Tactical_Chestplate:
     - ""
     - " &8[&a+&8] &7Decreased damage from bullets"
     - " "
-    - "&6Full Set Bonus: &iNone"
+    - "&6Full Set Bonus: &oNone"
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
@@ -129,7 +129,7 @@ Tactical_Leggings:
     - ""
     - " &8[&a+&8] &7Decreased damage from bullets"
     - " "
-    - "&6Full Set Bonus: &iNone"
+    - "&6Full Set Bonus: &oNone"
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
@@ -146,7 +146,7 @@ Tactical_Boots:
     - " &8[&a+&8] &7Increased movement speed"
     - " &8[&a+&8] &7Decreased damage from bullets"
     - " "
-    - "&6Full Set Bonus: &iNone"
+    - "&6Full Set Bonus: &oNone"
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
@@ -169,7 +169,7 @@ Radiation_Helmet:
   Lore:
     - "&7Wait, you're supposed to clean these?"
     - " "
-    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
@@ -181,19 +181,19 @@ Radiation_Chestplate:
   Lore:
     - "&7I'm pretty sure this is just plastic?"
     - " "
-    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
   Deny_Use_In_Crafting: true # prevents rename
 
 Radiation_Leggings:
-  Type: LEATHER_LEGGINS
+  Type: LEATHER_LEGGINGS
   Name: "&bRad Suit Leggings"
   Lore:
     - "&7Go to the bathroom before wearing"
     - " "
-    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
@@ -205,7 +205,7 @@ Radiation_Boots:
   Lore:
     - "&7Don't step on anything sharp"
     - " "
-    - "&6Full Set Bonus: &iRadiation Immunity"
+    - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"

@@ -13,6 +13,6 @@ Radiation_Set:
   Leggings: "Radiation_Leggings"
   Boots: "Radiation_Boots"
   Bonus_Effects:
-    Immune_Potion:
+    Immune_Potions:
       - POISON
       - WITHER

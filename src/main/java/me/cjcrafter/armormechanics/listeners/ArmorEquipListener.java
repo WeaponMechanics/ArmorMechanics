@@ -24,7 +24,7 @@ public class ArmorEquipListener implements Listener {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
         ItemStack item = event.getEquipped();
-        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "armor-title");
+        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title");
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty())
@@ -51,7 +51,7 @@ public class ArmorEquipListener implements Listener {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
         ItemStack item = event.getDequipped();
-        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "MechanicsCore", "armor-title");
+        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title");
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty())

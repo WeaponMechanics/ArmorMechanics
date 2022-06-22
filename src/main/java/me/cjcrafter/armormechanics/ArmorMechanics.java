@@ -1,5 +1,8 @@
 package me.cjcrafter.armormechanics;
 
+import me.cjcrafter.armormechanics.listeners.ArmorEquipListener;
+import me.cjcrafter.armormechanics.listeners.ImmunePotionCanceller;
+import me.cjcrafter.armormechanics.listeners.WeaponMechanicsDamageListener;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.utils.Debugger;
@@ -8,6 +11,7 @@ import me.deecaad.core.utils.ReflectionUtil;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -31,8 +35,8 @@ public class ArmorMechanics extends JavaPlugin {
     public void onLoad() {
         INSTANCE = this;
 
-        int level = getConfig().getInt("Debug_Level");
-        boolean printTraces = getConfig().getBoolean("Print_Traces");
+        int level = getConfig().getInt("Debug_Level", 2);
+        boolean printTraces = getConfig().getBoolean("Print_Traces", false);
         debug = new Debugger(getLogger(), level, printTraces);
 
         if (ReflectionUtil.getMCVersion() < 13) {
@@ -45,7 +49,7 @@ public class ArmorMechanics extends JavaPlugin {
         if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
             debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
             try {
-                FileUtil.copyResourcesTo(getClassLoader().getResource("WeaponMechanics"), getDataFolder().toPath());
+                FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
             } catch (IOException | URISyntaxException e) {
                 e.printStackTrace();
             }
@@ -84,6 +88,13 @@ public class ArmorMechanics extends JavaPlugin {
             }
         }
 
+        PluginManager pm = getServer().getPluginManager();
+        boolean wm = pm.isPluginEnabled("WeaponMechanics");
+        pm.registerEvents(new ArmorEquipListener(), this);
+        pm.registerEvents(new ImmunePotionCanceller(), this);
+        if (wm) pm.registerEvents(new WeaponMechanicsDamageListener(), this);
+
+        Command.register();
     }
 
     @Override

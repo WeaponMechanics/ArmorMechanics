@@ -81,7 +81,7 @@ public class BonusEffect implements Serializer<BonusEffect> {
             }
         }
 
-        double bulletResistance = data.of("Bullet_Resistance").assertRange(0.0, 1.0).getDouble();
+        double bulletResistance = data.of("Bullet_Resistance").assertRange(0.0, 1.0).getDouble(0.0);
 
         List<String[]> immunitiesStringList = data.ofList("Immune_Potions")
                 .addArgument(PotionEffectType.class, true, true)

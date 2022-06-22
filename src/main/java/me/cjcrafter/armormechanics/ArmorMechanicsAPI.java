@@ -12,10 +12,6 @@ import java.util.Objects;
 
 public class ArmorMechanicsAPI {
 
-    private static ArmorMechanics plugin;
-
-
-
     public static String getArmorTitle(ItemStack armor) {
         if (armor == null || !armor.hasItemMeta())
             return null;
@@ -46,6 +42,7 @@ public class ArmorMechanicsAPI {
 
         // Since an armor title may belong to multiple sets, we must check each
         // set to determine whether the player is wearing a set.
+        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
         for (ArmorSet set : plugin.sets.values()) {
             if (!Objects.equals(helmet, set.getHelmet()))
                 continue;
@@ -66,6 +63,7 @@ public class ArmorMechanicsAPI {
         if (equipment == null)
             return 0.0;
 
+        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
         BonusEffect helmet = plugin.effects.get(getArmorTitle(equipment.getHelmet()));
         BonusEffect chestplate = plugin.effects.get(getArmorTitle(equipment.getChestplate()));
         BonusEffect leggings = plugin.effects.get(getArmorTitle(equipment.getLeggings()));
@@ -91,6 +89,7 @@ public class ArmorMechanicsAPI {
         if (equipment == null)
             return false;
 
+        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
         BonusEffect helmet = plugin.effects.get(getArmorTitle(equipment.getHelmet()));
         BonusEffect chestplate = plugin.effects.get(getArmorTitle(equipment.getChestplate()));
         BonusEffect leggings = plugin.effects.get(getArmorTitle(equipment.getLeggings()));

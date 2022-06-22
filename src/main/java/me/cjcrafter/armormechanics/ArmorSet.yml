@@ -7,6 +7,6 @@ ArmorSet:
     Potion_Effects:
       - <PotionEffectType>-<amplifier>
       - <PotionEffectType>-<amplifier>-<ambient>-<hideparticles>-<icon>
-    Immune_Potion:
+    Immune_Potions:
       - <PotionEffectType>
     Bullet_Resistance: <Double>
