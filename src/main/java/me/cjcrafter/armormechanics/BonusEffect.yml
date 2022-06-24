@@ -1,0 +1,13 @@
+Bonus_Effects:
+  Potion_Effects: # Potion effects while wearing
+    - <PotionEffectType>-<amplifier>
+    - <PotionEffectType>-<amplifier>-<ambient>-<hideparticles>-<icon>
+  Immune_Potion: # cannot get these potion effects while wearing
+    - <PotionEffectType>
+  Bullet_Resistance:
+    Base: 0.01
+    Per_Weapon:
+     - "AK-47 0.02"
+  Equip_Mechanics: <MechanicsSerializer>
+  Dequip_Mechanics: <MechanicsSeriaizer>
+  Damage_Mechanics: <MechanicsSerializer>

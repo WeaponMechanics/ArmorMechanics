@@ -59,7 +59,7 @@ public class ArmorMechanicsAPI {
         return null;
     }
 
-    public static double getBulletResistance(EntityEquipment equipment) {
+    public static double getBulletResistance(EntityEquipment equipment, String weaponTitle) {
         if (equipment == null)
             return 0.0;
 
@@ -72,15 +72,15 @@ public class ArmorMechanicsAPI {
 
         double rate = 0.0;
         if (set != null && set.getBonus() != null)
-            rate += plugin.effects.get(set.getBonus()).getBulletResistance();
+            rate += plugin.effects.get(set.getBonus()).getBulletResistance(weaponTitle);
         if (helmet != null)
-            rate += helmet.getBulletResistance();
+            rate += helmet.getBulletResistance(weaponTitle);
         if (chestplate != null)
-            rate += chestplate.getBulletResistance();
+            rate += chestplate.getBulletResistance(weaponTitle);
         if (leggings != null)
-            rate += leggings.getBulletResistance();
+            rate += leggings.getBulletResistance(weaponTitle);
         if (boots != null)
-            rate += boots.getBulletResistance();
+            rate += boots.getBulletResistance(weaponTitle);
 
         return NumberUtil.minMax(0.0, rate, 1.0);
     }

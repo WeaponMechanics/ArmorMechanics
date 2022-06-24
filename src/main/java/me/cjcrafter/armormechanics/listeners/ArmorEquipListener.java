@@ -6,6 +6,8 @@ import me.cjcrafter.armormechanics.ArmorSet;
 import me.cjcrafter.armormechanics.BonusEffect;
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.events.EntityEquipmentEvent;
+import me.deecaad.weaponmechanics.WeaponMechanics;
+import me.deecaad.weaponmechanics.mechanics.CastData;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,12 +36,20 @@ public class ArmorEquipListener implements Listener {
         ArmorSet set = ArmorMechanicsAPI.getSet(entity);
 
         if (bonus != null) {
+            if (bonus.getEquipMechanics() != null)
+                bonus.getEquipMechanics().use(new CastData(WeaponMechanics.getEntityWrapper(entity)));
+
             for (PotionEffect potion : bonus.getPotions())
                 entity.addPotionEffect(potion);
         }
 
         if (set != null && set.getBonus() != null) {
-            for (PotionEffect potion : ArmorMechanics.INSTANCE.effects.get(set.getBonus()).getPotions())
+            BonusEffect setBonus = ArmorMechanics.INSTANCE.effects.get(set.getBonus());
+
+            if (setBonus.getEquipMechanics() != null)
+                setBonus.getEquipMechanics().use(new CastData(WeaponMechanics.getEntityWrapper(entity)));
+
+            for (PotionEffect potion : setBonus.getPotions())
                 entity.addPotionEffect(potion);
         }
     }
@@ -68,6 +78,9 @@ public class ArmorEquipListener implements Listener {
         String boots = getArmorTitle(equipment.getBoots());
 
         if (bonus != null) {
+            if (bonus.getDequipMechanics() != null)
+                bonus.getDequipMechanics().use(new CastData(WeaponMechanics.getEntityWrapper(entity)));
+
             for (PotionEffect potion : bonus.getPotions())
                 entity.removePotionEffect(potion.getType());
         }
@@ -96,7 +109,12 @@ public class ArmorEquipListener implements Listener {
         ArmorSet newSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
 
         if (oldSet != newSet) {
-            for (PotionEffect potion : ArmorMechanics.INSTANCE.effects.get(oldSet.getBonus()).getPotions())
+            BonusEffect setBonus = ArmorMechanics.INSTANCE.effects.get(oldSet.getBonus());
+
+            if (setBonus.getDequipMechanics() != null)
+                setBonus.getDequipMechanics().use(new CastData(WeaponMechanics.getEntityWrapper(entity)));
+
+            for (PotionEffect potion : setBonus.getPotions())
                 entity.removePotionEffect(potion.getType());
         }
 

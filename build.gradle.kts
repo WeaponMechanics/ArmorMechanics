@@ -20,8 +20,7 @@ bukkit {
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
-    depend = listOf("MechanicsCore")
-    softDepend = listOf("WeaponMechanics")
+    depend = listOf("MechanicsCore", "WeaponMechanics")
 }
 
 repositories {
@@ -42,7 +41,7 @@ repositories {
 }
 
 dependencies {
-    api("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
     compileOnly("me.deecaad:mechanicscore:+")
     compileOnly("me.deecaad:weaponmechanics:+")
 }
