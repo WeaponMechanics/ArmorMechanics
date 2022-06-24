@@ -2,9 +2,11 @@ package me.cjcrafter.armormechanics;
 
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.utils.NumberUtil;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
@@ -17,6 +19,52 @@ public class ArmorMechanicsAPI {
             return null;
 
         return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title");
+    }
+
+    public static EquipmentSlot getEquipmentSlot(Material mat) {
+        String name = mat.name();
+        if (name.endsWith("BOOTS"))
+            return EquipmentSlot.FEET;
+        if (name.endsWith("LEGGINGS"))
+            return EquipmentSlot.LEGS;
+        if (name.endsWith("CHESTPLATE"))
+            return EquipmentSlot.CHEST;
+        if (name.endsWith("HELMET"))
+            return EquipmentSlot.HEAD;
+
+        return null;
+    }
+
+    public static ItemStack getItem(EntityEquipment equipment, EquipmentSlot slot) {
+        switch (slot) {
+            case HEAD:
+                return equipment.getHelmet();
+            case CHEST:
+                return equipment.getChestplate();
+            case LEGS:
+                return equipment.getLeggings();
+            case FEET:
+                return equipment.getBoots();
+            default:
+                return null;
+        }
+    }
+
+    public static void setItem(EntityEquipment equipment, EquipmentSlot slot, ItemStack item) {
+        switch (slot) {
+            case HEAD:
+                equipment.setHelmet(item);
+                break;
+            case CHEST:
+                equipment.setChestplate(item);
+                break;
+            case LEGS:
+                equipment.setLeggings(item);
+                break;
+            case FEET:
+                equipment.setBoots(item);
+                break;
+        }
     }
 
     public static ArmorSet getSet(Entity entity) {

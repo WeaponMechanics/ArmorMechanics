@@ -3,7 +3,9 @@ package me.cjcrafter.armormechanics;
 import me.deecaad.core.MechanicsCore;
 import me.deecaad.core.commands.*;
 import me.deecaad.core.commands.arguments.EntityListArgumentType;
+import me.deecaad.core.commands.arguments.MapArgumentType;
 import me.deecaad.core.commands.arguments.StringArgumentType;
+import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.utils.StringUtil;
 import me.deecaad.weaponmechanics.UpdateChecker;
 import me.deecaad.weaponmechanics.WeaponMechanics;
@@ -14,6 +16,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginDescriptionFile;
 
@@ -36,19 +40,24 @@ public class Command {
     };
 
     public static void register() {
+
+        MapArgumentType giveDataMap = new MapArgumentType()
+                .with("forceEquip", MapArgumentType.INT(0, 1))
+                .with("preventRemove", MapArgumentType.INT(0, 1));
+
         CommandBuilder command = new CommandBuilder("am")
                 .withAliases("armor", "armormechanics")
                 .withPermission("armormechanics.admin")
                 .withDescription("ArmorMechanics' main command")
-
 
                 .withSubcommand(new CommandBuilder("give")
                         .withPermission("armormechanics.commands.give")
                         .withDescription("Gives the target(s) the requested armor")
                         .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to give the armor"))
                         .withArgument(new Argument<>("armor", new StringArgumentType()).withDesc("Which armor to give").replace(ARMOR_SUGGESTIONS))
+                        .withArgument(new Argument<>("data", giveDataMap, new HashMap<>()).withDesc("How to equip the armor"))
                         .executes(CommandExecutor.any((sender, args) -> {
-                            give(sender, (List<Entity>) args[0], (String) args[1]);
+                            give(sender, (List<Entity>) args[0], (String) args[1], (HashMap<String, Object>) args[2]);
                         })))
 
                 .withSubcommand(new CommandBuilder("get")
@@ -56,7 +65,7 @@ public class Command {
                         .withDescription("Gives you the requested armor")
                         .withArgument(new Argument<>("armor", new StringArgumentType()).withDesc("Which armor to give").replace(ARMOR_SUGGESTIONS))
                         .executes(CommandExecutor.entity((sender, args) -> {
-                            give(sender, Collections.singletonList(sender), (String) args[0]);
+                            give(sender, Collections.singletonList(sender), (String) args[0], new HashMap<>());
                         })))
 
                 .withSubcommand(new CommandBuilder("info")
@@ -70,7 +79,7 @@ public class Command {
         command.register();
     }
 
-    public static void give(CommandSender sender, List<Entity> entities, String title) {
+    public static void give(CommandSender sender, List<Entity> entities, String title, Map<String, Object> data) {
 
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
@@ -83,12 +92,34 @@ public class Command {
 
         title = StringUtil.didYouMean(title, startsWith.isEmpty() ? options : startsWith);
         ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
+        EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
+
+        boolean force = 1 == (int) data.get("forceEquip");
+        boolean preventRemove = 1 == (int) data.get("preventRemove");
 
         for (Entity entity : entities) {
             if (!entity.getType().isAlive())
                 continue;
 
             LivingEntity living = (LivingEntity) entity;
+            EntityEquipment equipment = living.getEquipment();
+
+            if (force) {
+                if (preventRemove) {
+                    ItemStack clone = armor.clone();
+                    CompatibilityAPI.getNBTCompatibility().setInt(clone, "ArmorMechanics", "prevent-remove", 1);
+                    ArmorMechanicsAPI.setItem(equipment, slot, clone);
+                    return;
+                }
+
+                ArmorMechanicsAPI.setItem(equipment, slot, armor.clone());
+                return;
+            }
+
+            if (ArmorMechanicsAPI.getItem(equipment, slot) == null) {
+                ArmorMechanicsAPI.setItem(equipment, slot, armor.clone());
+                return;
+            }
 
             if (living.getType() == EntityType.PLAYER) {
                 Player player = (Player) living;

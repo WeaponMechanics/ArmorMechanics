@@ -2,6 +2,7 @@ package me.cjcrafter.armormechanics;
 
 import me.cjcrafter.armormechanics.listeners.ArmorEquipListener;
 import me.cjcrafter.armormechanics.listeners.ImmunePotionCanceller;
+import me.cjcrafter.armormechanics.listeners.PreventRemoveListener;
 import me.cjcrafter.armormechanics.listeners.WeaponMechanicsDamageListener;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
@@ -89,10 +90,10 @@ public class ArmorMechanics extends JavaPlugin {
         }
 
         PluginManager pm = getServer().getPluginManager();
-        boolean wm = pm.isPluginEnabled("WeaponMechanics");
         pm.registerEvents(new ArmorEquipListener(), this);
         pm.registerEvents(new ImmunePotionCanceller(), this);
-        if (wm) pm.registerEvents(new WeaponMechanicsDamageListener(), this);
+        pm.registerEvents(new PreventRemoveListener(), this);
+        pm.registerEvents(new WeaponMechanicsDamageListener(), this);
 
         Command.register();
     }
