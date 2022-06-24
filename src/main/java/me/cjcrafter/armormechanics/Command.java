@@ -7,8 +7,6 @@ import me.deecaad.core.commands.arguments.MapArgumentType;
 import me.deecaad.core.commands.arguments.StringArgumentType;
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.utils.StringUtil;
-import me.deecaad.weaponmechanics.UpdateChecker;
-import me.deecaad.weaponmechanics.WeaponMechanics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -66,6 +64,29 @@ public class Command {
                         .withArgument(new Argument<>("armor", new StringArgumentType()).withDesc("Which armor to give").replace(ARMOR_SUGGESTIONS))
                         .executes(CommandExecutor.entity((sender, args) -> {
                             give(sender, Collections.singletonList(sender), (String) args[0], new HashMap<>());
+                        })))
+
+                .withSubcommand(new CommandBuilder("giveset")
+                        .withPermission("armormechanics.commands.giveset")
+                        .withDescription("Gives the target(s) the requested set of armor")
+                        .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to give the set"))
+                        .withArgument(new Argument<>("set", new StringArgumentType()).withDesc("Which set of armor to give").replace(SET_SUGGESTIONS))
+                        .withArgument(new Argument<>("data", giveDataMap, new HashMap<>()).withDesc("How to equip the armor"))
+                        .executes(CommandExecutor.any((sender, args) -> {
+                            ArmorSet set = ArmorMechanics.INSTANCE.sets.get((String) args[1]);
+                            if (set.getHelmet() != null) give(sender, (List<Entity>) args[0], set.getHelmet(), (Map<String, Object>) args[2]);
+                            if (set.getChestplate() != null) give(sender, (List<Entity>) args[0], set.getChestplate(), (Map<String, Object>) args[2]);
+                            if (set.getLeggings() != null) give(sender, (List<Entity>) args[0], set.getLeggings(), (Map<String, Object>) args[2]);
+                            if (set.getBoots() != null) give(sender, (List<Entity>) args[0], set.getBoots(), (Map<String, Object>) args[2]);
+                        })))
+
+                .withSubcommand(new CommandBuilder("clear")
+                        .withPermission("armormechanics.commands.clear")
+                        .withDescription("Clears the target's armor")
+                        .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to clear"))
+                        .withArgument(new Argument<>("slots", new StringArgumentType().withLiteral("*"), "*").withDesc("Which slot(s) to clear").replace(SuggestionsBuilder.from("helmet", "chestplate", "leggings", "boots")))
+                        .executes(CommandExecutor.any((sender, args) -> {
+                            clear(sender, (List<Entity>) args[0], (String) args[1]);
                         })))
 
                 .withSubcommand(new CommandBuilder("info")
@@ -128,6 +149,29 @@ public class Command {
                 if (!overflow.isEmpty()) {
                     sender.sendMessage(ChatColor.RED + player.getName() + "'s inventory was full!");
                 }
+            }
+        }
+    }
+
+    public static void clear(CommandSender sender, List<Entity> targets, String slots) {
+        EquipmentSlot slot = "*".equals(slots) ? null : EquipmentSlot.valueOf(slots.toUpperCase(Locale.ROOT));
+
+        sender.sendMessage(GREEN + "Removing armor from " + targets.size() + (targets.size() == 1 ? "entity" : "entities"));
+
+        for (Entity target : targets) {
+            if (!target.getType().isAlive())
+                continue;
+
+            LivingEntity entity = (LivingEntity) target;
+            EntityEquipment equipment = entity.getEquipment();
+
+            if (slot == null) {
+                equipment.setBoots(null);
+                equipment.setLeggings(null);
+                equipment.setChestplate(null);
+                equipment.setHelmet(null);
+            } else {
+                ArmorMechanicsAPI.setItem(equipment, slot, null);
             }
         }
     }
