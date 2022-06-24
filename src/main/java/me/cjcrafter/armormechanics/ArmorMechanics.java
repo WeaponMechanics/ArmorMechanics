@@ -60,6 +60,24 @@ public class ArmorMechanics extends JavaPlugin {
     @Override
     public void onEnable() {
 
+        reload();
+
+        PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(new ArmorEquipListener(), this);
+        pm.registerEvents(new ImmunePotionCanceller(), this);
+        pm.registerEvents(new PreventRemoveListener(), this);
+        pm.registerEvents(new WeaponMechanicsDamageListener(), this);
+
+        Command.register();
+    }
+
+    public void reload() {
+
+        // Clear old data
+        effects.clear();
+        armors.clear();
+        sets.clear();
+
         // Serialize armor types
         File armorFile = new File(getDataFolder(), "Armor.yml");
         FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
@@ -88,18 +106,6 @@ public class ArmorMechanics extends JavaPlugin {
                 e.log(debug);
             }
         }
-
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new ArmorEquipListener(), this);
-        pm.registerEvents(new ImmunePotionCanceller(), this);
-        pm.registerEvents(new PreventRemoveListener(), this);
-        pm.registerEvents(new WeaponMechanicsDamageListener(), this);
-
-        Command.register();
-    }
-
-    @Override
-    public void onDisable() {
 
     }
 }

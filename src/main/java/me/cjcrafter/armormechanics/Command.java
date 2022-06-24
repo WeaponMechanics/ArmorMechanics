@@ -8,6 +8,7 @@ import me.deecaad.core.commands.arguments.StringArgumentType;
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.utils.EnumUtil;
 import me.deecaad.core.utils.StringUtil;
+import me.deecaad.weaponmechanics.WeaponMechanics;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
@@ -88,6 +89,13 @@ public class Command {
                         .withArgument(new Argument<>("slots", new StringArgumentType().withLiteral("*"), "*").withDesc("Which slot(s) to clear").replace(SuggestionsBuilder.from("head", "chest", "legs", "feet")))
                         .executes(CommandExecutor.any((sender, args) -> {
                             clear(sender, (List<Entity>) args[0], (String) args[1]);
+                        })))
+
+                .withSubcommand(new CommandBuilder("reload")
+                        .withPermission("armormechanics.commands.reload")
+                        .withDescription("Reloads the plugin's configurations")
+                        .executes(CommandExecutor.any((sender, args) -> {
+                            ArmorMechanics.INSTANCE.reload();
                         })))
 
                 .withSubcommand(new CommandBuilder("info")
@@ -187,12 +195,12 @@ public class Command {
 
         sender.sendMessage("  " + GRAY + SYM + GOLD + " Server: " + GRAY + Bukkit.getName() + " " + Bukkit.getVersion());
         sender.sendMessage("  " + GRAY + SYM + GOLD + " MechanicsCore: " + GRAY + MechanicsCore.getPlugin().getDescription().getVersion());
+        sender.sendMessage("  " + GRAY + SYM + GOLD + " WeaponMechanics: " + GRAY + WeaponMechanics.getPlugin().getDescription().getVersion());
         sender.sendMessage("  " + GRAY + SYM + GOLD + " Java: " + GRAY + System.getProperty("java.version"));
 
         // Gets all supported plugins
         Set<String> softDepends = new LinkedHashSet<>(desc.getSoftDepend());
         softDepends.addAll(MechanicsCore.getPlugin().getDescription().getSoftDepend());
-        softDepends.remove("MechanicsCore");
         softDepends.removeIf(name -> Bukkit.getPluginManager().getPlugin(name) == null);
         sender.sendMessage("  " + GRAY + SYM + GOLD + " Supported plugins: " + GRAY + String.join(", ", softDepends));
     }
