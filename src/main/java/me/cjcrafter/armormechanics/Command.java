@@ -6,6 +6,7 @@ import me.deecaad.core.commands.arguments.EntityListArgumentType;
 import me.deecaad.core.commands.arguments.MapArgumentType;
 import me.deecaad.core.commands.arguments.StringArgumentType;
 import me.deecaad.core.compatibility.CompatibilityAPI;
+import me.deecaad.core.utils.EnumUtil;
 import me.deecaad.core.utils.StringUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -84,7 +85,7 @@ public class Command {
                         .withPermission("armormechanics.commands.clear")
                         .withDescription("Clears the target's armor")
                         .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to clear"))
-                        .withArgument(new Argument<>("slots", new StringArgumentType().withLiteral("*"), "*").withDesc("Which slot(s) to clear").replace(SuggestionsBuilder.from("helmet", "chestplate", "leggings", "boots")))
+                        .withArgument(new Argument<>("slots", new StringArgumentType().withLiteral("*"), "*").withDesc("Which slot(s) to clear").replace(SuggestionsBuilder.from("head", "chest", "legs", "feet")))
                         .executes(CommandExecutor.any((sender, args) -> {
                             clear(sender, (List<Entity>) args[0], (String) args[1]);
                         })))
@@ -115,8 +116,8 @@ public class Command {
         ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
         EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
 
-        boolean force = 1 == (int) data.get("forceEquip");
-        boolean preventRemove = 1 == (int) data.get("preventRemove");
+        boolean force = 1 == (int) data.getOrDefault("forceEquip", 0);
+        boolean preventRemove = 1 == (int) data.getOrDefault("preventRemove", 0);
 
         for (Entity entity : entities) {
             if (!entity.getType().isAlive())
@@ -154,7 +155,7 @@ public class Command {
     }
 
     public static void clear(CommandSender sender, List<Entity> targets, String slots) {
-        EquipmentSlot slot = "*".equals(slots) ? null : EquipmentSlot.valueOf(slots.toUpperCase(Locale.ROOT));
+        EquipmentSlot slot = "*".equals(slots) ? null : EquipmentSlot.valueOf(StringUtil.didYouMean(slots, EnumUtil.getOptions(EquipmentSlot.class)).toUpperCase(Locale.ROOT));
 
         sender.sendMessage(GREEN + "Removing armor from " + targets.size() + (targets.size() == 1 ? "entity" : "entities"));
 

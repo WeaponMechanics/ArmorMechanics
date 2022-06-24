@@ -6,6 +6,22 @@ Scuba_Set:
   Bonus_Effects:
     Potion_Effects:
       - WATER_BREATHING-1-false-true
+    Equip_Mechanics:
+      Message:
+        Title:
+          Title: "&aEQUIPPED"
+          Subtitle: "&7Scuba Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
+    Dequip_Mechanics:
+      Message:
+        Title:
+          Title: "&cDEQUIPPED"
+          Subtitle: "&7Scuba Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
 
 Radiation_Set:
   Helmet: "Radiation_Helmet"
@@ -16,3 +32,19 @@ Radiation_Set:
     Immune_Potions:
       - POISON
       - WITHER
+    Equip_Mechanics:
+      Message:
+        Title:
+          Title: "&aEQUIPPED"
+          Subtitle: "&7Radiation Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
+    Dequip_Mechanics:
+      Message:
+        Title:
+          Title: "&cDEQUIPPED"
+          Subtitle: "&7Radiation Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
