@@ -8,7 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
-import org.bukkit.permissions.PermissionDefault;
 
 public class PreventRemoveListener implements Listener {
 
@@ -16,7 +15,6 @@ public class PreventRemoveListener implements Listener {
 
     public PreventRemoveListener() {
         permission = new Permission("armormechanics.preventremovebypass");
-        permission.setDefault(PermissionDefault.OP);
         permission.setDescription("Allow users to remove armor which normally can't be removed");
         Bukkit.getPluginManager().addPermission(permission);
     }

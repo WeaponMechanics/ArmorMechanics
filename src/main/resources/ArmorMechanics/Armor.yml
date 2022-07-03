@@ -25,7 +25,6 @@ Scuba_Helmet:
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 HEAD
   Leather_Color: "#0000F0"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Scuba_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -41,7 +40,6 @@ Scuba_Chestplate:
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 CHEST
   Leather_Color: "#0000F0"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Scuba_Leggings:
   Type: LEATHER_LEGGINGS
@@ -57,7 +55,6 @@ Scuba_Leggings:
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 LEGS
   Leather_Color: "#0000F0"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Scuba_Boots:
   Type: LEATHER_BOOTS
@@ -76,7 +73,6 @@ Scuba_Boots:
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 FEET
   Leather_Color: "#0000F0"
-  Deny_Use_In_Crafting: true # prevents rename
 
 ###########################################################
 # TACTICAL SET
@@ -99,9 +95,9 @@ Tactical_Helmet:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
-  Deny_Use_In_Crafting: true # prevents rename
   Bonus_Effects:
-    Bullet_Resistance: 0.04
+    Bullet_Resistance:
+      Base: 0.04
     Potion_Effects:
       - NIGHT_VISION 1
 
@@ -117,9 +113,9 @@ Tactical_Chestplate:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
-  Deny_Use_In_Crafting: true # prevents rename
   Bonus_Effects:
-    Bullet_Resistance: 0.07
+    Bullet_Resistance:
+      Base: 0.07
 
 Tactical_Leggings:
   Type: LEATHER_LEGGINGS
@@ -133,9 +129,9 @@ Tactical_Leggings:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
-  Deny_Use_In_Crafting: true # prevents rename
   Bonus_Effects:
-    Bullet_Resistance: 0.05
+    Bullet_Resistance:
+      Base: 0.05
 
 Tactical_Boots:
   Type: LEATHER_BOOTS
@@ -150,11 +146,11 @@ Tactical_Boots:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
-  Deny_Use_In_Crafting: true # prevents rename
   Attributes:
     - GENERIC_MOVEMENT_SPEED 0.002 FEET
   Bonus_Effects:
-    Bullet_Resistance: 0.04
+    Bullet_Resistance:
+      Base: 0.04
 
 ###########################################################
 # Radiation Suit
@@ -173,7 +169,6 @@ Radiation_Helmet:
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Radiation_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -185,7 +180,6 @@ Radiation_Chestplate:
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Radiation_Leggings:
   Type: LEATHER_LEGGINGS
@@ -197,7 +191,6 @@ Radiation_Leggings:
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
-  Deny_Use_In_Crafting: true # prevents rename
 
 Radiation_Boots:
   Type: LEATHER_BOOTS
@@ -209,5 +202,4 @@ Radiation_Boots:
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
-  Deny_Use_In_Crafting: true # prevents rename
 
