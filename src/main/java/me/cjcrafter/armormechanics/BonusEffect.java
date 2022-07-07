@@ -116,7 +116,7 @@ public class BonusEffect implements Serializer<BonusEffect> {
             if (potionEffectType == null)
                 throw new SerializerOptionsException(this, "Potion Effect", Arrays.stream(PotionEffectType.values()).map(Object::toString).collect(Collectors.toList()), split[0], data.of().getLocation());
 
-            int amplifier = Integer.parseInt(split[1]);
+            int amplifier = Integer.parseInt(split[1]) - 1;
             boolean ambient = split.length > 2 ? Boolean.parseBoolean(split[2]) : false;
             boolean particles = split.length > 3 ? Boolean.parseBoolean(split[3]) : false;
             boolean icon = split.length > 4 ? Boolean.parseBoolean(split[4]) : false;
