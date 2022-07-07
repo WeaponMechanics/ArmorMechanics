@@ -96,6 +96,7 @@ public class Command {
                         .withDescription("Reloads the plugin's configurations")
                         .executes(CommandExecutor.any((sender, args) -> {
                             ArmorMechanics.INSTANCE.reload();
+                            sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
                         })))
 
                 .withSubcommand(new CommandBuilder("info")
@@ -126,6 +127,10 @@ public class Command {
 
         boolean force = 1 == (int) data.getOrDefault("forceEquip", 0);
         boolean preventRemove = 1 == (int) data.getOrDefault("preventRemove", 0);
+
+        if (!force && preventRemove) {
+            sender.sendMessage(RED + "When using preventRemove, forceEquip must also be enabled!");
+        }
 
         for (Entity entity : entities) {
             if (!entity.getType().isAlive())

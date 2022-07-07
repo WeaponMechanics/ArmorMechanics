@@ -86,19 +86,23 @@ public class ArmorMechanicsAPI {
         return getSet(helmet, chestplate, leggings, boots);
     }
 
+    public static ArmorSet getSet(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
+        return getSet(getArmorTitle(helmet), getArmorTitle(chestplate), getArmorTitle(leggings), getArmorTitle(boots));
+    }
+
     public static ArmorSet getSet(String helmet, String chestplate, String leggings, String boots) {
 
         // Since an armor title may belong to multiple sets, we must check each
         // set to determine whether the player is wearing a set.
         ArmorMechanics plugin = ArmorMechanics.INSTANCE;
         for (ArmorSet set : plugin.sets.values()) {
-            if (!Objects.equals(helmet, set.getHelmet()))
+            if (set.getHelmet() != null && !set.getHelmet().equals(helmet))
                 continue;
-            if (!Objects.equals(chestplate, set.getChestplate()))
+            if (set.getChestplate() != null && !set.getChestplate().equals(chestplate))
                 continue;
-            if (!Objects.equals(leggings, set.getLeggings()))
+            if (set.getLeggings() != null && !set.getLeggings().equals(leggings))
                 continue;
-            if (!Objects.equals(boots, set.getBoots()))
+            if (set.getBoots() != null && !set.getBoots().equals(boots))
                 continue;
 
             return set;

@@ -21,10 +21,16 @@ public class ArmorEquipListener implements Listener {
 
     @EventHandler
     public void onEquip(EntityEquipmentEvent event) {
-        if (!event.isEquipping() || !event.isArmor())
-            return;
+        if (event.isEquipping() && event.isArmor())
+            equip(event);
+        if (event.isDequipping() && event.isArmor())
+            dequip(event);
+    }
+
+    public void equip(EntityEquipmentEvent event) {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
+        EntityEquipment equipment = entity.getEquipment();
         ItemStack item = event.getEquipped();
         String title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title");
 
@@ -33,7 +39,29 @@ public class ArmorEquipListener implements Listener {
             return;
 
         BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
-        ArmorSet set = ArmorMechanicsAPI.getSet(entity);
+
+        // Determine which set they will be wearing after the armor is equipped
+        ItemStack helmet = equipment.getHelmet();
+        ItemStack chestplate = equipment.getChestplate();
+        ItemStack leggings = equipment.getLeggings();
+        ItemStack boots = equipment.getBoots();
+
+        switch (event.getSlot()) {
+            case HEAD:
+                helmet = event.getEquipped();
+                break;
+            case CHEST:
+                chestplate = event.getEquipped();
+                break;
+            case LEGS:
+                leggings = event.getEquipped();
+                break;
+            case FEET:
+                boots = event.getEquipped();
+                break;
+        }
+
+        ArmorSet set = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
 
         if (bonus != null) {
             if (bonus.getEquipMechanics() != null)
@@ -54,10 +82,7 @@ public class ArmorEquipListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onDequip(EntityEquipmentEvent event) {
-        if (!event.isDequipping() || !event.isArmor())
-            return;
+    public void dequip(EntityEquipmentEvent event) {
 
         LivingEntity entity = (LivingEntity) event.getEntity();
         ItemStack item = event.getDequipped();
