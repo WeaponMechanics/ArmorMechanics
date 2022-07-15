@@ -160,7 +160,8 @@ Tactical_Boots:
 ###########################################################
 
 Radiation_Helmet:
-  Type: LEATHER_HELMET
+  Type: PLAYER_HEAD
+  Skull_Owning_Player: "970e0a59-b95d-45a9-9039-b43ac4fbfc7c https://textures.minecraft.net/texture/a0564817fcc8dd51bc1957c0b7ea142db687dd6f1caafd35bb4dcfee592421c"
   Name: "&bGas Mask"
   Lore:
     - "&7Wait, you're supposed to clean these?"
@@ -168,7 +169,6 @@ Radiation_Helmet:
     - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
-  Leather_Color: "#fafa00"
 
 Radiation_Chestplate:
   Type: LEATHER_CHESTPLATE

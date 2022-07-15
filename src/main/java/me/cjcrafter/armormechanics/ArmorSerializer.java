@@ -20,6 +20,8 @@ public class ArmorSerializer extends ItemSerializer {
     public ItemStack serialize(SerializeData data) throws SerializerException {
         ItemStack item = super.serialize(data);
 
+
+        ///give @p minecraft:player_head{display:{Name:"{\"text\":\"Biohazard Suit\"}"},SkullOwner:{Id:"970e0a59-b95d-45a9-9039-b43ac4fbfc7c",Properties:{textures:[{Value:"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYTA1NjQ4MTdmY2M4ZGQ1MWJjMTk1N2MwYjdlYTE0MmRiNjg3ZGQ2ZjFjYWFmZDM1YmI0ZGNmZWU1OTI0MjFjIn19fQ=="}]}}} 1
         if (!isArmor(item))
             throw data.exception("Type", "Material was not a valid armor type", SerializerException.forValue(item.getType()));
 
@@ -39,7 +41,8 @@ public class ArmorSerializer extends ItemSerializer {
     public static boolean isArmor(ItemStack item) {
         String name = item.getType().name();
 
-        return name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE")
+        return name.equals("PLAYER_HEAD")
+                || name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE")
                 || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS");
     }
 }
