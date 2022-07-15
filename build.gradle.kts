@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "me.cjcrafter"
-version = "1.0.0"
+version = "1.0.1"
 
 plugins {
     `java-library`
@@ -35,21 +35,28 @@ repositories {
         url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
         credentials {
             username = "CJCrafter"
-            password = "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" // this is a public token created in CJCrafter's name which will never expire
+            password = "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" // this is a public token created in CJCrafter's name which will never expire
         }
     }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:+")
-    compileOnly("me.deecaad:weaponmechanics:+")
+    compileOnly("me.deecaad:mechanicscore:1.3.3-BETA")
+    compileOnly("me.deecaad:weaponmechanics:1.8.3-BETA")
+    implementation("org.bstats:bstats-bukkit:3.0.0")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
     classifier = null
     archiveFileName.set("ArmorMechanics-${project.version}.jar")
     configurations = listOf(project.configurations["shadeOnly"], project.configurations["runtimeClasspath"])
+
+    dependencies {
+        relocate ("org.bstats", "me.cjcrafter.armormechanics.lib.bstats") {
+            include(dependency("org.bstats:"))
+        }
+    }
 }
 
 tasks.named("assemble").configure {

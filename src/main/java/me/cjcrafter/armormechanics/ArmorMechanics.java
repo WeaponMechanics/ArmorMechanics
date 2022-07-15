@@ -6,6 +6,8 @@ import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.utils.Debugger;
 import me.deecaad.core.utils.FileUtil;
 import me.deecaad.core.utils.ReflectionUtil;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SimplePie;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -23,6 +25,7 @@ public class ArmorMechanics extends JavaPlugin {
     public static ArmorMechanics INSTANCE;
 
     private Debugger debug;
+    private Metrics metrics;
 
     public final Map<String, BonusEffect> effects = new HashMap<>();
     public final Map<String, ItemStack> armors = new HashMap<>();
@@ -58,6 +61,7 @@ public class ArmorMechanics extends JavaPlugin {
     public void onEnable() {
 
         reload();
+        registerBStats();
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new ArmorEquipListener(), this);
@@ -104,6 +108,53 @@ public class ArmorMechanics extends JavaPlugin {
                 e.log(debug);
             }
         }
+    }
 
+    private void registerBStats() {
+        if (metrics != null) return;
+
+        debug.debug("Registering bStats");
+
+        // See https://bstats.org/plugin/bukkit/ArmorMechanics/15777. This is
+        // the bStats plugin id used to track information.
+        int id = 15777;
+
+        this.metrics = new Metrics(this, id);
+
+        metrics.addCustomChart(new SimplePie("registered_armors", () -> {
+            int count = armors.size();
+
+            if (count <= 10) {
+                return "0-10";
+            } else if (count <= 20) {
+                return "11-20";
+            } else if (count <= 30) {
+                return "21-30";
+            } else if (count <= 50) {
+                return "31-50";
+            } else if (count <= 100) {
+                return "51-100";
+            } else {
+                return ">100";
+            }
+        }));
+
+        metrics.addCustomChart(new SimplePie("registered_sets", () -> {
+            int count = sets.size();
+
+            if (count <= 2) {
+                return "0-2";
+            } else if (count <= 5) {
+                return "3-5";
+            } else if (count <= 10) {
+                return "6-10";
+            } else if (count <= 20) {
+                return "11-20";
+            } else if (count <= 50) {
+                return "21-50";
+            } else {
+                return ">50";
+            }
+        }));
     }
 }
