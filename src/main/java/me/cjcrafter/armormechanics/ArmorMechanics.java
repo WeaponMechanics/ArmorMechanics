@@ -45,16 +45,6 @@ public class ArmorMechanics extends JavaPlugin {
             getServer().getPluginManager().disablePlugin(this);
             return;
         }
-
-        // Write config from jar to datafolder
-        if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
-            debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
-            try {
-                FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
-        }
     }
 
     @Override
@@ -65,6 +55,7 @@ public class ArmorMechanics extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new ArmorEquipListener(), this);
+        pm.registerEvents(new BlockPlaceListener(), this);
         pm.registerEvents(new DamageMechanicListener(), this);
         pm.registerEvents(new ImmunePotionCanceller(), this);
         pm.registerEvents(new PreventRemoveListener(), this);
@@ -74,6 +65,18 @@ public class ArmorMechanics extends JavaPlugin {
     }
 
     public void reload() {
+
+        // Write config from jar to datafolder
+        if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
+            debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
+            try {
+                FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
+            } catch (IOException | URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+
+        reloadConfig();
 
         // Clear old data
         effects.clear();

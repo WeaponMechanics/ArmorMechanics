@@ -5,3 +5,6 @@
 #   3: Debug
 Debug_Level: 2
 Print_Traces: false
+
+# Setting this to false will allow players to place heads on the ground
+Prevent_Armor_Place: true
