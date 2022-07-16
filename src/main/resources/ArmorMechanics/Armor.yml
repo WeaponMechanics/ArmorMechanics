@@ -7,7 +7,8 @@
 ###########################################################
 
 Scuba_Helmet:
-  Type: LEATHER_HELMET
+  Type: PLAYER_HEAD
+  Skull_Owning_Player: "cd737173-c336-444e-b132-88e2760259d6 https://textures.minecraft.net/texture/dc7843730f0cdada084777a2029ad7a5fea1d83886aa6cb4436e4aa65a4d89d1"
   Name: "&bScuba Mask"
   Lore:
     - "&7Darth Vader sounds not included"
@@ -23,8 +24,8 @@ Scuba_Helmet:
     - RESPIRATION 3
     - AQUA_AFFINITY 1
   Attributes:
+    - GENERIC_ARMOR 2 HEAD
     - GENERIC_MOVEMENT_SPEED -0.003 HEAD
-  Leather_Color: "#0000F0"
 
 Scuba_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -95,6 +96,8 @@ Tactical_Helmet:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
+  Attributes:
+    - GENERIC_ARMOR 2 HEAD
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.04
@@ -113,6 +116,8 @@ Tactical_Chestplate:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
+  Attributes:
+    - GENERIC_ARMOR 6 CHEST
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.07
@@ -129,6 +134,8 @@ Tactical_Leggings:
     - "&7It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
+  Attributes:
+    - GENERIC_ARMOR 5 LEGS
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.05
@@ -148,6 +155,7 @@ Tactical_Boots:
   Leather_Color: "#4b5320"
   Attributes:
     - GENERIC_MOVEMENT_SPEED 0.002 FEET
+    - GENERIC_ARMOR 2 FEET
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.04
@@ -162,17 +170,19 @@ Tactical_Boots:
 Radiation_Helmet:
   Type: PLAYER_HEAD
   Skull_Owning_Player: "970e0a59-b95d-45a9-9039-b43ac4fbfc7c https://textures.minecraft.net/texture/a0564817fcc8dd51bc1957c0b7ea142db687dd6f1caafd35bb4dcfee592421c"
-  Name: "&bGas Mask"
+  Name: "&eGas Mask"
   Lore:
     - "&7Wait, you're supposed to clean these?"
     - " "
     - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
+  Attributes:
+    - GENERIC_ARMOR 2 HEAD
 
 Radiation_Chestplate:
   Type: LEATHER_CHESTPLATE
-  Name: "&bRad Suit Chestplate"
+  Name: "&eRad Suit Chestplate"
   Lore:
     - "&7I'm pretty sure this is just plastic?"
     - " "
@@ -183,7 +193,7 @@ Radiation_Chestplate:
 
 Radiation_Leggings:
   Type: LEATHER_LEGGINGS
-  Name: "&bRad Suit Leggings"
+  Name: "&eRad Suit Leggings"
   Lore:
     - "&7Go to the bathroom before wearing"
     - " "
@@ -194,12 +204,99 @@ Radiation_Leggings:
 
 Radiation_Boots:
   Type: LEATHER_BOOTS
-  Name: "&bRad Suit Boots"
+  Name: "&eRad Suit Boots"
   Lore:
     - "&7Don't step on anything sharp"
     - " "
+    - " &8[&a+&8] &7Increased movement speed"
+    - " &8[&a+&8] &7Decreased damage from bullets"
     - "&6Full Set Bonus: &oRadiation Immunity"
     - "&7Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
 
+###########################################################
+# Heavy Set
+#
+# Very powerful set of armor that makes the user extremely strong
+# at the expense of all of their movement.
+###########################################################
+Heavy_Helmet:
+  Type: NETHERITE_HELMET
+  Name: "&eHeavy Helmet"
+  Lore:
+    - "&7Clang clang clang"
+    - " "
+    - " &8[&a+&8] &7Increased health"
+    - " &8[&c-&8] &7Decreased movement speed"
+    - " "
+    - "&6Full Set Bonus: &oNone"
+    - "&7It's plenty strong already"
+  Hide_Flags: true
+  Unbreakable: true
+  Attributes:
+    - GENERIC_MAX_HEALTH 5 head
+    - GENERIC_KNOCKBACK_RESISTANCE 0.25 head
+    - GENERIC_MOVEMENT_SPEED -0.07 head
+  Enchantments:
+    - PROTECTION 5
+
+Heavy_Chestplate:
+  Type: NETHERITE_CHESTPLATE
+  Name: "&eHeavy Chestplate"
+  Lore:
+    - "&7Clang clang clang"
+    - " "
+    - " &8[&a+&8] &7Increased health"
+    - " &8[&c-&8] &7Decreased movement speed"
+    - " "
+    - "&6Full Set Bonus: &oNone"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Unbreakable: true
+  Attributes:
+    - GENERIC_MAX_HEALTH 5 chest
+    - GENERIC_KNOCKBACK_RESISTANCE 0.25 chest
+    - GENERIC_MOVEMENT_SPEED -0.07 chest
+  Enchantments:
+    - PROTECTION 5
+
+Heavy_Leggings:
+  Type: NETHERITE_LEGGINGS
+  Name: "&eHeavy Leggings"
+  Lore:
+    - "&7Clang clang clang"
+    - " "
+    - " &8[&a+&8] &7Increased health"
+    - " &8[&c-&8] &7Decreased movement speed"
+    - " "
+    - "&6Full Set Bonus: &oNone"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Unbreakable: true
+  Attributes:
+    - GENERIC_MAX_HEALTH 5 legs
+    - GENERIC_KNOCKBACK_RESISTANCE 0.25 legs
+    - GENERIC_MOVEMENT_SPEED -0.07 legs
+  Enchantments:
+    - PROTECTION 5
+
+Heavy_Boots:
+  Type: NETHERITE_BOOTS
+  Name: "&eHeavy Boots"
+  Lore:
+    - "&7Clang clang clang"
+    - " "
+    - " &8[&a+&8] &7Increased health"
+    - " &8[&c-&8] &7Decreased movement speed"
+    - " "
+    - "&6Full Set Bonus: &oNone"
+    - "&7Prevents you from getting poisoned or withered"
+  Hide_Flags: true
+  Unbreakable: true
+  Attributes:
+    - GENERIC_MAX_HEALTH 5 feet
+    - GENERIC_KNOCKBACK_RESISTANCE 0.25 feet
+    - GENERIC_MOVEMENT_SPEED -0.07 feet
+  Enchantments:
+    - PROTECTION 5

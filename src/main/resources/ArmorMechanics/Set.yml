@@ -2,7 +2,7 @@ Scuba_Set:
   Helmet: "Scuba_Helmet"
   Chestplate: "Scuba_Chestplate"
   Leggings: "Scuba_Leggings"
-  #Boots: "Scuba_Boots"  # Just as a demo, lets say we don't need flippers to be considered a "full set"
+  Boots: "Scuba_Boots"
   Bonus_Effects:
     Potion_Effects:
       - WATER_BREATHING-1-false-true
@@ -48,3 +48,29 @@ Radiation_Set:
           Fade_In: 20
           Stay: 50
           Fade_Out: 20
+
+Tactical_Set:
+  Helmet: "Tactical_Helmet"
+  Chestplate: "Tactical_Chestplate"
+  Leggings: "Tactical_Leggings"
+  Boots: "Tactical_Boots"
+  Bonus_Effects:
+    Equip_Mechanics:
+      Message:
+        Title:
+          Title: "&aEQUIPPED"
+          Subtitle: "&7Radiation Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
+    Dequip_Mechanics:
+      Message:
+        Title:
+          Title: "&cDEQUIPPED"
+          Subtitle: "&7Radiation Set"
+          Fade_In: 20
+          Stay: 50
+          Fade_Out: 20
+    Bullet_Resistance:
+      Base: 0.001
+
