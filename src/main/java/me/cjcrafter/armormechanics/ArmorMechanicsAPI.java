@@ -10,10 +10,19 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.Objects;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class ArmorMechanicsAPI {
 
+
+    /**
+     * Returns the armor-title associated with the given armor, or returns
+     * <code>null</code> if the given item doesn't have a title.
+     *
+     * @param armor The nullable item to check.
+     * @return The armor-title, or null.
+     */
     public static String getArmorTitle(ItemStack armor) {
         if (armor == null || !armor.hasItemMeta())
             return null;
@@ -21,7 +30,15 @@ public class ArmorMechanicsAPI {
         return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title");
     }
 
-    public static EquipmentSlot getEquipmentSlot(Material mat) {
+    /**
+     * Returns the expected {@link EquipmentSlot} that the given material
+     * would be worn on. However, using commands or plugins may allow players
+     * to equip armor in other slots.
+     *
+     * @param mat The non-null material to check.
+     * @return The associated equipment slot, or null.
+     */
+    public static EquipmentSlot getEquipmentSlot(@Nonnull Material mat) {
         String name = mat.name();
         if (name.endsWith("BOOTS"))
             return EquipmentSlot.FEET;
@@ -35,7 +52,15 @@ public class ArmorMechanicsAPI {
         return null;
     }
 
-    public static ItemStack getItem(EntityEquipment equipment, EquipmentSlot slot) {
+    /**
+     * Version safe method for {@link EntityEquipment#getItem(EquipmentSlot)}.
+     *
+     * @param equipment The non-null equipment the entity is wearing.
+     * @param slot      The non-null slot to check.
+     * @return The nullable item in that slot.
+     */
+    @Nullable
+    public static ItemStack getItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot) {
         switch (slot) {
             case HEAD:
                 return equipment.getHelmet();
@@ -50,7 +75,14 @@ public class ArmorMechanicsAPI {
         }
     }
 
-    public static void setItem(EntityEquipment equipment, EquipmentSlot slot, ItemStack item) {
+    /**
+     * Version safe method for {@link EntityEquipment#setItem(EquipmentSlot, ItemStack)}.
+     *
+     * @param equipment The non-null equipment the entity is wearing.
+     * @param slot      The non-null slot to set.
+     * @param item      The item to use, or null.
+     */
+    public static void setItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot, @Nonnull ItemStack item) {
         switch (slot) {
             case HEAD:
                 equipment.setHelmet(item);
@@ -67,6 +99,12 @@ public class ArmorMechanicsAPI {
         }
     }
 
+    /**
+     * Shorthand for {@link #getSet(String, String, String, String)}.
+     *
+     * @param entity The non-null entity to check.
+     * @return The set the entity is wearing, or null.
+     */
     public static ArmorSet getSet(Entity entity) {
         if (entity.getType().isAlive())
             return null;
@@ -74,6 +112,12 @@ public class ArmorMechanicsAPI {
         return getSet(((LivingEntity) entity).getEquipment());
     }
 
+    /**
+     * Shorthand for {@link #getSet(String, String, String, String)}.
+     *
+     * @param equipment The equipment the entity is wearing.
+     * @return The set the entity is wearing, or null.
+     */
     public static ArmorSet getSet(EntityEquipment equipment) {
         if (equipment == null)
             return null;
@@ -86,10 +130,39 @@ public class ArmorMechanicsAPI {
         return getSet(helmet, chestplate, leggings, boots);
     }
 
+    /**
+     * Shorthand for {@link #getSet(String, String, String, String)}.
+     *
+     * @param helmet The nullable helmet to check.
+     * @param chestplate The nullable chestplate to check.
+     * @param leggings The nullable leggings to check.
+     * @param boots The nullable boots to check.
+     * @return The set associated with the 4 items, or null.
+     */
     public static ArmorSet getSet(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
         return getSet(getArmorTitle(helmet), getArmorTitle(chestplate), getArmorTitle(leggings), getArmorTitle(boots));
     }
 
+    /**
+     * Returns the {@link ArmorSet} that matches the 4 pieces of armor. Some
+     * important things to realize, players are able to use 3 pieces of armor
+     * for a set, and use 1 as a wildcard, if the server admin configured this.
+     *
+     * <p>1 piece of armor may belong to multiple sets. Although a server admin
+     * would be evil to do this, and probably should be locked up in an insane
+     * asylum, it's something to look out for.
+     *
+     * <p>You should also carefully consider when you call this method for an
+     * entity. It's equipment may have already updates, or it may not have
+     * updated. If you run into issues running this method, make sure you print
+     * out the armor so you check if it is what you expect it to be.
+     *
+     * @param helmet The nullable helmet to check.
+     * @param chestplate The nullable chestplate to check.
+     * @param leggings The nullable leggings to check.
+     * @param boots The nullable boots to check.
+     * @return The set associated with the 4 titles, or null.
+     */
     public static ArmorSet getSet(String helmet, String chestplate, String leggings, String boots) {
 
         // Since an armor title may belong to multiple sets, we must check each
@@ -111,7 +184,17 @@ public class ArmorMechanicsAPI {
         return null;
     }
 
-    public static double getBulletResistance(EntityEquipment equipment, String weaponTitle) {
+    /**
+     * Adds up the total bullet resistance of all armor pieces and the set
+     * associated with the given equipment. The returned number is a percentage
+     * damage reduction (0.0 = no protection, 1.0 = full protection). The value
+     * will always be between 0.0 (inclusive) and 1.0 (inclusive).
+     *
+     * @param equipment The nullable entity equipment.
+     * @param weaponTitle The non-null weapon used to damage the entity.
+     * @return A percentage damage reduction, or 0.0.
+     */
+    public static double getBulletResistance(@Nullable EntityEquipment equipment, @Nonnull String weaponTitle) {
         if (equipment == null)
             return 0.0;
 
@@ -137,7 +220,15 @@ public class ArmorMechanicsAPI {
         return NumberUtil.minMax(0.0, rate, 1.0);
     }
 
-    public static boolean isImmune(EntityEquipment equipment, PotionEffectType type) {
+    /**
+     * Returns <code>true</code> if the entity's armor or {@link ArmorSet} is
+     * immune to the given potion effect.
+     *
+     * @param equipment The nullable equipment.
+     * @param type The non-null potion effect type.
+     * @return true if the entity is immune.
+     */
+    public static boolean isImmune(@Nullable EntityEquipment equipment, @Nonnull PotionEffectType type) {
         if (equipment == null)
             return false;
 
