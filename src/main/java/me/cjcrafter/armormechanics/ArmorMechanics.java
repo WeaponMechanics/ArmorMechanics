@@ -24,7 +24,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     public static ArmorMechanics INSTANCE;
 
-    private Debugger debug;
+    Debugger debug;
     private Metrics metrics;
 
     public final Map<String, BonusEffect> effects = new HashMap<>();

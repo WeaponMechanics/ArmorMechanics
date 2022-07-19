@@ -8,3 +8,15 @@ Print_Traces: false
 
 # Setting this to false will allow players to place heads on the ground
 Prevent_Armor_Place: true
+
+# Settings this to true will cause ArmorMechanics to delete any armor item that
+# no longer exists in config. We have this disabled by default, as this may annoy your playerbase
+Delete_Old_Armor: false
+
+# Settings this to false will give you a *MINOR* performance benefit. However,
+# any armor that already exists will no longer be updated if you change it in
+# config. If you don't understand those implications, leave this to be true.
+#
+# This option will also prevent players from effectively renaming, enchanting
+# or modifying your armor, since it will be reset when they wear it.
+Update_Armor: true

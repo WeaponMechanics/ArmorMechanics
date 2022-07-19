@@ -2,6 +2,7 @@ package me.cjcrafter.armormechanics;
 
 import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.utils.NumberUtil;
+import me.deecaad.core.utils.Debugger;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
@@ -82,7 +83,7 @@ public class ArmorMechanicsAPI {
      * @param slot      The non-null slot to set.
      * @param item      The item to use, or null.
      */
-    public static void setItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot, @Nonnull ItemStack item) {
+    public static void setItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot, ItemStack item) {
         switch (slot) {
             case HEAD:
                 equipment.setHelmet(item);
@@ -251,5 +252,37 @@ public class ArmorMechanicsAPI {
             return true;
 
         return false;
+    }
+
+    /**
+     * The server admin may have to make balance changes <i>after</i> they have
+     * distributed their armor. Since attributes/enchantments are set PER ITEM,
+     * we have to update items to make sure they have the proper stats.
+     * ArmorMechanics calls this method whenever armor is equipped to an armor
+     * slot.
+     *
+     * <p>The following options are updated: Attributes, Enchantments, Display
+     * name, Lore, Unbreakable, Material Type, Player Skull.
+     *
+     * @param armor The non-null item to update.
+     */
+    public static void update(ItemStack armor) {
+        Debugger debug = ArmorMechanics.INSTANCE.debug;
+        String title = getArmorTitle(armor);
+
+        // Check if we should delete this item.
+        // If the armor no longer exists, we cannot update its properties.
+        if (!ArmorMechanics.INSTANCE.armors.containsKey(title)) {
+            boolean deleteOld = ArmorMechanics.INSTANCE.getConfig().getBoolean("Delete_Old_Armor", false);
+
+            if (deleteOld)
+                armor.setAmount(0);
+
+            return;
+        }
+
+        ItemStack template = ArmorMechanics.INSTANCE.armors.get(title);
+        armor.setType(template.getType());
+        armor.setItemMeta(template.getItemMeta());
     }
 }
