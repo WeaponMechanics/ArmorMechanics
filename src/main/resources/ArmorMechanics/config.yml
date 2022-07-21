@@ -11,6 +11,10 @@ Prevent_Armor_Place: true
 
 # Settings this to true will cause ArmorMechanics to delete any armor item that
 # no longer exists in config. We have this disabled by default, as this may annoy your playerbase
+#
+# Whenever you update your armor, I *HIGHLY SUGGEST* you run a /restart on your
+# server instead of just a /am reload. This will force all players to relog and
+# their armor will be deleted.
 Delete_Old_Armor: false
 
 # Settings this to false will give you a *MINOR* performance benefit. However,
@@ -19,4 +23,8 @@ Delete_Old_Armor: false
 #
 # This option will also prevent players from effectively renaming, enchanting
 # or modifying your armor, since it will be reset when they wear it.
+#
+# Whenever you update your armor, I *HIGHLY SUGGEST* you run a /restart on your
+# server instead of just a /am reload. This will force all players to relog and
+# their armor will be updated.
 Update_Armor: true
