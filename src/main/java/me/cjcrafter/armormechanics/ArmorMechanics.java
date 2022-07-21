@@ -5,6 +5,7 @@ import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.utils.Debugger;
 import me.deecaad.core.utils.FileUtil;
+import me.deecaad.core.utils.LogLevel;
 import me.deecaad.core.utils.ReflectionUtil;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
@@ -24,7 +25,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     public static ArmorMechanics INSTANCE;
 
-    Debugger debug;
+    public Debugger debug;
     private Metrics metrics;
 
     public final Map<String, BonusEffect> effects = new HashMap<>();
@@ -61,6 +62,16 @@ public class ArmorMechanics extends JavaPlugin {
         pm.registerEvents(new ImmunePotionCanceller(), this);
         pm.registerEvents(new PreventRemoveListener(), this);
         pm.registerEvents(new WeaponMechanicsDamageListener(), this);
+
+        // Try to hook into MythicMobs, an error will be thrown if the user is
+        // using any version below v5.0.0
+        if (pm.getPlugin("MythicMobs") != null) {
+            try {
+                pm.registerEvents(new MythicMobsListener(), this);
+            } catch (Throwable e) {
+                debug.log(LogLevel.ERROR, "Could not hook into MythicMobs", e);
+            }
+        }
 
         Command.register();
     }
