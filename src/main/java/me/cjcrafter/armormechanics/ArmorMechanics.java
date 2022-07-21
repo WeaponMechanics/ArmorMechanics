@@ -55,6 +55,7 @@ public class ArmorMechanics extends JavaPlugin {
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new ArmorEquipListener(), this);
+        pm.registerEvents(new ArmorUpdateListener(), this);
         pm.registerEvents(new BlockPlaceListener(), this);
         pm.registerEvents(new DamageMechanicListener(), this);
         pm.registerEvents(new ImmunePotionCanceller(), this);
