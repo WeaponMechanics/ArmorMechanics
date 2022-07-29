@@ -58,7 +58,7 @@ public class BonusEffect implements Serializer<BonusEffect> {
     }
 
     public double getBulletResistance(String weaponTitle) {
-        if (perWeaponResistances.containsKey(weaponTitle))
+        if (perWeaponResistances.size() != 0 && perWeaponResistances.containsKey(weaponTitle))
             return perWeaponResistances.get(weaponTitle);
 
         return bulletResistance;
