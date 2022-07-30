@@ -81,11 +81,7 @@ public class ArmorMechanics extends JavaPlugin {
         // Write config from jar to datafolder
         if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
             debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
-            try {
-                FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
-            } catch (IOException | URISyntaxException e) {
-                e.printStackTrace();
-            }
+            FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
         }
 
         reloadConfig();
