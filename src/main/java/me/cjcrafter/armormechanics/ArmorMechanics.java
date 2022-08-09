@@ -1,16 +1,24 @@
 package me.cjcrafter.armormechanics;
 
 import me.cjcrafter.armormechanics.listeners.*;
+import me.cjcrafter.auto.UpdateChecker;
+import me.cjcrafter.auto.UpdateInfo;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.TaskChain;
 import me.deecaad.core.utils.Debugger;
 import me.deecaad.core.utils.FileUtil;
 import me.deecaad.core.utils.LogLevel;
 import me.deecaad.core.utils.ReflectionUtil;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,6 +33,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     public Debugger debug;
     private Metrics metrics;
+    private UpdateChecker update;
 
     public final Map<String, BonusEffect> effects = new HashMap<>();
     public final Map<String, ItemStack> armors = new HashMap<>();
@@ -51,6 +60,7 @@ public class ArmorMechanics extends JavaPlugin {
 
         reload();
         registerBStats();
+        registerUpdateChecker();
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new ArmorEquipListener(), this);
@@ -165,5 +175,28 @@ public class ArmorMechanics extends JavaPlugin {
                 return ">50";
             }
         }));
+    }
+
+    private void registerUpdateChecker() {
+        update = new UpdateChecker(this, UpdateChecker.github("WeaponMechanics", "ArmorMechanics"));
+
+        Listener listener = new Listener() {
+            @EventHandler
+            public void onJoin(PlayerJoinEvent event) {
+                if (event.getPlayer().isOp()) {
+                    new TaskChain(ArmorMechanics.this)
+                            .thenRunAsync((callback) -> update.hasUpdate())
+                            .thenRunSync((callback) -> {
+                                UpdateInfo update = (UpdateInfo) callback;
+                                if (callback != null)
+                                    event.getPlayer().sendMessage(ChatColor.RED + "ArmorMechanics is out of date! " + update.current + " -> " + update.newest);
+
+                                return null;
+                            });
+                }
+            }
+        };
+
+        Bukkit.getPluginManager().registerEvents(listener, this);
     }
 }
