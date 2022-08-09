@@ -55,7 +55,7 @@ public class ArmorMechanicsAPI {
             return EquipmentSlot.LEGS;
         if (name.endsWith("CHESTPLATE"))
             return EquipmentSlot.CHEST;
-        if (name.endsWith("HELMET") || name.equals("PLAYER_HEAD"))
+        if (name.endsWith("HELMET") || name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN"))
             return EquipmentSlot.HEAD;
 
         return null;

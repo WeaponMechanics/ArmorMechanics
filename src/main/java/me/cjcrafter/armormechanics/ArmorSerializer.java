@@ -39,7 +39,7 @@ public class ArmorSerializer extends ItemSerializer {
     public static boolean isArmor(ItemStack item) {
         String name = item.getType().name();
 
-        return name.equals("PLAYER_HEAD")
+        return name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN")
                 || name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE")
                 || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS");
     }
