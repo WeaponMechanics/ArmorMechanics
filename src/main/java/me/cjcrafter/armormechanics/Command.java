@@ -124,6 +124,12 @@ public class Command {
 
         title = StringUtil.didYouMean(title, startsWith.isEmpty() ? options : startsWith);
         ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
+
+        if (armor == null) {
+            sender.sendMessage(RED + "Couldn't find armor '" + title + "'... Choose from " + options);
+            return;
+        }
+
         EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
 
         boolean force = 1 == (int) data.getOrDefault("forceEquip", 0);

@@ -83,6 +83,9 @@ public class ArmorMechanics extends JavaPlugin {
 
         Command.register();
 
+        reload();
+
+        // Automatically reload ArmorMechanics if WeaponMechanics reloads.
         new Listener() {
             @EventHandler
             public void onQueue(QueueSerializerEvent event) {
@@ -122,6 +125,12 @@ public class ArmorMechanics extends JavaPlugin {
                         } catch (SerializerException e) {
                             e.log(debug);
                         }
+                    }
+
+                    if (armors.isEmpty()) {
+                        debug.error("Couldn't find any armors from '" + armorFile + "'",
+                                "Keys: " + armorConfig.getKeys(false));
+                        return;
                     }
 
                     File setFile = new File(getDataFolder(), "Set.yml");
