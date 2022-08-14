@@ -95,8 +95,9 @@ public class Command {
                         .withPermission("armormechanics.commands.reload")
                         .withDescription("Reloads the plugin's configurations")
                         .executes(CommandExecutor.any((sender, args) -> {
-                            ArmorMechanics.INSTANCE.reload();
-                            sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
+                            ArmorMechanics.INSTANCE.reload().thenRunSync(() -> {
+                                sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
+                            });
                         })))
 
                 .withSubcommand(new CommandBuilder("info")

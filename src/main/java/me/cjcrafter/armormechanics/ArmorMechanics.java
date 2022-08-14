@@ -3,6 +3,7 @@ package me.cjcrafter.armormechanics;
 import me.cjcrafter.armormechanics.listeners.*;
 import me.cjcrafter.auto.UpdateChecker;
 import me.cjcrafter.auto.UpdateInfo;
+import me.deecaad.core.events.QueueSerializerEvent;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.file.TaskChain;
@@ -58,7 +59,6 @@ public class ArmorMechanics extends JavaPlugin {
     @Override
     public void onEnable() {
 
-        reload();
         registerBStats();
         registerUpdateChecker();
 
@@ -82,51 +82,62 @@ public class ArmorMechanics extends JavaPlugin {
         }
 
         Command.register();
+
+        new Listener() {
+            @EventHandler
+            public void onQueue(QueueSerializerEvent event) {
+                if ("WeaponMechanics".equals(event.getSourceName()))
+                    reload();
+            }
+        };
     }
 
-    public void reload() {
+    public TaskChain reload() {
+        return new TaskChain(this)
+                .thenRunAsync(() -> {
+                    // Write config from jar to datafolder
+                    if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
+                        debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
+                        FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
+                    }
+                })
+                .thenRunSync(() -> {
+                    reloadConfig();
 
-        // Write config from jar to datafolder
-        if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
-            debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
-            FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
-        }
+                    // Clear old data
+                    effects.clear();
+                    armors.clear();
+                    sets.clear();
 
-        reloadConfig();
+                    // Serialize armor types
+                    File armorFile = new File(getDataFolder(), "Armor.yml");
+                    FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
 
-        // Clear old data
-        effects.clear();
-        armors.clear();
-        sets.clear();
+                    for (String key : armorConfig.getKeys(false)) {
+                        ArmorSerializer serializer = new ArmorSerializer();
+                        SerializeData data = new SerializeData(serializer, armorFile, key, armorConfig);
 
-        // Serialize armor types
-        File armorFile = new File(getDataFolder(), "Armor.yml");
-        FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
+                        try {
+                            serializer.serialize(data);
+                        } catch (SerializerException e) {
+                            e.log(debug);
+                        }
+                    }
 
-        for (String key : armorConfig.getKeys(false)) {
-            ArmorSerializer serializer = new ArmorSerializer();
-            SerializeData data = new SerializeData(serializer, armorFile, key, armorConfig);
+                    File setFile = new File(getDataFolder(), "Set.yml");
+                    FileConfiguration setConfig = YamlConfiguration.loadConfiguration(setFile);
 
-            try {
-                serializer.serialize(data);
-            } catch (SerializerException e) {
-                e.log(debug);
-            }
-        }
+                    for (String key : setConfig.getKeys(false)) {
+                        ArmorSet serializer = new ArmorSet();
+                        SerializeData data = new SerializeData(serializer, setFile, key, setConfig);
 
-        File setFile = new File(getDataFolder(), "Set.yml");
-        FileConfiguration setConfig = YamlConfiguration.loadConfiguration(setFile);
-
-        for (String key : setConfig.getKeys(false)) {
-            ArmorSet serializer = new ArmorSet();
-            SerializeData data = new SerializeData(serializer, setFile, key, setConfig);
-
-            try {
-                serializer.serialize(data);
-            } catch (SerializerException e) {
-                e.log(debug);
-            }
-        }
+                        try {
+                            serializer.serialize(data);
+                        } catch (SerializerException e) {
+                            e.log(debug);
+                        }
+                    }
+                });
     }
 
     private void registerBStats() {
