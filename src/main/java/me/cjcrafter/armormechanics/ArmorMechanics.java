@@ -1,15 +1,25 @@
 package me.cjcrafter.armormechanics;
 
 import me.cjcrafter.armormechanics.listeners.*;
+import me.cjcrafter.auto.UpdateChecker;
+import me.cjcrafter.auto.UpdateInfo;
+import me.deecaad.core.events.QueueSerializerEvent;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
+import me.deecaad.core.file.TaskChain;
 import me.deecaad.core.utils.Debugger;
 import me.deecaad.core.utils.FileUtil;
+import me.deecaad.core.utils.LogLevel;
 import me.deecaad.core.utils.ReflectionUtil;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SimplePie;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +36,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     Debugger debug;
     private Metrics metrics;
+    private UpdateChecker update;
 
     public final Map<String, BonusEffect> effects = new HashMap<>();
     public final Map<String, ItemStack> armors = new HashMap<>();
@@ -52,61 +63,93 @@ public class ArmorMechanics extends JavaPlugin {
 
         reload();
         registerBStats();
+        registerUpdateChecker();
 
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvents(new ArmorEquipListener(), this);
+        pm.registerEvents(new ArmorUpdateListener(), this);
         pm.registerEvents(new BlockPlaceListener(), this);
         pm.registerEvents(new DamageMechanicListener(), this);
         pm.registerEvents(new ImmunePotionCanceller(), this);
         pm.registerEvents(new PreventRemoveListener(), this);
         pm.registerEvents(new WeaponMechanicsDamageListener(), this);
 
+        // Try to hook into MythicMobs, an error will be thrown if the user is
+        // using any version below v5.0.0
+        if (pm.getPlugin("MythicMobs") != null) {
+            try {
+                pm.registerEvents(new MythicMobsListener(), this);
+            } catch (Throwable e) {
+                debug.log(LogLevel.ERROR, "Could not hook into MythicMobs", e);
+            }
+        }
+
         Command.register();
+
+        reload();
+
+        // Automatically reload ArmorMechanics if WeaponMechanics reloads.
+        new Listener() {
+            @EventHandler
+            public void onQueue(QueueSerializerEvent event) {
+                if ("WeaponMechanics".equals(event.getSourceName()))
+                    reload();
+            }
+        };
     }
 
-    public void reload() {
+    public TaskChain reload() {
+        return new TaskChain(this)
+                .thenRunAsync(() -> {
+                    // Write config from jar to datafolder
+                    if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
+                        debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
+                        FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
+                    }
+                })
+                .thenRunSync(() -> {
+                    reloadConfig();
 
-        // Write config from jar to datafolder
-        if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
-            debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
-            FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
-        }
+                    // Clear old data
+                    effects.clear();
+                    armors.clear();
+                    sets.clear();
 
-        reloadConfig();
+                    // Serialize armor types
+                    File armorFile = new File(getDataFolder(), "Armor.yml");
+                    FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
 
-        // Clear old data
-        effects.clear();
-        armors.clear();
-        sets.clear();
+                    for (String key : armorConfig.getKeys(false)) {
+                        ArmorSerializer serializer = new ArmorSerializer();
+                        SerializeData data = new SerializeData(serializer, armorFile, key, armorConfig);
 
-        // Serialize armor types
-        File armorFile = new File(getDataFolder(), "Armor.yml");
-        FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
+                        try {
+                            serializer.serialize(data);
+                        } catch (SerializerException e) {
+                            e.log(debug);
+                        }
+                    }
 
-        for (String key : armorConfig.getKeys(false)) {
-            ArmorSerializer serializer = new ArmorSerializer();
-            SerializeData data = new SerializeData(serializer, armorFile, key, armorConfig);
+                    if (armors.isEmpty()) {
+                        debug.error("Couldn't find any armors from '" + armorFile + "'",
+                                "Keys: " + armorConfig.getKeys(false));
+                        return;
+                    }
 
-            try {
-                serializer.serialize(data);
-            } catch (SerializerException e) {
-                e.log(debug);
-            }
-        }
+                    File setFile = new File(getDataFolder(), "Set.yml");
+                    FileConfiguration setConfig = YamlConfiguration.loadConfiguration(setFile);
 
-        File setFile = new File(getDataFolder(), "Set.yml");
-        FileConfiguration setConfig = YamlConfiguration.loadConfiguration(setFile);
+                    for (String key : setConfig.getKeys(false)) {
+                        ArmorSet serializer = new ArmorSet();
+                        SerializeData data = new SerializeData(serializer, setFile, key, setConfig);
 
-        for (String key : setConfig.getKeys(false)) {
-            ArmorSet serializer = new ArmorSet();
-            SerializeData data = new SerializeData(serializer, setFile, key, setConfig);
-
-            try {
-                serializer.serialize(data);
-            } catch (SerializerException e) {
-                e.log(debug);
-            }
-        }
+                        try {
+                            serializer.serialize(data);
+                        } catch (SerializerException e) {
+                            e.log(debug);
+                        }
+                    }
+                });
     }
 
     private void registerBStats() {
@@ -155,5 +198,28 @@ public class ArmorMechanics extends JavaPlugin {
                 return ">50";
             }
         }));
+    }
+
+    private void registerUpdateChecker() {
+        update = new UpdateChecker(this, UpdateChecker.github("WeaponMechanics", "ArmorMechanics"));
+
+        Listener listener = new Listener() {
+            @EventHandler
+            public void onJoin(PlayerJoinEvent event) {
+                if (event.getPlayer().isOp()) {
+                    new TaskChain(ArmorMechanics.this)
+                            .thenRunAsync((callback) -> update.hasUpdate())
+                            .thenRunSync((callback) -> {
+                                UpdateInfo update = (UpdateInfo) callback;
+                                if (callback != null)
+                                    event.getPlayer().sendMessage(ChatColor.RED + "ArmorMechanics is out of date! " + update.current + " -> " + update.newest);
+
+                                return null;
+                            });
+                }
+            }
+        };
+
+        Bukkit.getPluginManager().registerEvents(listener, this);
     }
 }

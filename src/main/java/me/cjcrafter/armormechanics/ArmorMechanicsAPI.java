@@ -31,6 +31,14 @@ public class ArmorMechanicsAPI {
         return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title");
     }
 
+    @Nonnull
+    public static ItemStack generateArmor(String armorTitle) {
+        if (armorTitle == null || !ArmorMechanics.INSTANCE.armors.containsKey(armorTitle))
+            throw new IllegalArgumentException("Unknown armor-title '" + armorTitle + "'");
+
+        return ArmorMechanics.INSTANCE.armors.get(armorTitle).clone();
+    }
+
     /**
      * Returns the expected {@link EquipmentSlot} that the given material
      * would be worn on. However, using commands or plugins may allow players
@@ -47,7 +55,7 @@ public class ArmorMechanicsAPI {
             return EquipmentSlot.LEGS;
         if (name.endsWith("CHESTPLATE"))
             return EquipmentSlot.CHEST;
-        if (name.endsWith("HELMET") || name.equals("PLAYER_HEAD"))
+        if (name.endsWith("HELMET") || name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN"))
             return EquipmentSlot.HEAD;
 
         return null;
@@ -281,8 +289,13 @@ public class ArmorMechanicsAPI {
             return;
         }
 
+        // We need to save the old durability and set it to the new item, since
+        // setItemMeta will reset the item's durability.
+        short durability = armor.getDurability();
+
         ItemStack template = ArmorMechanics.INSTANCE.armors.get(title);
         armor.setType(template.getType());
         armor.setItemMeta(template.getItemMeta());
+        armor.setDurability(durability);
     }
 }

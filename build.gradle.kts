@@ -1,13 +1,13 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "me.cjcrafter"
-version = "1.2.0"
+version = "1.3.7"
 
 plugins {
     `java-library`
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.0"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.1"
+    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
 }
 
 configurations {
@@ -20,7 +20,7 @@ bukkit {
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
-    depend = listOf("MechanicsCore", "WeaponMechanics")
+    softDepend = listOf("MechanicsCore", "WeaponMechanics")
 }
 
 repositories {
@@ -35,16 +35,24 @@ repositories {
         url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
         credentials {
             username = findProperty("user").toString()
-            password = findProperty("pass").toString()
+            password = findProperty("pass").toString() // Check WeaponMechanics wiki on how to use this in your repo!
         }
+    }
+
+    maven {
+        name = "lumine-repo"
+        url = uri("http://mvn.lumine.io/repository/maven-public/")
+        isAllowInsecureProtocol = true
     }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    implementation("io.lumine:Mythic-Dist:5.0.1-SNAPSHOT")
     compileOnly("me.deecaad:mechanicscore:1.5.6")
     compileOnly("me.deecaad:weaponmechanics:1.11.7")
     implementation("org.bstats:bstats-bukkit:3.0.0")
+    implementation("me.cjcrafter:mechanicsautodownload:1.1.2")
 }
 
 tasks.named<ShadowJar>("shadowJar") {
@@ -55,6 +63,9 @@ tasks.named<ShadowJar>("shadowJar") {
     dependencies {
         relocate ("org.bstats", "me.cjcrafter.armormechanics.lib.bstats") {
             include(dependency("org.bstats:"))
+        }
+        relocate ("me.cjcrafter.auto", "me.cjcrafter.armormechanics.lib.auto") {
+            include(dependency("me.cjcrafter:mechanicsautodownload"))
         }
     }
 }

@@ -96,8 +96,9 @@ public class Command {
                         .withPermission("armormechanics.commands.reload")
                         .withDescription("Reloads the plugin's configurations")
                         .executes(CommandExecutor.any((sender, args) -> {
-                            ArmorMechanics.INSTANCE.reload();
-                            sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
+                            ArmorMechanics.INSTANCE.reload().thenRunSync(() -> {
+                                sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
+                            });
                         })))
 
                 .withSubcommand(new CommandBuilder("info")
@@ -124,6 +125,12 @@ public class Command {
 
         title = StringUtil.didYouMean(title, startsWith.isEmpty() ? options : startsWith);
         ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
+
+        if (armor == null) {
+            sender.sendMessage(RED + "Couldn't find armor '" + title + "'... Choose from " + options);
+            return;
+        }
+
         EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
 
         boolean dontEquip = 1 == (int) data.getOrDefault("dontEquip", 0);
