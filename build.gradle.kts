@@ -34,16 +34,16 @@ repositories {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
         credentials {
-            username = "CJCrafter"
-            password = "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" // this is a public token created in CJCrafter's name which will never expire
+            username = findProperty("user").toString()
+            password = findProperty("pass").toString()
         }
     }
 }
 
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:1.3.3-BETA")
-    compileOnly("me.deecaad:weaponmechanics:1.8.3-BETA")
+    compileOnly("me.deecaad:mechanicscore:1.5.6")
+    compileOnly("me.deecaad:weaponmechanics:1.11.7")
     implementation("org.bstats:bstats-bukkit:3.0.0")
 }
 

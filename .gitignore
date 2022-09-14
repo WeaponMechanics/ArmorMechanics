@@ -26,3 +26,4 @@ build/
 # Maven
 log/
 target/
+/gradle.properties

@@ -42,6 +42,7 @@ public class Command {
     public static void register() {
 
         MapArgumentType giveDataMap = new MapArgumentType()
+                .with("dontEquip", MapArgumentType.INT(0, 1))
                 .with("forceEquip", MapArgumentType.INT(0, 1))
                 .with("preventRemove", MapArgumentType.INT(0, 1));
 
@@ -125,6 +126,7 @@ public class Command {
         ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
         EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
 
+        boolean dontEquip = 1 == (int) data.getOrDefault("dontEquip", 0);
         boolean force = 1 == (int) data.getOrDefault("forceEquip", 0);
         boolean preventRemove = 1 == (int) data.getOrDefault("preventRemove", 0);
 
@@ -139,7 +141,7 @@ public class Command {
             LivingEntity living = (LivingEntity) entity;
             EntityEquipment equipment = living.getEquipment();
 
-            if (force) {
+            if (!dontEquip && force) {
                 if (preventRemove) {
                     ItemStack clone = armor.clone();
                     CompatibilityAPI.getNBTCompatibility().setInt(clone, "ArmorMechanics", "prevent-remove", 1);
@@ -151,7 +153,7 @@ public class Command {
                 return;
             }
 
-            if (ArmorMechanicsAPI.getItem(equipment, slot) == null) {
+            if (!dontEquip && ArmorMechanicsAPI.getItem(equipment, slot) == null) {
                 ArmorMechanicsAPI.setItem(equipment, slot, armor.clone());
                 return;
             }
