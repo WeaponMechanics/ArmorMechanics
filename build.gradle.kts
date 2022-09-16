@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "me.cjcrafter"
-version = "1.3.7"
+version = "1.3.8"
 
 plugins {
     `java-library`
@@ -33,6 +33,15 @@ repositories {
     maven {
         name = "GitHubPackages"
         url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsMain")
+        credentials {
+            username = findProperty("user").toString()
+            password = findProperty("pass").toString() // Check WeaponMechanics wiki on how to use this in your repo!
+        }
+    }
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/WeaponMechanics/MechanicsAutoDownload")
         credentials {
             username = findProperty("user").toString()
             password = findProperty("pass").toString() // Check WeaponMechanics wiki on how to use this in your repo!

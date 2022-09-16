@@ -25,8 +25,6 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +32,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     public static ArmorMechanics INSTANCE;
 
-    Debugger debug;
+    public Debugger debug;
     private Metrics metrics;
     private UpdateChecker update;
 
