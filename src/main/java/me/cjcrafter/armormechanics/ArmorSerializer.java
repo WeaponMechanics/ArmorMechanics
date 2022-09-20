@@ -18,7 +18,7 @@ public class ArmorSerializer extends ItemSerializer {
     @Nonnull
     @Override
     public ItemStack serialize(SerializeData data) throws SerializerException {
-        ItemStack item = super.serialize(data);
+        ItemStack item = super.serializeWithoutRecipe(data);
 
         if (!isArmor(item))
             throw data.exception("Type", "Material was not a valid armor type", SerializerException.forValue(item.getType()));
@@ -30,10 +30,10 @@ public class ArmorSerializer extends ItemSerializer {
         CompatibilityAPI.getNBTCompatibility().setString(item, "ArmorMechanics", "armor-title", title);
 
         // Register the effects
-        ArmorMechanics.INSTANCE.armors.put(title, item);
+        ArmorMechanics.INSTANCE.armors.put(title, item.clone()); // clone... just in case
         ArmorMechanics.INSTANCE.effects.put(title, effect);
 
-        return item;
+        return super.serializeRecipe(data, item);
     }
 
     public static boolean isArmor(ItemStack item) {
