@@ -4,12 +4,12 @@ import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.Serializer;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.file.SerializerOptionsException;
-import me.deecaad.core.utils.ReflectionUtil;
+import me.deecaad.core.mechanics.CastData;
+import me.deecaad.core.mechanics.Mechanics;
+import me.deecaad.core.mechanics.defaultmechanics.Mechanic;
+import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic;
 import me.deecaad.core.utils.primitive.DoubleMap;
 import me.deecaad.weaponmechanics.WeaponMechanics;
-import me.deecaad.weaponmechanics.WeaponMechanicsAPI;
-import me.deecaad.weaponmechanics.mechanics.CastData;
-import me.deecaad.weaponmechanics.mechanics.Mechanics;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.potion.PotionEffect;
@@ -88,7 +88,7 @@ public class BonusEffect implements Serializer<BonusEffect> {
         if (damageMechanics == null)
             return;
 
-        damageMechanics.use(new CastData(WeaponMechanics.getEntityWrapper((LivingEntity) event.getEntity())));
+        damageMechanics.use(new CastData((LivingEntity) event.getEntity(), null, null));
     }
 
     @Override
@@ -100,31 +100,17 @@ public class BonusEffect implements Serializer<BonusEffect> {
     @Override
     public BonusEffect serialize(SerializeData data) throws SerializerException {
 
-        // Uses the format: <PotionEffectType>-<Amplifier>-<Ambient>-<Hide>-<Icon>
-        List<String[]> stringPotionList = data.ofList("Potion_Effects")
-                .addArgument(PotionEffectType.class, true, true)
-                .addArgument(int.class, true).assertArgumentPositive()
-                .addArgument(boolean.class, false)
-                .addArgument(boolean.class, false)
-                .addArgument(boolean.class, false)
-                .assertList().get();
+        Mechanics mechanics = data.of("Potion_Effects").serialize(Mechanics.class);
+        List<PotionEffect> potions = new ArrayList<>();
 
-        List<PotionEffect> potionEffectList = new ArrayList<>();
-        for (String[] split : stringPotionList) {
+        if (mechanics != null) {
+            List<Mechanic> list = mechanics.getMechanics();
+            for (int i = 0; i < list.size(); i++) {
+                if (!(list.get(i) instanceof PotionMechanic potion))
+                    throw data.listException("Potion_Effects", i, "You can only use potion effects here",
+                            SerializerException.forValue(list.get(i).getClass().getSimpleName()));
 
-            PotionEffectType potionEffectType = PotionEffectType.getByName(split[0].trim()); // auto applies lowercase
-            if (potionEffectType == null)
-                throw new SerializerOptionsException(this, "Potion Effect", Arrays.stream(PotionEffectType.values()).map(Object::toString).collect(Collectors.toList()), split[0], data.of().getLocation());
-
-            int amplifier = Integer.parseInt(split[1]) - 1;
-            boolean ambient = split.length > 2 ? Boolean.parseBoolean(split[2]) : false;
-            boolean particles = split.length > 3 ? Boolean.parseBoolean(split[3]) : false;
-            boolean icon = split.length > 4 ? Boolean.parseBoolean(split[4]) : false;
-
-            if (ReflectionUtil.getMCVersion() < 14) {
-                potionEffectList.add(new PotionEffect(potionEffectType, Integer.MAX_VALUE, amplifier, ambient, particles));// 84
-            } else {
-                potionEffectList.add(new PotionEffect(potionEffectType, Integer.MAX_VALUE, amplifier, ambient, particles, icon));// 86
+                potions.add(potion.getPotion());
             }
         }
 
@@ -168,6 +154,6 @@ public class BonusEffect implements Serializer<BonusEffect> {
         Mechanics dequip = data.of("Dequip_Mechanics").serialize(Mechanics.class);
         Mechanics damage = data.of("Damage_Mechanics").serialize(Mechanics.class);
 
-        return new BonusEffect(potionEffectList, bulletResistance, perWeapon, new HashSet<>(immunities), equip, dequip, damage);
+        return new BonusEffect(potions, bulletResistance, perWeapon, new HashSet<>(immunities), equip, dequip, damage);
     }
 }

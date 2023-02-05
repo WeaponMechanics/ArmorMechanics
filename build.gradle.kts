@@ -1,7 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 
 group = "me.cjcrafter"
-version = "1.3.9"
+version = "2.0.0"
 
 plugins {
     `java-library`
@@ -56,10 +56,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
     implementation("io.lumine:Mythic-Dist:5.0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:1.5.6")
-    compileOnly("me.deecaad:weaponmechanics:1.11.7")
+    compileOnly("me.deecaad:mechanicscore:2.0.1")
+    compileOnly("me.deecaad:weaponmechanics:2.0.1")
     implementation("org.bstats:bstats-bukkit:3.0.0")
     implementation("me.cjcrafter:mechanicsautodownload:1.1.2")
 }
@@ -92,7 +92,7 @@ java {
 tasks {
     compileJava {
         options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything
-        options.release.set(8)
+        options.release.set(16)
     }
     javadoc {
         options.encoding = Charsets.UTF_8.name() // We want UTF-8 for everything

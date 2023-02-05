@@ -5,23 +5,11 @@ Scuba_Set:
   Boots: "Scuba_Boots"
   Bonus_Effects:
     Potion_Effects:
-      - WATER_BREATHING-1-false-true
+      - "Potion{potion=WATER_BREATHING}"
     Equip_Mechanics:
-      Message:
-        Title:
-          Title: "&aEQUIPPED"
-          Subtitle: "&7Scuba Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<green>EQUIPPED, subtitle=<gray>Scuba Set}"
     Dequip_Mechanics:
-      Message:
-        Title:
-          Title: "&cDEQUIPPED"
-          Subtitle: "&7Scuba Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<red>DEQUIPPED, subtitle=<gray>Scuba Set}"
 
 Radiation_Set:
   Helmet: "Radiation_Helmet"
@@ -33,21 +21,9 @@ Radiation_Set:
       - POISON
       - WITHER
     Equip_Mechanics:
-      Message:
-        Title:
-          Title: "&aEQUIPPED"
-          Subtitle: "&7Radiation Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<green>EQUIPPED, subtitle=<gray>Radiation Set}"
     Dequip_Mechanics:
-      Message:
-        Title:
-          Title: "&cDEQUIPPED"
-          Subtitle: "&7Radiation Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<red>DEQUIPPED, subtitle=<gray>Radiation Set}"
 
 Tactical_Set:
   Helmet: "Tactical_Helmet"
@@ -56,21 +32,9 @@ Tactical_Set:
   Boots: "Tactical_Boots"
   Bonus_Effects:
     Equip_Mechanics:
-      Message:
-        Title:
-          Title: "&aEQUIPPED"
-          Subtitle: "&7Radiation Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<green>EQUIPPED, subtitle=<gray>Tactical Set}"
     Dequip_Mechanics:
-      Message:
-        Title:
-          Title: "&cDEQUIPPED"
-          Subtitle: "&7Radiation Set"
-          Fade_In: 20
-          Stay: 50
-          Fade_Out: 20
+      - "Title{title=<red>DEQUIPPED, subtitle=<gray>Tactical Set}"
     Bullet_Resistance:
       Base: 0.001
 

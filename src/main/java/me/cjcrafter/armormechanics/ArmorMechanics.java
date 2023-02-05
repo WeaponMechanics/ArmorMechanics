@@ -4,6 +4,7 @@ import me.cjcrafter.armormechanics.listeners.*;
 import me.cjcrafter.auto.UpdateChecker;
 import me.cjcrafter.auto.UpdateInfo;
 import me.deecaad.core.events.QueueSerializerEvent;
+import me.deecaad.core.file.BukkitConfig;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.file.TaskChain;
@@ -119,7 +120,7 @@ public class ArmorMechanics extends JavaPlugin {
 
                     for (String key : armorConfig.getKeys(false)) {
                         ArmorSerializer serializer = new ArmorSerializer();
-                        SerializeData data = new SerializeData(serializer, armorFile, key, armorConfig);
+                        SerializeData data = new SerializeData(serializer, armorFile, key, new BukkitConfig(armorConfig));
 
                         try {
                             serializer.serialize(data);
@@ -139,7 +140,7 @@ public class ArmorMechanics extends JavaPlugin {
 
                     for (String key : setConfig.getKeys(false)) {
                         ArmorSet serializer = new ArmorSet();
-                        SerializeData data = new SerializeData(serializer, setFile, key, setConfig);
+                        SerializeData data = new SerializeData(serializer, setFile, key, new BukkitConfig(setConfig));
 
                         try {
                             serializer.serialize(data);

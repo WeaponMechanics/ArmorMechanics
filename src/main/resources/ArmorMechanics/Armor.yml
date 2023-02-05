@@ -11,14 +11,14 @@ Scuba_Helmet:
   Skull_Owning_Player: "cd737173-c336-444e-b132-88e2760259d6 https://textures.minecraft.net/texture/dc7843730f0cdada084777a2029ad7a5fea1d83886aa6cb4436e4aa65a4d89d1"
   Name: "&bScuba Mask"
   Lore:
-    - "&7Darth Vader sounds not included"
+    - "<gray>Darth Vader sounds not included"
     - ""
-    - " &8[&a+&8] &7Increases breath under water"
-    - " &8[&a+&8] &7Improves vision while under water"
-    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increases breath under water"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Improves vision while under water"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed on land"
     - " "
     - "&6Full Set Bonus: &oWater Breathing"
-    - "&7Allows infinite breath under water"
+    - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Enchantments:
     - RESPIRATION 3
@@ -31,12 +31,12 @@ Scuba_Chestplate:
   Type: LEATHER_CHESTPLATE
   Name: "&bScuba Chestplate"
   Lore:
-    - "&7Please no do not bring this Armor into a fight"
+    - "<gray>Please no do not bring this Armor into a fight"
     - " "
-    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed on land"
     - " "
     - "&6Full Set Bonus: &oWater Breathing"
-    - "&7Allows infinite breath under water"
+    - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 CHEST
@@ -46,12 +46,12 @@ Scuba_Leggings:
   Type: LEATHER_LEGGINGS
   Name: "&bScuba Leggings"
   Lore:
-    - "&7Doesn't offer much protection, but hey, swim"
+    - "<gray>Doesn't offer much protection, but hey, swim"
     - " "
-    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed on land"
     - " "
     - "&6Full Set Bonus: &oWater Breathing"
-    - "&7Allows infinite breath under water"
+    - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
     - GENERIC_MOVEMENT_SPEED -0.003 LEGS
@@ -61,13 +61,13 @@ Scuba_Boots:
   Type: LEATHER_BOOTS
   Name: "&bScuba Flippers"
   Lore:
-    - "&7How the hell are you supposed to run in these?"
+    - "<gray>How the hell are you supposed to run in these?"
     - ""
-    - " &8[&a+&8] &7Increases movement speed under water"
-    - " &8[&c-&8] &7Decreased movement speed on land"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increases movement speed under water"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed on land"
     - " "
     - "&6Full Set Bonus: &oWater Breathing"
-    - "&7Allows infinite breath under water"
+    - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Enchantments:
     - DEPTH_STRIDER 4
@@ -85,15 +85,15 @@ Scuba_Boots:
 
 Tactical_Helmet:
   Type: LEATHER_HELMET
-  Name: "&eTactical Helmet"
+  Name: "<yellow>Tactical Helmet"
   Lore:
-    - "&7Now with night vision goggles!"
+    - "<gray>Now with night vision goggles!"
     - ""
-    - " &8[&a+&8] &7See in the dark"
-    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>See in the dark"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Decreased damage from bullets"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7It's just cloth... What did you expect?"
+    - "<gray>It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
@@ -106,14 +106,14 @@ Tactical_Helmet:
 
 Tactical_Chestplate:
   Type: LEATHER_CHESTPLATE
-  Name: "&eTactical Chestplate"
+  Name: "<yellow>Tactical Chestplate"
   Lore:
-    - "&7Surprisingly ineffective against knives"
+    - "<gray>Surprisingly ineffective against knives"
     - ""
-    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Decreased damage from bullets"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7It's just cloth... What did you expect?"
+    - "<gray>It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
@@ -124,14 +124,14 @@ Tactical_Chestplate:
 
 Tactical_Leggings:
   Type: LEATHER_LEGGINGS
-  Name: "&eTactical Leggings"
+  Name: "<yellow>Tactical Leggings"
   Lore:
-    - "&7Getting shot in the leg hurts, so wear this"
+    - "<gray>Getting shot in the leg hurts, so wear this"
     - ""
-    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Decreased damage from bullets"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7It's just cloth... What did you expect?"
+    - "<gray>It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
@@ -142,15 +142,15 @@ Tactical_Leggings:
 
 Tactical_Boots:
   Type: LEATHER_BOOTS
-  Name: "&eTactical Boots"
+  Name: "<yellow>Tactical Boots"
   Lore:
-    - "&7SOMEHOW faster then wearing nothing at all!"
+    - "<gray>SOMEHOW faster then wearing nothing at all!"
     - ""
-    - " &8[&a+&8] &7Increased movement speed"
-    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Decreased damage from bullets"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7It's just cloth... What did you expect?"
+    - "<gray>It's just cloth... What did you expect?"
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
@@ -170,48 +170,48 @@ Tactical_Boots:
 Radiation_Helmet:
   Type: PLAYER_HEAD
   Skull_Owning_Player: "970e0a59-b95d-45a9-9039-b43ac4fbfc7c https://textures.minecraft.net/texture/a0564817fcc8dd51bc1957c0b7ea142db687dd6f1caafd35bb4dcfee592421c"
-  Name: "&eGas Mask"
+  Name: "<yellow>Gas Mask"
   Lore:
-    - "&7Wait, you're supposed to clean these?"
+    - "<gray>Wait, you're supposed to clean these?"
     - " "
     - "&6Full Set Bonus: &oRadiation Immunity"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Attributes:
     - GENERIC_ARMOR 2 HEAD
 
 Radiation_Chestplate:
   Type: LEATHER_CHESTPLATE
-  Name: "&eRad Suit Chestplate"
+  Name: "<yellow>Rad Suit Chestplate"
   Lore:
-    - "&7I'm pretty sure this is just plastic?"
+    - "<gray>I'm pretty sure this is just plastic?"
     - " "
     - "&6Full Set Bonus: &oRadiation Immunity"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
 
 Radiation_Leggings:
   Type: LEATHER_LEGGINGS
-  Name: "&eRad Suit Leggings"
+  Name: "<yellow>Rad Suit Leggings"
   Lore:
-    - "&7Go to the bathroom before wearing"
+    - "<gray>Go to the bathroom before wearing"
     - " "
     - "&6Full Set Bonus: &oRadiation Immunity"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
 
 Radiation_Boots:
   Type: LEATHER_BOOTS
-  Name: "&eRad Suit Boots"
+  Name: "<yellow>Rad Suit Boots"
   Lore:
-    - "&7Don't step on anything sharp"
+    - "<gray>Don't step on anything sharp"
     - " "
-    - " &8[&a+&8] &7Increased movement speed"
-    - " &8[&a+&8] &7Decreased damage from bullets"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Decreased damage from bullets"
     - "&6Full Set Bonus: &oRadiation Immunity"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Leather_Color: "#fafa00"
 
@@ -223,15 +223,15 @@ Radiation_Boots:
 ###########################################################
 Heavy_Helmet:
   Type: NETHERITE_HELMET
-  Name: "&eHeavy Helmet"
+  Name: "<yellow>Heavy Helmet"
   Lore:
-    - "&7Clang clang clang"
+    - "<gray>Clang clang clang"
     - " "
-    - " &8[&a+&8] &7Increased health"
-    - " &8[&c-&8] &7Decreased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased health"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7It's plenty strong already"
+    - "<gray>It's plenty strong already"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
@@ -243,15 +243,15 @@ Heavy_Helmet:
 
 Heavy_Chestplate:
   Type: NETHERITE_CHESTPLATE
-  Name: "&eHeavy Chestplate"
+  Name: "<yellow>Heavy Chestplate"
   Lore:
-    - "&7Clang clang clang"
+    - "<gray>Clang clang clang"
     - " "
-    - " &8[&a+&8] &7Increased health"
-    - " &8[&c-&8] &7Decreased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased health"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
@@ -263,15 +263,15 @@ Heavy_Chestplate:
 
 Heavy_Leggings:
   Type: NETHERITE_LEGGINGS
-  Name: "&eHeavy Leggings"
+  Name: "<yellow>Heavy Leggings"
   Lore:
-    - "&7Clang clang clang"
+    - "<gray>Clang clang clang"
     - " "
-    - " &8[&a+&8] &7Increased health"
-    - " &8[&c-&8] &7Decreased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased health"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
@@ -283,15 +283,15 @@ Heavy_Leggings:
 
 Heavy_Boots:
   Type: NETHERITE_BOOTS
-  Name: "&eHeavy Boots"
+  Name: "<yellow>Heavy Boots"
   Lore:
-    - "&7Clang clang clang"
+    - "<gray>Clang clang clang"
     - " "
-    - " &8[&a+&8] &7Increased health"
-    - " &8[&c-&8] &7Decreased movement speed"
+    - " <dark_gray>[<green>+<dark_gray>] <gray>Increased health"
+    - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "&7Prevents you from getting poisoned or withered"
+    - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
