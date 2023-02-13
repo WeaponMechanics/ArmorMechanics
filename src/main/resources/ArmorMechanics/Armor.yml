@@ -102,7 +102,7 @@ Tactical_Helmet:
     Bullet_Resistance:
       Base: 0.04
     Potion_Effects:
-      - NIGHT_VISION 1
+      - "Potion{potion=NIGHT_VISION}"
 
 Tactical_Chestplate:
   Type: LEATHER_CHESTPLATE

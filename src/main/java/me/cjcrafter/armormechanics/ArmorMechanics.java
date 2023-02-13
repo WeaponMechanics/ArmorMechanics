@@ -85,8 +85,6 @@ public class ArmorMechanics extends JavaPlugin {
 
         Command.register();
 
-        reload();
-
         // Automatically reload ArmorMechanics if WeaponMechanics reloads.
         new Listener() {
             @EventHandler

@@ -8,6 +8,7 @@ import me.deecaad.core.mechanics.CastData;
 import me.deecaad.core.mechanics.Mechanics;
 import me.deecaad.core.mechanics.defaultmechanics.Mechanic;
 import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic;
+import me.deecaad.core.utils.ReflectionUtil;
 import me.deecaad.core.utils.primitive.DoubleMap;
 import me.deecaad.weaponmechanics.WeaponMechanics;
 import org.bukkit.entity.LivingEntity;
@@ -110,7 +111,15 @@ public class BonusEffect implements Serializer<BonusEffect> {
                     throw data.listException("Potion_Effects", i, "You can only use potion effects here",
                             SerializerException.forValue(list.get(i).getClass().getSimpleName()));
 
-                potions.add(potion.getPotion());
+                // We want an infinite potion effect
+                // TODO 1.20 has actual infinite instead of MAX_VALUE, check it out
+                PotionEffect base = potion.getPotion();
+                PotionEffect effect = new PotionEffect(base.getType(), Integer.MAX_VALUE, base.getAmplifier(), base.isAmbient(), base.hasParticles());
+                if (ReflectionUtil.getMCVersion() > 13) {
+                    effect = new PotionEffect(base.getType(), Integer.MAX_VALUE, base.getAmplifier(), base.isAmbient(), base.hasParticles(), base.hasIcon());
+                }
+
+                potions.add(effect);
             }
         }
 
