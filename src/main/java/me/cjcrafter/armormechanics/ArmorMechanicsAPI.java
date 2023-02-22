@@ -70,18 +70,13 @@ public class ArmorMechanicsAPI {
      */
     @Nullable
     public static ItemStack getItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot) {
-        switch (slot) {
-            case HEAD:
-                return equipment.getHelmet();
-            case CHEST:
-                return equipment.getChestplate();
-            case LEGS:
-                return equipment.getLeggings();
-            case FEET:
-                return equipment.getBoots();
-            default:
-                return null;
-        }
+        return switch (slot) {
+            case HEAD -> equipment.getHelmet();
+            case CHEST -> equipment.getChestplate();
+            case LEGS -> equipment.getLeggings();
+            case FEET -> equipment.getBoots();
+            default -> null;
+        };
     }
 
     /**
@@ -93,18 +88,10 @@ public class ArmorMechanicsAPI {
      */
     public static void setItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot, ItemStack item) {
         switch (slot) {
-            case HEAD:
-                equipment.setHelmet(item);
-                break;
-            case CHEST:
-                equipment.setChestplate(item);
-                break;
-            case LEGS:
-                equipment.setLeggings(item);
-                break;
-            case FEET:
-                equipment.setBoots(item);
-                break;
+            case HEAD -> equipment.setHelmet(item);
+            case CHEST -> equipment.setChestplate(item);
+            case LEGS -> equipment.setLeggings(item);
+            case FEET -> equipment.setBoots(item);
         }
     }
 
