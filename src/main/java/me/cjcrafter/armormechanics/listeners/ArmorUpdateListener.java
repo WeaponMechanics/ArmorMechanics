@@ -14,6 +14,8 @@ public class ArmorUpdateListener implements Listener {
 
     @EventHandler
     public void onEquip(EntityEquipmentEvent event) {
+        if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Update_Armor"))
+            return;
         if (!event.isEquipping())
             return;
 
@@ -38,6 +40,5 @@ public class ArmorUpdateListener implements Listener {
                 ArmorMechanicsAPI.setItem(equipment, event.getSlot(), item);
             }
         }.runTask(ArmorMechanics.INSTANCE);
-
     }
 }
