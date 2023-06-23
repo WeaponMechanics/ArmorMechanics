@@ -251,7 +251,7 @@ Heavy_Chestplate:
     - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "<gray>Prevents you from getting poisoned or withered"
+    - "<gray>It's plenty strong already"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
@@ -271,7 +271,7 @@ Heavy_Leggings:
     - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "<gray>Prevents you from getting poisoned or withered"
+    - "<gray>It's plenty strong already"
   Hide_Flags: true
   Unbreakable: true
   Attributes:
@@ -291,7 +291,7 @@ Heavy_Boots:
     - " <dark_gray>[<red>-<dark_gray>] <gray>Decreased movement speed"
     - " "
     - "&6Full Set Bonus: &oNone"
-    - "<gray>Prevents you from getting poisoned or withered"
+    - "<gray>It's plenty strong already"
   Hide_Flags: true
   Unbreakable: true
   Attributes:

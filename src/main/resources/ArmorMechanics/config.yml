@@ -9,6 +9,11 @@ Print_Traces: false
 # Setting this to false will allow players to place heads on the ground
 Prevent_Armor_Place: true
 
+# Setting this to false will allow you to use non-armor items. Players will
+# not be able to manually click to equip these armors, but you can use commands
+# to force equip the item. In general, I recommend you keep this as true
+Prevent_Illegal_Armor: true
+
 # Settings this to true will cause ArmorMechanics to delete any armor item that
 # no longer exists in config. We have this disabled by default, as this may annoy your playerbase
 #

@@ -39,6 +39,11 @@ public class ArmorSerializer extends ItemSerializer {
     public static boolean isArmor(ItemStack item) {
         String name = item.getType().name();
 
+        // Let people turn off the isArmor() check since *technically*
+        // any item can be equipped.
+        if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Prevent_Illegal_Armor", true))
+            return true;
+
         return name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN")
                 || name.endsWith("_HELMET") || name.endsWith("_CHESTPLATE")
                 || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS");
