@@ -1,147 +1,124 @@
-package me.cjcrafter.armormechanics;
+package me.cjcrafter.armormechanics
 
-import me.cjcrafter.armormechanics.events.ArmorUpdateEvent;
-import me.deecaad.core.MechanicsCore;
-import me.deecaad.core.compatibility.CompatibilityAPI;
-import me.deecaad.core.lib.adventure.text.Component;
-import me.deecaad.core.lib.adventure.text.serializer.gson.GsonComponentSerializer;
-import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import me.deecaad.core.placeholder.PlaceholderMessage;
-import me.deecaad.core.placeholder.PlaceholderRequestEvent;
-import me.deecaad.core.utils.NumberUtil;
-import me.deecaad.core.utils.ReflectionUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.entity.Damageable;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffectType;
+import me.cjcrafter.armormechanics.events.ArmorUpdateEvent
+import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.core.utils.NumberUtil
+import me.deecaad.core.utils.ReflectionUtil
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.entity.Damageable
+import org.bukkit.entity.Entity
+import org.bukkit.entity.LivingEntity
+import org.bukkit.inventory.EntityEquipment
+import org.bukkit.inventory.EquipmentSlot
+import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffectType
+import java.lang.IllegalArgumentException
+import javax.annotation.Nonnull
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import java.lang.reflect.Field;
-import java.util.*;
-
-public class ArmorMechanicsAPI {
-
-    private static final Field loreField = ReflectionUtil.getField(ReflectionUtil.getCBClass("inventory.CraftMetaItem"), "lore");
+object ArmorMechanicsAPI {
 
     /**
      * Returns the armor-title associated with the given armor, or returns
-     * <code>null</code> if the given item doesn't have a title.
+     * `null` if the given item doesn't have a title.
      *
      * @param armor The nullable item to check.
      * @return The armor-title, or null.
      */
-    public static String getArmorTitle(ItemStack armor) {
+    fun getArmorTitle(armor: ItemStack?): String? {
         if (armor == null || !armor.hasItemMeta())
-            return null;
-
-        return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title");
+            return null
+        else
+            return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title")
     }
 
-    @Nonnull
-    public static ItemStack generateArmor(String armorTitle) {
-        if (armorTitle == null || !ArmorMechanics.INSTANCE.armors.containsKey(armorTitle))
-            throw new IllegalArgumentException("Unknown armor-title '" + armorTitle + "'");
+    fun generateArmor(armorTitle: String?): ItemStack {
+        require(armorTitle != null) { "Unknown armor-title '$armorTitle'" }
+        require(ArmorMechanics.INSTANCE.armors.containsKey(armorTitle)) { "Unknown armor-title '$armorTitle'" }
 
-        return ArmorMechanics.INSTANCE.armors.get(armorTitle).clone();
+        return ArmorMechanics.INSTANCE.armors[armorTitle]!!.clone()
     }
 
     /**
-     * Returns the expected {@link EquipmentSlot} that the given material
+     * Returns the expected [EquipmentSlot] that the given material
      * would be worn on. However, using commands or plugins may allow players
      * to equip armor in other slots.
      *
      * @param mat The non-null material to check.
      * @return The associated equipment slot, or null.
      */
-    public static EquipmentSlot getEquipmentSlot(@Nonnull Material mat) {
-        String name = mat.name();
-        if (name.endsWith("BOOTS"))
-            return EquipmentSlot.FEET;
-        if (name.endsWith("LEGGINGS"))
-            return EquipmentSlot.LEGS;
-        if (name.endsWith("CHESTPLATE"))
-            return EquipmentSlot.CHEST;
-        if (name.endsWith("HELMET") || name.equals("PLAYER_HEAD") || name.equals("CARVED_PUMPKIN"))
-            return EquipmentSlot.HEAD;
-
-        return null;
+    fun getEquipmentSlot(mat: Material): EquipmentSlot? {
+        val name = mat.name
+        if (name.endsWith("BOOTS")) return EquipmentSlot.FEET
+        if (name.endsWith("LEGGINGS")) return EquipmentSlot.LEGS
+        if (name.endsWith("CHESTPLATE")) return EquipmentSlot.CHEST
+        if (name.endsWith("HELMET") || name == "PLAYER_HEAD" || name == "CARVED_PUMPKIN") return EquipmentSlot.HEAD
+        else return null
     }
 
     /**
-     * Version safe method for {@link EntityEquipment#getItem(EquipmentSlot)}.
+     * Version safe method for [EntityEquipment.getItem].
      *
      * @param equipment The non-null equipment the entity is wearing.
      * @param slot      The non-null slot to check.
      * @return The nullable item in that slot.
      */
-    @Nullable
-    public static ItemStack getItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot) {
-        return switch (slot) {
-            case HEAD -> equipment.getHelmet();
-            case CHEST -> equipment.getChestplate();
-            case LEGS -> equipment.getLeggings();
-            case FEET -> equipment.getBoots();
-            default -> null;
-        };
+    fun getItem(equipment: EntityEquipment, slot: EquipmentSlot): ItemStack? {
+        return when (slot) {
+            EquipmentSlot.HEAD -> equipment.helmet
+            EquipmentSlot.CHEST -> equipment.chestplate
+            EquipmentSlot.LEGS -> equipment.leggings
+            EquipmentSlot.FEET -> equipment.boots
+            else -> null
+        }
     }
 
     /**
-     * Version safe method for {@link EntityEquipment#setItem(EquipmentSlot, ItemStack)}.
+     * Version safe method for [EntityEquipment.setItem].
      *
      * @param equipment The non-null equipment the entity is wearing.
      * @param slot      The non-null slot to set.
      * @param item      The item to use, or null.
      */
-    public static void setItem(@Nonnull EntityEquipment equipment, @Nonnull EquipmentSlot slot, ItemStack item) {
-        switch (slot) {
-            case HEAD -> equipment.setHelmet(item);
-            case CHEST -> equipment.setChestplate(item);
-            case LEGS -> equipment.setLeggings(item);
-            case FEET -> equipment.setBoots(item);
+    fun setItem(equipment: EntityEquipment, slot: EquipmentSlot, item: ItemStack?) {
+        when (slot) {
+            EquipmentSlot.HEAD -> equipment.helmet = item
+            EquipmentSlot.CHEST -> equipment.chestplate = item
+            EquipmentSlot.LEGS -> equipment.leggings = item
+            EquipmentSlot.FEET -> equipment.boots = item
+            EquipmentSlot.HAND, EquipmentSlot.OFF_HAND -> throw IllegalArgumentException("Invalid slot $slot")
         }
     }
 
     /**
-     * Shorthand for {@link #getSet(String, String, String, String)}.
+     * Shorthand for [.getSet].
      *
      * @param entity The non-null entity to check.
      * @return The set the entity is wearing, or null.
      */
-    public static ArmorSet getSet(Entity entity) {
-        if (entity.getType().isAlive())
-            return null;
-
-        return getSet(((LivingEntity) entity).getEquipment());
+    fun getSet(entity: Entity): ArmorSet? {
+        return getSet((entity as? LivingEntity)?.equipment)
     }
 
     /**
-     * Shorthand for {@link #getSet(String, String, String, String)}.
+     * Shorthand for [.getSet].
      *
      * @param equipment The equipment the entity is wearing.
      * @return The set the entity is wearing, or null.
      */
-    public static ArmorSet getSet(EntityEquipment equipment) {
+    fun getSet(equipment: EntityEquipment?): ArmorSet? {
         if (equipment == null)
-            return null;
+            return null
 
-        String helmet = getArmorTitle(equipment.getHelmet());
-        String chestplate = getArmorTitle(equipment.getChestplate());
-        String leggings = getArmorTitle(equipment.getLeggings());
-        String boots = getArmorTitle(equipment.getBoots());
-
-        return getSet(helmet, chestplate, leggings, boots);
+        val helmet = getArmorTitle(equipment.helmet)
+        val chestplate = getArmorTitle(equipment.chestplate)
+        val leggings = getArmorTitle(equipment.leggings)
+        val boots = getArmorTitle(equipment.boots)
+        return getSet(helmet, chestplate, leggings, boots)
     }
 
     /**
-     * Shorthand for {@link #getSet(String, String, String, String)}.
+     * Shorthand for [.getSet].
      *
      * @param helmet The nullable helmet to check.
      * @param chestplate The nullable chestplate to check.
@@ -149,20 +126,22 @@ public class ArmorMechanicsAPI {
      * @param boots The nullable boots to check.
      * @return The set associated with the 4 items, or null.
      */
-    public static ArmorSet getSet(ItemStack helmet, ItemStack chestplate, ItemStack leggings, ItemStack boots) {
-        return getSet(getArmorTitle(helmet), getArmorTitle(chestplate), getArmorTitle(leggings), getArmorTitle(boots));
+    fun getSet(helmet: ItemStack?, chestplate: ItemStack?, leggings: ItemStack?, boots: ItemStack?): ArmorSet? {
+        return getSet(getArmorTitle(helmet), getArmorTitle(chestplate), getArmorTitle(leggings), getArmorTitle(boots))
     }
 
     /**
-     * Returns the {@link ArmorSet} that matches the 4 pieces of armor. Some
+     * Returns the [ArmorSet] that matches the 4 pieces of armor. Some
      * important things to realize, players are able to use 3 pieces of armor
      * for a set, and use 1 as a wildcard, if the server admin configured this.
      *
-     * <p>1 piece of armor may belong to multiple sets. Although a server admin
+     *
+     * 1 piece of armor may belong to multiple sets. Although a server admin
      * would be evil to do this, and probably should be locked up in an insane
      * asylum, it's something to look out for.
      *
-     * <p>You should also carefully consider when you call this method for an
+     *
+     * You should also carefully consider when you call this method for an
      * entity. It's equipment may have already updates, or it may not have
      * updated. If you run into issues running this method, make sure you print
      * out the armor so you check if it is what you expect it to be.
@@ -173,132 +152,71 @@ public class ArmorMechanicsAPI {
      * @param boots The nullable boots to check.
      * @return The set associated with the 4 titles, or null.
      */
-    public static ArmorSet getSet(String helmet, String chestplate, String leggings, String boots) {
+    fun getSet(helmet: String?, chestplate: String?, leggings: String?, boots: String?): ArmorSet? {
 
         // Since an armor title may belong to multiple sets, we must check each
         // set to determine whether the player is wearing a set.
-        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
-        for (ArmorSet set : plugin.sets.values()) {
-            if (set.getHelmet() != null && !set.getHelmet().equals(helmet))
-                continue;
-            if (set.getChestplate() != null && !set.getChestplate().equals(chestplate))
-                continue;
-            if (set.getLeggings() != null && !set.getLeggings().equals(leggings))
-                continue;
-            if (set.getBoots() != null && !set.getBoots().equals(boots))
-                continue;
-
-            return set;
+        for (set in ArmorMechanics.INSTANCE.sets.values) {
+            if (set.helmet != null && set.helmet != helmet) continue
+            if (set.chestplate != null && set.chestplate != chestplate) continue
+            if (set.leggings != null && set.leggings != leggings) continue
+            if (set.boots != null && set.boots != boots) continue
+            return set
         }
+        return null
+    }
 
-        return null;
+    fun getBonusEffects(entity: LivingEntity): List<BonusEffect> {
+        val armor = entity.equipment ?: return emptyList()
+        val helmet = getArmorTitle(armor.helmet)
+        val chestplate = getArmorTitle(armor.chestplate)
+        val leggings = getArmorTitle(armor.leggings)
+        val boots = getArmorTitle(armor.boots)
+
+        val set = getSet(helmet, chestplate, leggings, boots)
+        val temp = ArrayList<BonusEffect>()
+
+        val effects = ArmorMechanics.INSTANCE.effects
+        effects[helmet]?.let { temp.add(it) }
+        effects[chestplate]?.let { temp.add(it) }
+        effects[leggings]?.let { temp.add(it) }
+        effects[boots]?.let { temp.add(it) }
+        set?.bonus?.let { temp.add(it) }
+
+        return temp
     }
 
     /**
-     * Adds up the total bullet resistance of all armor pieces and the set
-     * associated with the given equipment. The returned number is a percentage
-     * damage reduction (0.0 = no protection, 1.0 = full protection). The value
-     * will always be between 0.0 (inclusive) and 1.0 (inclusive).
-     *
-     * @param equipment The nullable entity equipment.
-     * @param weaponTitle The non-null weapon used to damage the entity.
-     * @return A percentage damage reduction, or 0.0.
-     */
-    public static double getBulletResistance(@Nullable EntityEquipment equipment, @Nonnull String weaponTitle) {
-        if (equipment == null)
-            return 0.0;
-
-        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
-        BonusEffect helmet = plugin.effects.get(getArmorTitle(equipment.getHelmet()));
-        BonusEffect chestplate = plugin.effects.get(getArmorTitle(equipment.getChestplate()));
-        BonusEffect leggings = plugin.effects.get(getArmorTitle(equipment.getLeggings()));
-        BonusEffect boots = plugin.effects.get(getArmorTitle(equipment.getBoots()));
-        ArmorSet set = getSet(equipment);
-
-        double rate = 0.0;
-        if (set != null && set.getBonus() != null)
-            rate += plugin.effects.get(set.getBonus()).getBulletResistance(weaponTitle);
-        if (helmet != null)
-            rate += helmet.getBulletResistance(weaponTitle);
-        if (chestplate != null)
-            rate += chestplate.getBulletResistance(weaponTitle);
-        if (leggings != null)
-            rate += leggings.getBulletResistance(weaponTitle);
-        if (boots != null)
-            rate += boots.getBulletResistance(weaponTitle);
-
-        return NumberUtil.minMax(0.0, rate, 1.0);
-    }
-
-    /**
-     * Returns <code>true</code> if the entity's armor or {@link ArmorSet} is
-     * immune to the given potion effect.
-     *
-     * @param equipment The nullable equipment.
-     * @param type The non-null potion effect type.
-     * @return true if the entity is immune.
-     */
-    public static boolean isImmune(@Nullable EntityEquipment equipment, @Nonnull PotionEffectType type) {
-        if (equipment == null)
-            return false;
-
-        ArmorMechanics plugin = ArmorMechanics.INSTANCE;
-        BonusEffect helmet = plugin.effects.get(getArmorTitle(equipment.getHelmet()));
-        BonusEffect chestplate = plugin.effects.get(getArmorTitle(equipment.getChestplate()));
-        BonusEffect leggings = plugin.effects.get(getArmorTitle(equipment.getLeggings()));
-        BonusEffect boots = plugin.effects.get(getArmorTitle(equipment.getBoots()));
-        ArmorSet set = getSet(equipment);
-
-        if (set != null && set.getBonus() != null && plugin.effects.get(set.getBonus()).getImmunities().contains(type))
-            return true;
-        if (helmet != null && helmet.getImmunities().contains(type))
-            return true;
-        if (chestplate != null && chestplate.getImmunities().contains(type))
-            return true;
-        if (leggings != null && leggings.getImmunities().contains(type))
-            return true;
-        if (boots != null && boots.getImmunities().contains(type))
-            return true;
-
-        return false;
-    }
-
-    /**
-     * The server admin may have to make balance changes <i>after</i> they have
+     * The server admin may have to make balance changes *after* they have
      * distributed their armor. Since attributes/enchantments are set PER ITEM,
      * we have to update items to make sure they have the proper stats.
      * ArmorMechanics calls this method whenever armor is equipped to an armor
      * slot.
      *
-     * <p>The following options are updated: Attributes, Enchantments, Display
+     * The following options are updated: Attributes, Enchantments, Display
      * name, Lore, Unbreakable, Material Type, Player Skull.
      *
      * @param entity The entity involved.
      * @param armor  The non-null item to update.
      */
-    public static void update(LivingEntity entity, ItemStack armor) {
-        String title = getArmorTitle(armor);
+    fun update(entity: LivingEntity?, armor: ItemStack) {
+        val title = getArmorTitle(armor)
 
         // Check if we should delete this item.
         // If the armor no longer exists, we cannot update its properties.
         if (!ArmorMechanics.INSTANCE.armors.containsKey(title)) {
-            boolean deleteOld = ArmorMechanics.INSTANCE.getConfig().getBoolean("Delete_Old_Armor", false);
-
-            if (deleteOld)
-                armor.setAmount(0);
-
-            return;
+            val deleteOld = ArmorMechanics.INSTANCE.getConfig().getBoolean("Delete_Old_Armor", false)
+            if (deleteOld) armor.amount = 0
+            return
         }
 
         // We need to save the old durability and set it to the new item, since
         // setItemMeta will reset the item's durability.
-        short durability = armor.getDurability();
-
-        ItemStack template = ArmorMechanics.INSTANCE.armors.get(title);
-        armor.setType(template.getType());
-        armor.setItemMeta(template.getItemMeta());
-        armor.setDurability(durability);
-
-        Bukkit.getPluginManager().callEvent(new ArmorUpdateEvent(entity, armor, title));
+        val durability = (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage
+        val template = ArmorMechanics.INSTANCE.armors[title]
+        armor.setType(template!!.type)
+        armor.setItemMeta(template.itemMeta)
+        (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage = durability!!
+        Bukkit.getPluginManager().callEvent(ArmorUpdateEvent(entity!!, armor, title!!))
     }
 }

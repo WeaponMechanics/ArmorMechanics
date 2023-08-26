@@ -1,51 +1,26 @@
-package me.cjcrafter.armormechanics.events;
+package me.cjcrafter.armormechanics.events
 
-import me.deecaad.core.mechanics.Mechanics;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
+import me.deecaad.core.mechanics.Mechanics
+import org.bukkit.entity.Entity
+import org.bukkit.event.HandlerList
+import org.bukkit.event.entity.EntityEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
 
-import java.util.List;
+class ArmorMechanicsEquipEvent(
+    what: Entity,
+    val armor: ItemStack,
+    val armorTitle: String,
+    var equipMechanics: Mechanics?,
+    var potions: List<PotionEffect>
+) :
+    EntityEvent(what) {
 
-public class ArmorMechanicsEquipEvent extends EntityEvent {
-
-    private static final HandlerList handlers = new HandlerList();
-
-    private Mechanics equipMechanics;
-    private List<PotionEffect> potions;
-
-    public ArmorMechanicsEquipEvent(@NotNull Entity what, Mechanics equipMechanics, List<PotionEffect> potions) {
-        super(what);
-        this.equipMechanics = equipMechanics;
-        this.potions = potions;
+    override fun getHandlers(): HandlerList {
+        return handlerList
     }
 
-    public Mechanics getEquipMechanics() {
-        return equipMechanics;
-    }
-
-    public void setEquipMechanics(Mechanics equipMechanics) {
-        this.equipMechanics = equipMechanics;
-    }
-
-    public List<PotionEffect> getPotions() {
-        return potions;
-    }
-
-    public void setPotions(List<PotionEffect> potions) {
-        this.potions = potions;
-    }
-
-    @NotNull
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    @NotNull
-    public static HandlerList getHandlerList() {
-        return handlers;
+    companion object {
+        val handlerList = HandlerList()
     }
 }

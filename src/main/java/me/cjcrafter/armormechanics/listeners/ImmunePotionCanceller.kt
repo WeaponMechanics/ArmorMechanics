@@ -1,18 +1,24 @@
-package me.cjcrafter.armormechanics.listeners;
+package me.cjcrafter.armormechanics.listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPotionEffectEvent;
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import org.bukkit.entity.LivingEntity
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.entity.EntityPotionEffectEvent
 
-public class ImmunePotionCanceller implements Listener {
+class ImmunePotionCanceller : Listener {
 
     @EventHandler
-    public void onPotion(EntityPotionEffectEvent event) {
-        Entity entity = event.getEntity();
-        if (entity.getType().isAlive())
-            event.setCancelled(ArmorMechanicsAPI.isImmune(((LivingEntity) entity).getEquipment(), event.getModifiedType()));
+    fun onPotion(event: EntityPotionEffectEvent) {
+        val entity = event.entity
+        if (entity !is LivingEntity)
+            return
+
+        for (effect in ArmorMechanicsAPI.getBonusEffects(entity)) {
+            if (effect.immunities.contains(event.newEffect?.type)) {
+                event.isCancelled = true
+                return
+            }
+        }
     }
 }

@@ -1,52 +1,25 @@
-package me.cjcrafter.armormechanics.events;
+package me.cjcrafter.armormechanics.events
 
-import me.deecaad.core.mechanics.Mechanics;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.HandlerList;
-import org.bukkit.event.entity.EntityEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
-import org.jetbrains.annotations.NotNull;
+import me.deecaad.core.mechanics.Mechanics
+import org.bukkit.entity.Entity
+import org.bukkit.event.HandlerList
+import org.bukkit.event.entity.EntityEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
 
-import java.util.List;
+class ArmorMechanicsDequipEvent(
+    what: Entity,
+    val armor: ItemStack?,
+    val armorTitle: String?,
+    var dequipMechanics: Mechanics?,
+    var potions: List<PotionEffect>
+) : EntityEvent(what) {
 
-public class ArmorMechanicsDequipEvent extends EntityEvent {
-
-    private static final HandlerList handlers = new HandlerList();
-
-    private Mechanics dequipMechanics;
-    private List<PotionEffect> potions;
-
-    public ArmorMechanicsDequipEvent(@NotNull Entity what, ItemStack armor, String armorTitle, Mechanics dequipMechanics, List<PotionEffect> potions) {
-        super(what);
-        this.dequipMechanics = dequipMechanics;
-        this.potions = potions;
+    override fun getHandlers(): HandlerList {
+        return handlerList
     }
 
-    public Mechanics getDequipMechanics() {
-        return dequipMechanics;
-    }
-
-    public void setDequipMechanics(Mechanics dequipMechanics) {
-        this.dequipMechanics = dequipMechanics;
-    }
-
-    public List<PotionEffect> getPotions() {
-        return potions;
-    }
-
-    public void setPotions(List<PotionEffect> potions) {
-        this.potions = potions;
-    }
-
-    @NotNull
-    @Override
-    public HandlerList getHandlers() {
-        return handlers;
-    }
-
-    @NotNull
-    public static HandlerList getHandlerList() {
-        return handlers;
+    companion object {
+        val handlerList = HandlerList()
     }
 }

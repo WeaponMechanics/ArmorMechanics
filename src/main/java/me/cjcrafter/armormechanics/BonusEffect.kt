@@ -1,201 +1,157 @@
-package me.cjcrafter.armormechanics;
+package me.cjcrafter.armormechanics
 
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.Serializer;
-import me.deecaad.core.file.SerializerException;
-import me.deecaad.core.file.SerializerOptionsException;
-import me.deecaad.core.mechanics.CastData;
-import me.deecaad.core.mechanics.Mechanics;
-import me.deecaad.core.mechanics.defaultmechanics.Mechanic;
-import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic;
-import me.deecaad.core.utils.ReflectionUtil;
-import me.deecaad.core.utils.primitive.DoubleMap;
-import me.deecaad.weaponmechanics.WeaponMechanics;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import me.deecaad.core.file.SerializeData
+import me.deecaad.core.file.Serializer
+import me.deecaad.core.file.SerializerException
+import me.deecaad.core.file.SerializerOptionsException
+import me.deecaad.core.mechanics.CastData
+import me.deecaad.core.mechanics.Mechanics
+import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic
+import me.deecaad.core.utils.ReflectionUtil
+import me.deecaad.core.utils.primitive.DoubleMap
+import org.bukkit.entity.LivingEntity
+import org.bukkit.event.entity.EntityDamageEvent
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
+import java.util.*
+import java.util.stream.Collectors
+import javax.annotation.Nonnull
+import kotlin.collections.ArrayList
 
-import javax.annotation.Nonnull;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-public class BonusEffect implements Serializer<BonusEffect> {
-
-    private List<PotionEffect> potions;
-    private Set<PotionEffectType> immunities;
-    private Mechanics equipMechanics;
-    private Mechanics dequipMechanics;
-    private Mechanics damageMechanics;
+class BonusEffect : Serializer<BonusEffect> {
+    var potions: List<PotionEffect> = ArrayList()
+    var immunities: Set<PotionEffectType> = HashSet()
+    var equipMechanics: Mechanics? = null
+    var dequipMechanics: Mechanics? = null
+    var damageMechanics: Mechanics? = null
 
     // WeaponMechanics things
-    private double bulletResistance;
-    private DoubleMap<String> perWeaponBulletResistances;
-    private double explosionResistance;
-    private DoubleMap<String> perWeaponExplosionResistances;
+    var bulletResistance = 0.0
+    var perWeaponBulletResistances: Map<String, Double> = HashMap()
+    var explosionResistance = 0.0
+    var perWeaponExplosionResistances: Map<String, Double> = HashMap()
 
-    public BonusEffect() {
+    constructor()
+    constructor(
+        potions: List<PotionEffect>,
+        immunities: Set<PotionEffectType>,
+        equipMechanics: Mechanics?,
+        dequipMechanics: Mechanics?,
+        damageMechanics: Mechanics?,
+        bulletResistance: Double,
+        perWeaponBulletResistances: Map<String, Double>,
+        explosionResistance: Double,
+        perWeaponExplosionResistances: Map<String, Double>
+    ) {
+        this.potions = potions
+        this.immunities = immunities
+        this.equipMechanics = equipMechanics
+        this.dequipMechanics = dequipMechanics
+        this.damageMechanics = damageMechanics
+        this.bulletResistance = bulletResistance
+        this.perWeaponBulletResistances = perWeaponBulletResistances
+        this.explosionResistance = explosionResistance
+        this.perWeaponExplosionResistances = perWeaponExplosionResistances
     }
 
-    public BonusEffect(List<PotionEffect> potions, Set<PotionEffectType> immunities, Mechanics equipMechanics,
-                       Mechanics dequipMechanics, Mechanics damageMechanics, double bulletResistance,
-                       DoubleMap<String> perWeaponBulletResistances, double explosionResistance, DoubleMap<String> perWeaponExplosionResistances) {
-
-        this.potions = potions;
-        this.immunities = immunities;
-        this.equipMechanics = equipMechanics;
-        this.dequipMechanics = dequipMechanics;
-        this.damageMechanics = damageMechanics;
-
-        this.bulletResistance = bulletResistance;
-        this.perWeaponBulletResistances = perWeaponBulletResistances;
-        this.explosionResistance = explosionResistance;
-        this.perWeaponExplosionResistances = perWeaponExplosionResistances;
+    fun onDamage(event: EntityDamageEvent) {
+        if (damageMechanics == null) return
+        damageMechanics!!.use(CastData(event.entity as LivingEntity, null, null))
     }
 
-    public List<PotionEffect> getPotions() {
-        return potions;
+    fun getBulletResistance(weaponTitle: String?): Double {
+        return perWeaponBulletResistances[weaponTitle] ?: bulletResistance
     }
 
-    public Set<PotionEffectType> getImmunities() {
-        return immunities;
+    fun getExplosionResistance(weaponTitle: String?): Double {
+        return perWeaponExplosionResistances[weaponTitle] ?: explosionResistance
     }
 
-    public Mechanics getEquipMechanics() {
-        return equipMechanics;
-    }
-
-    public Mechanics getDequipMechanics() {
-        return dequipMechanics;
-    }
-
-    public Mechanics getDamageMechanics() {
-        return damageMechanics;
-    }
-
-    public void onDamage(EntityDamageEvent event) {
-        if (damageMechanics == null)
-            return;
-
-        damageMechanics.use(new CastData((LivingEntity) event.getEntity(), null, null));
-    }
-
-    public double getBulletResistance() {
-        return bulletResistance;
-    }
-
-    public double getBulletResistance(String weaponTitle) {
-        if (perWeaponBulletResistances.containsKey(weaponTitle))
-            return perWeaponBulletResistances.get(weaponTitle);
-
-        return bulletResistance;
-    }
-
-    public DoubleMap<String> getPerWeaponBulletResistances() {
-        return perWeaponBulletResistances;
-    }
-
-    public double getExplosionResistance() {
-        return bulletResistance;
-    }
-
-    public double getExplosionResistance(String weaponTitle) {
-        if (perWeaponExplosionResistances.containsKey(weaponTitle))
-            return perWeaponExplosionResistances.get(weaponTitle);
-
-        return explosionResistance;
-    }
-
-    public DoubleMap<String> getPerWeaponExplosionResistances() {
-        return perWeaponExplosionResistances;
-    }
-
-    @Override
-    public String getKeyword() {
-        return "Bonus_Effects";
+    override fun getKeyword(): String {
+        return "Bonus_Effects"
     }
 
     @Nonnull
-    @Override
-    public BonusEffect serialize(SerializeData data) throws SerializerException {
-
-        Mechanics mechanics = data.of("Potion_Effects").serialize(Mechanics.class);
-        List<PotionEffect> potions = new ArrayList<>();
-
+    @Throws(SerializerException::class)
+    override fun serialize(data: SerializeData): BonusEffect {
+        val mechanics = data.of("Potion_Effects").serialize(Mechanics::class.java)
+        val potions: MutableList<PotionEffect> = ArrayList()
         if (mechanics != null) {
-            List<Mechanic> list = mechanics.getMechanics();
-            for (int i = 0; i < list.size(); i++) {
-                if (!(list.get(i) instanceof PotionMechanic potion))
-                    throw data.listException("Potion_Effects", i, "You can only use potion effects here",
-                            SerializerException.forValue(list.get(i).getClass().getSimpleName()));
+            val list = mechanics.mechanics
+            for (i in list.indices) {
+                if (list[i] !is PotionMechanic) throw data.listException(
+                    "Potion_Effects", i, "You can only use potion effects here",
+                    SerializerException.forValue(list[i].javaClass.getSimpleName())
+                )
 
                 // We want an infinite potion effect
                 // TODO 1.20 has actual infinite instead of MAX_VALUE, check it out
-                PotionEffect base = potion.getPotion();
-                PotionEffect effect = new PotionEffect(base.getType(), Integer.MAX_VALUE, base.getAmplifier(), base.isAmbient(), base.hasParticles());
+                val base: PotionEffect = (list[i] as PotionMechanic).potion
+                var effect = PotionEffect(base.type, Int.MAX_VALUE, base.amplifier, base.isAmbient, base.hasParticles())
                 if (ReflectionUtil.getMCVersion() > 13) {
-                    effect = new PotionEffect(base.getType(), Integer.MAX_VALUE, base.getAmplifier(), base.isAmbient(), base.hasParticles(), base.hasIcon());
+                    effect = PotionEffect(
+                        base.type,
+                        Int.MAX_VALUE,
+                        base.amplifier,
+                        base.isAmbient,
+                        base.hasParticles(),
+                        base.hasIcon()
+                    )
                 }
-
-                potions.add(effect);
+                potions.add(effect)
             }
         }
+        val bulletResistance = data.of("Bullet_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0)
+        val perWeaponData = data.ofList("Bullet_Resistance.Per_Weapon")
+            .addArgument(String::class.java, true, true)
+            .addArgument(Double::class.javaPrimitiveType, true).assertArgumentRange(0.0, 2.0)
+            .assertList().get()
 
-        double bulletResistance = data.of("Bullet_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0);
-        List<String[]> perWeaponData = data.ofList("Bullet_Resistance.Per_Weapon")
-                .addArgument(String.class, true, true)
-                .addArgument(double.class, true).assertArgumentRange(0.0, 2.0)
-                .assertList().get();
-        DoubleMap<String> perWeaponBulletResistances = new DoubleMap<>();
-
-        for (int i = 0; i < perWeaponData.size(); i++) {
-            String[] split = perWeaponData.get(i);
-
-            String weapon = split[0];
-            double resistance = Double.parseDouble(split[1]);
-
-            perWeaponBulletResistances.put(weapon, resistance);
+        val perWeaponBulletResistances = HashMap<String, Double>()
+        for (i in perWeaponData.indices) {
+            val split = perWeaponData[i]
+            val weapon = split[0]
+            val resistance = split[1].toDouble()
+            perWeaponBulletResistances[weapon] = resistance
         }
 
-        double explosionResistance = data.of("Explosion_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0);
-        List<String[]> perWeaponExplosionData = data.ofList("Explosion_Resistance.Per_Weapon")
-                .addArgument(String.class, true, true)
-                .addArgument(double.class, true).assertArgumentRange(0.0, 2.0)
-                .assertList().get();
-        DoubleMap<String> perWeaponExplosionResistances = new DoubleMap<>();
+        val explosionResistance = data.of("Explosion_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0)
+        val perWeaponExplosionData = data.ofList("Explosion_Resistance.Per_Weapon")
+            .addArgument(String::class.java, true, true)
+            .addArgument(Double::class.javaPrimitiveType, true).assertArgumentRange(0.0, 2.0)
+            .assertList().get()
 
-        for (int i = 0; i < perWeaponExplosionData.size(); i++) {
-            String[] split = perWeaponData.get(i);
-
-            String weapon = split[0];
-            double resistance = Double.parseDouble(split[1]);
-
-            perWeaponExplosionResistances.put(weapon, resistance);
+        val perWeaponExplosionResistances = HashMap<String, Double>()
+        for (i in perWeaponExplosionData.indices) {
+            val split = perWeaponData[i]
+            val weapon = split[0]
+            val resistance = split[1].toDouble()
+            perWeaponExplosionResistances[weapon] = resistance
         }
 
-        List<String[]> immunitiesStringList = data.ofList("Immune_Potions")
-                .addArgument(PotionEffectType.class, true, true)
-                .assertList().get();
-
-        List<PotionEffectType> immunities = new ArrayList<>();
-        for (String[] split : immunitiesStringList) {
-
-            PotionEffectType potionEffectType = PotionEffectType.getByName(split[0].trim());
-            if (potionEffectType == null)
-                throw new SerializerOptionsException(this, "Potion Effect", Arrays.stream(PotionEffectType.values()).map(Object::toString).collect(Collectors.toList()), split[0], data.of().getLocation());
-
-            immunities.add(potionEffectType);
+        val immunitiesStringList = data.ofList("Immune_Potions")
+            .addArgument(PotionEffectType::class.java, true, true)
+            .assertList().get()
+        val immunities: MutableList<PotionEffectType> = ArrayList()
+        for (split in immunitiesStringList) {
+            val potionEffectType = PotionEffectType.getByName(split[0].trim { it <= ' ' })
+                ?: throw SerializerOptionsException(
+                    this,
+                    "Potion Effect",
+                    Arrays.stream(PotionEffectType.values()).map { obj: PotionEffectType -> obj.toString() }
+                        .collect(Collectors.toList()),
+                    split[0],
+                    data.of().location)
+            immunities.add(potionEffectType)
         }
 
-        Mechanics equip = data.of("Equip_Mechanics").serialize(Mechanics.class);
-        Mechanics dequip = data.of("Dequip_Mechanics").serialize(Mechanics.class);
-        Mechanics damage = data.of("Damage_Mechanics").serialize(Mechanics.class);
+        val equip = data.of("Equip_Mechanics").serialize(Mechanics::class.java)
+        val dequip = data.of("Dequip_Mechanics").serialize(Mechanics::class.java)
+        val damage = data.of("Damage_Mechanics").serialize(Mechanics::class.java)
 
-        return new BonusEffect(potions, new HashSet<>(immunities), equip, dequip, damage, bulletResistance,
-                perWeaponBulletResistances, explosionResistance, perWeaponExplosionResistances);
+        return BonusEffect(
+            potions, HashSet(immunities), equip, dequip, damage, bulletResistance,
+            perWeaponBulletResistances, explosionResistance, perWeaponExplosionResistances
+        )
     }
 }

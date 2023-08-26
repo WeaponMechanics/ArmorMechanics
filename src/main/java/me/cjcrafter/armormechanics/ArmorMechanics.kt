@@ -1,225 +1,205 @@
-package me.cjcrafter.armormechanics;
+package me.cjcrafter.armormechanics
 
-import me.cjcrafter.armormechanics.listeners.*;
-import me.cjcrafter.auto.UpdateChecker;
-import me.cjcrafter.auto.UpdateInfo;
-import me.deecaad.core.events.QueueSerializerEvent;
-import me.deecaad.core.file.BukkitConfig;
-import me.deecaad.core.file.SerializeData;
-import me.deecaad.core.file.SerializerException;
-import me.deecaad.core.file.TaskChain;
-import me.deecaad.core.placeholder.PlaceholderMessage;
-import me.deecaad.core.utils.Debugger;
-import me.deecaad.core.utils.FileUtil;
-import me.deecaad.core.utils.LogLevel;
-import me.deecaad.core.utils.ReflectionUtil;
-import org.bstats.bukkit.Metrics;
-import org.bstats.charts.SimplePie;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.java.JavaPlugin;
+import me.cjcrafter.armormechanics.commands.Command
+import me.cjcrafter.armormechanics.listeners.*
+import me.cjcrafter.auto.UpdateChecker
+import me.cjcrafter.auto.UpdateInfo
+import me.deecaad.core.events.QueueSerializerEvent
+import me.deecaad.core.file.BukkitConfig
+import me.deecaad.core.file.SerializeData
+import me.deecaad.core.file.SerializerException
+import me.deecaad.core.file.TaskChain
+import me.deecaad.core.utils.Debugger
+import me.deecaad.core.utils.FileUtil
+import me.deecaad.core.utils.LogLevel
+import me.deecaad.core.utils.ReflectionUtil
+import org.bstats.bukkit.Metrics
+import org.bstats.charts.SimplePie
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.configuration.file.FileConfiguration
+import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
+import java.io.File
+import java.util.concurrent.Callable
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+class ArmorMechanics : JavaPlugin() {
+    lateinit var debug: Debugger
+    private var metrics: Metrics? = null
+    private var update: UpdateChecker? = null
+    val effects: MutableMap<String, BonusEffect> = HashMap()
+    val armors: MutableMap<String, ItemStack> = HashMap()
+    val sets: MutableMap<String, ArmorSet> = HashMap()
 
-public class ArmorMechanics extends JavaPlugin {
-
-    public static ArmorMechanics INSTANCE;
-
-    public Debugger debug;
-    private Metrics metrics;
-    private UpdateChecker update;
-
-    public final Map<String, BonusEffect> effects = new HashMap<>();
-    public final Map<String, ItemStack> armors = new HashMap<>();
-    public final Map<String, List<PlaceholderMessage>> lores = new HashMap<>();
-    public final Map<String, ArmorSet> sets = new HashMap<>();
-
-
-    @Override
-    public void onLoad() {
-        INSTANCE = this;
-
-        int level = getConfig().getInt("Debug_Level", 2);
-        boolean printTraces = getConfig().getBoolean("Print_Traces", false);
-        debug = new Debugger(getLogger(), level, printTraces);
-
+    override fun onLoad() {
+        INSTANCE = this
+        val level = getConfig().getInt("Debug_Level", 2)
+        val printTraces = getConfig().getBoolean("Print_Traces", false)
+        debug = Debugger(logger, level, printTraces)
         if (ReflectionUtil.getMCVersion() < 13) {
-            debug.error("  !!!!! ERROR !!!!!", "  !!!!! ERROR !!!!!", "  !!!!! ERROR !!!!!", "  Plugin only supports Minecraft 1.13 and higher");
-            getServer().getPluginManager().disablePlugin(this);
-            return;
+            debug.error(
+                "  !!!!! ERROR !!!!!",
+                "  !!!!! ERROR !!!!!",
+                "  !!!!! ERROR !!!!!",
+                "  Plugin only supports Minecraft 1.13 and higher"
+            )
+            server.pluginManager.disablePlugin(this)
+            return
         }
     }
 
-    @Override
-    public void onEnable() {
+    override fun onEnable() {
+        reload()
+        registerBStats()
+        registerUpdateChecker()
+        val pm = server.pluginManager
+        pm.registerEvents(ArmorEquipListener(), this)
+        pm.registerEvents(ArmorUpdateListener(), this)
+        pm.registerEvents(BlockPlaceListener(), this)
+        pm.registerEvents(DamageMechanicListener(), this)
+        pm.registerEvents(ImmunePotionCanceller(), this)
+        pm.registerEvents(PreventRemoveListener(), this)
 
-        reload();
-        registerBStats();
-        registerUpdateChecker();
-
-        PluginManager pm = getServer().getPluginManager();
-        pm.registerEvents(new ArmorEquipListener(), this);
-        pm.registerEvents(new ArmorUpdateListener(), this);
-        pm.registerEvents(new BlockPlaceListener(), this);
-        pm.registerEvents(new DamageMechanicListener(), this);
-        pm.registerEvents(new ImmunePotionCanceller(), this);
-        pm.registerEvents(new PreventRemoveListener(), this);
-        pm.registerEvents(new WeaponMechanicsDamageListener(), this);
+        if (pm.getPlugin("WeaponMechanics") != null) {
+            pm.registerEvents(WeaponMechanicsDamageListener(), this)
+        }
 
         // Try to hook into MythicMobs, an error will be thrown if the user is
         // using any version below v5.0.0
         if (pm.getPlugin("MythicMobs") != null) {
             try {
-                pm.registerEvents(new MythicMobsListener(), this);
-            } catch (Throwable e) {
-                debug.log(LogLevel.ERROR, "Could not hook into MythicMobs", e);
+                pm.registerEvents(MythicMobsListener(), this)
+            } catch (e: Throwable) {
+                debug.log(LogLevel.ERROR, "Could not hook into MythicMobs", e)
             }
         }
-
-        Command.register();
+        Command.register()
 
         // Automatically reload ArmorMechanics if WeaponMechanics reloads.
-        new Listener() {
+        object : Listener {
             @EventHandler
-            public void onQueue(QueueSerializerEvent event) {
-                if ("WeaponMechanics".equals(event.getSourceName()))
-                    reload();
+            fun onQueue(event: QueueSerializerEvent) {
+                if ("WeaponMechanics" == event.sourceName) reload()
             }
-        };
+        }
     }
 
-    public TaskChain reload() {
-        return new TaskChain(this)
-                .thenRunAsync(() -> {
-                    // Write config from jar to datafolder
-                    if (!getDataFolder().exists() || getDataFolder().listFiles() == null || getDataFolder().listFiles().length == 0) {
-                        debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)");
-                        FileUtil.copyResourcesTo(getClassLoader().getResource("ArmorMechanics"), getDataFolder().toPath());
+    fun reload(): TaskChain {
+        return TaskChain(this)
+            .thenRunAsync(Runnable {
+                // Write config from jar to datafolder
+                if (!dataFolder.exists() ||  (dataFolder.listFiles()?.size ?: 0) == 0) {
+                    debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)")
+                    FileUtil.copyResourcesTo(classLoader.getResource("ArmorMechanics"), dataFolder.toPath())
+                }
+            })
+            .thenRunSync(Runnable {
+                reloadConfig()
+
+                // Clear old data
+                effects.clear()
+                armors.clear()
+                sets.clear()
+
+                // Serialize armor types
+                val armorFile = File(dataFolder, "Armor.yml")
+                val armorConfig: FileConfiguration = YamlConfiguration.loadConfiguration(armorFile)
+                for (key in armorConfig.getKeys(false)) {
+                    val serializer = ArmorSerializer()
+                    val data = SerializeData(serializer, armorFile, key, BukkitConfig(armorConfig))
+                    try {
+                        serializer.serialize(data)
+                    } catch (e: SerializerException) {
+                        e.log(debug)
                     }
-                })
-                .thenRunSync(() -> {
-                    reloadConfig();
-
-                    // Clear old data
-                    effects.clear();
-                    armors.clear();
-                    sets.clear();
-
-                    // Serialize armor types
-                    File armorFile = new File(getDataFolder(), "Armor.yml");
-                    FileConfiguration armorConfig = YamlConfiguration.loadConfiguration(armorFile);
-
-                    for (String key : armorConfig.getKeys(false)) {
-                        ArmorSerializer serializer = new ArmorSerializer();
-                        SerializeData data = new SerializeData(serializer, armorFile, key, new BukkitConfig(armorConfig));
-
-                        try {
-                            serializer.serialize(data);
-                        } catch (SerializerException e) {
-                            e.log(debug);
-                        }
+                }
+                if (armors.isEmpty()) {
+                    debug.error(
+                        "Couldn't find any armors from '$armorFile'",
+                        "Keys: " + armorConfig.getKeys(false)
+                    )
+                    return@Runnable
+                }
+                val setFile = File(dataFolder, "Set.yml")
+                val setConfig: FileConfiguration = YamlConfiguration.loadConfiguration(setFile)
+                for (key in setConfig.getKeys(false)) {
+                    val serializer = ArmorSet()
+                    val data = SerializeData(serializer, setFile, key, BukkitConfig(setConfig))
+                    try {
+                        serializer.serialize(data)
+                    } catch (e: SerializerException) {
+                        e.log(debug)
                     }
-
-                    if (armors.isEmpty()) {
-                        debug.error("Couldn't find any armors from '" + armorFile + "'",
-                                "Keys: " + armorConfig.getKeys(false));
-                        return;
-                    }
-
-                    File setFile = new File(getDataFolder(), "Set.yml");
-                    FileConfiguration setConfig = YamlConfiguration.loadConfiguration(setFile);
-
-                    for (String key : setConfig.getKeys(false)) {
-                        ArmorSet serializer = new ArmorSet();
-                        SerializeData data = new SerializeData(serializer, setFile, key, new BukkitConfig(setConfig));
-
-                        try {
-                            serializer.serialize(data);
-                        } catch (SerializerException e) {
-                            e.log(debug);
-                        }
-                    }
-                });
+                }
+            })
     }
 
-    private void registerBStats() {
-        if (metrics != null) return;
-
-        debug.debug("Registering bStats");
+    private fun registerBStats() {
+        if (metrics != null) return
+        debug.debug("Registering bStats")
 
         // See https://bstats.org/plugin/bukkit/ArmorMechanics/15777. This is
         // the bStats plugin id used to track information.
-        int id = 15777;
-
-        this.metrics = new Metrics(this, id);
-
-        metrics.addCustomChart(new SimplePie("registered_armors", () -> {
-            int count = armors.size();
-
+        val id = 15777
+        metrics = Metrics(this, id)
+        metrics!!.addCustomChart(SimplePie("registered_armors", Callable {
+            val count = armors.size
             if (count <= 10) {
-                return "0-10";
+                return@Callable "0-10"
             } else if (count <= 20) {
-                return "11-20";
+                return@Callable "11-20"
             } else if (count <= 30) {
-                return "21-30";
+                return@Callable "21-30"
             } else if (count <= 50) {
-                return "31-50";
+                return@Callable "31-50"
             } else if (count <= 100) {
-                return "51-100";
+                return@Callable "51-100"
             } else {
-                return ">100";
+                return@Callable ">100"
             }
-        }));
-
-        metrics.addCustomChart(new SimplePie("registered_sets", () -> {
-            int count = sets.size();
-
+        }))
+        metrics!!.addCustomChart(SimplePie("registered_sets", Callable {
+            val count = sets.size
             if (count <= 2) {
-                return "0-2";
+                return@Callable "0-2"
             } else if (count <= 5) {
-                return "3-5";
+                return@Callable "3-5"
             } else if (count <= 10) {
-                return "6-10";
+                return@Callable "6-10"
             } else if (count <= 20) {
-                return "11-20";
+                return@Callable "11-20"
             } else if (count <= 50) {
-                return "21-50";
+                return@Callable "21-50"
             } else {
-                return ">50";
+                return@Callable ">50"
             }
-        }));
+        }))
     }
 
-    private void registerUpdateChecker() {
-        update = new UpdateChecker(this, UpdateChecker.github("WeaponMechanics", "ArmorMechanics"));
-
-        Listener listener = new Listener() {
+    private fun registerUpdateChecker() {
+        update = UpdateChecker(this, UpdateChecker.github("WeaponMechanics", "ArmorMechanics"))
+        val listener: Listener = object : Listener {
             @EventHandler
-            public void onJoin(PlayerJoinEvent event) {
-                if (event.getPlayer().isOp()) {
-                    new TaskChain(ArmorMechanics.this)
-                            .thenRunAsync((callback) -> update.hasUpdate())
-                            .thenRunSync((callback) -> {
-                                UpdateInfo update = (UpdateInfo) callback;
-                                if (callback != null)
-                                    event.getPlayer().sendMessage(ChatColor.RED + "ArmorMechanics is out of date! " + update.current + " -> " + update.newest);
-
-                                return null;
-                            });
+            fun onJoin(event: PlayerJoinEvent) {
+                if (event.player.isOp) {
+                    TaskChain(this@ArmorMechanics)
+                        .thenRunAsync { callback: Any? -> update!!.hasUpdate() }
+                        .thenRunSync { callback: Any? ->
+                            val update = callback as UpdateInfo?
+                            if (callback != null) event.player.sendMessage(ChatColor.RED.toString() + "ArmorMechanics is out of date! " + update!!.current + " -> " + update.newest)
+                            null
+                        }
                 }
             }
-        };
+        }
+        Bukkit.getPluginManager().registerEvents(listener, this)
+    }
 
-        Bukkit.getPluginManager().registerEvents(listener, this);
+    companion object {
+        lateinit var INSTANCE: ArmorMechanics
     }
 }

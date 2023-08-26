@@ -1,128 +1,97 @@
-package me.cjcrafter.armormechanics.listeners;
+package me.cjcrafter.armormechanics.listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanics;
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI;
-import me.cjcrafter.armormechanics.ArmorSet;
-import me.cjcrafter.armormechanics.BonusEffect;
-import me.deecaad.core.compatibility.CompatibilityAPI;
-import me.deecaad.core.events.EntityEquipmentEvent;
-import me.deecaad.core.mechanics.CastData;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.potion.PotionEffect;
+import me.cjcrafter.armormechanics.ArmorMechanics
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.core.events.EntityEquipmentEvent
+import me.deecaad.core.mechanics.CastData
+import org.bukkit.entity.LivingEntity
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.inventory.EquipmentSlot
+import java.lang.IllegalArgumentException
 
-import static me.cjcrafter.armormechanics.ArmorMechanicsAPI.getArmorTitle;
-
-public class ArmorEquipListener implements Listener {
+class ArmorEquipListener : Listener {
 
     @EventHandler
-    public void onEquip(EntityEquipmentEvent event) {
-        if (event.isEquipping() && event.isArmor())
-            equip(event);
-        if (event.isDequipping() && event.isArmor())
-            dequip(event);
+    fun onEquip(event: EntityEquipmentEvent) {
+        if (event.isEquipping && event.isArmor) equip(event)
+        if (event.isDequipping && event.isArmor) dequip(event)
     }
 
-    public void equip(EntityEquipmentEvent event) {
-
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        EntityEquipment equipment = entity.getEquipment();
-        ItemStack item = event.getEquipped();
-        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title");
+    fun equip(event: EntityEquipmentEvent) {
+        val entity = event.entity as LivingEntity
+        val equipment = entity.equipment
+        val item = event.equipped
+        val title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
 
         // When the equipped armor is not from ArmorMechanics, skip
-        if (title == null || title.isEmpty())
-            return;
-
-        BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
+        if (title == null || title.isEmpty()) return
+        val bonus = ArmorMechanics.INSTANCE.effects[title]
 
         // Determine which set they will be wearing after the armor is equipped
-        ItemStack helmet = equipment.getHelmet();
-        ItemStack chestplate = equipment.getChestplate();
-        ItemStack leggings = equipment.getLeggings();
-        ItemStack boots = equipment.getBoots();
-
-        switch (event.getSlot()) {
-            case HEAD -> helmet = event.getEquipped();
-            case CHEST -> chestplate = event.getEquipped();
-            case LEGS -> leggings = event.getEquipped();
-            case FEET -> boots = event.getEquipped();
+        var helmet = equipment!!.helmet
+        var chestplate = equipment.chestplate
+        var leggings = equipment.leggings
+        var boots = equipment.boots
+        when (event.slot) {
+            EquipmentSlot.HEAD -> helmet = event.equipped
+            EquipmentSlot.CHEST -> chestplate = event.equipped
+            EquipmentSlot.LEGS -> leggings = event.equipped
+            EquipmentSlot.FEET -> boots = event.equipped
+            else -> throw IllegalArgumentException("impossible")
         }
 
-        ArmorSet set = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
-
+        val set = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots)
         if (bonus != null) {
-            if (bonus.getEquipMechanics() != null)
-                bonus.getEquipMechanics().use(new CastData(entity, title, item));
-
-            for (PotionEffect potion : bonus.getPotions())
-                entity.addPotionEffect(potion);
+            bonus.equipMechanics?.use(CastData(entity, title, item))
+            for (potion in bonus.potions)
+                entity.addPotionEffect(potion)
         }
 
-        if (set != null && set.getBonus() != null) {
-            BonusEffect setBonus = ArmorMechanics.INSTANCE.effects.get(set.getBonus());
 
-            if (setBonus.getEquipMechanics() != null)
-                setBonus.getEquipMechanics().use(new CastData(entity, title, item));
-
-            for (PotionEffect potion : setBonus.getPotions())
-                entity.addPotionEffect(potion);
+        if (set?.bonus != null) {
+            set.bonus.equipMechanics?.use(CastData(entity, title, item))
+            for (potion in set.bonus.potions)
+                entity.addPotionEffect(potion)
         }
     }
 
-    public void dequip(EntityEquipmentEvent event) {
-
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        ItemStack item = event.getDequipped();
-        String title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title");
+    fun dequip(event: EntityEquipmentEvent) {
+        val entity = event.entity as LivingEntity
+        val item = event.dequipped
+        val title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
 
         // When the equipped armor is not from ArmorMechanics, skip
-        if (title == null || title.isEmpty())
-            return;
-
-        BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
+        if (title == null || title.isEmpty()) return
+        val bonus = ArmorMechanics.INSTANCE.effects[title]
         if (bonus != null) {
-            if (bonus.getDequipMechanics() != null)
-                bonus.getDequipMechanics().use(new CastData(entity, title, item));
-
-            for (PotionEffect potion : bonus.getPotions())
-                entity.removePotionEffect(potion.getType());
+            bonus.dequipMechanics?.use(CastData(entity, title, item))
+            for (potion in bonus.potions)
+                entity.removePotionEffect(potion.type)
         }
 
         // Set bonus is a little weird, as we need to check if the user
         // previously had a set bonus, and if it needs to be removed.
-        EntityEquipment equipment = entity.getEquipment();
-        String helmet = getArmorTitle(equipment.getHelmet());
-        String chestplate = getArmorTitle(equipment.getChestplate());
-        String leggings = getArmorTitle(equipment.getLeggings());
-        String boots = getArmorTitle(equipment.getBoots());
-
-        ArmorSet oldSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
-        if (oldSet == null)
-            return;
-
-        switch (event.getSlot()) {
-            case HEAD -> helmet = null;
-            case CHEST -> chestplate = null;
-            case LEGS -> leggings = null;
-            case FEET -> boots = null;
+        val equipment = entity.equipment
+        var helmet = ArmorMechanicsAPI.getArmorTitle(equipment!!.helmet)
+        var chestplate = ArmorMechanicsAPI.getArmorTitle(equipment.chestplate)
+        var leggings = ArmorMechanicsAPI.getArmorTitle(equipment.leggings)
+        var boots = ArmorMechanicsAPI.getArmorTitle(equipment.boots)
+        val oldSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots) ?: return
+        when (event.slot) {
+            EquipmentSlot.HEAD -> helmet = null
+            EquipmentSlot.CHEST -> chestplate = null
+            EquipmentSlot.LEGS -> leggings = null
+            EquipmentSlot.FEET -> boots = null
+            else -> throw IllegalArgumentException("impossible")
         }
 
-        ArmorSet newSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
-
-        if (oldSet != newSet) {
-            BonusEffect setBonus = ArmorMechanics.INSTANCE.effects.get(oldSet.getBonus());
-
-            if (setBonus.getDequipMechanics() != null)
-                setBonus.getDequipMechanics().use(new CastData(entity, title, item));
-
-            for (PotionEffect potion : setBonus.getPotions())
-                entity.removePotionEffect(potion.getType());
+        val newSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots)
+        if (oldSet !== newSet) {
+            oldSet.bonus.dequipMechanics?.use(CastData(entity, title, item))
+            for (potion in oldSet.bonus.potions)
+                entity.removePotionEffect(potion.type)
         }
-
-
     }
 }

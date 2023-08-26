@@ -1,21 +1,20 @@
-package me.cjcrafter.armormechanics.listeners;
+package me.cjcrafter.armormechanics.listeners
 
-import io.lumine.mythic.bukkit.events.MythicDropLoadEvent;
-import me.cjcrafter.armormechanics.ArmorMechanics;
-import me.cjcrafter.armormechanics.lib.MythicMobsArmorDrop;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
+import io.lumine.mythic.bukkit.events.MythicDropLoadEvent
+import me.cjcrafter.armormechanics.ArmorMechanics
+import me.cjcrafter.armormechanics.lib.MythicMobsArmorDrop
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
 
-public class MythicMobsListener implements Listener {
-
-    public MythicMobsListener() {
-        ArmorMechanics.INSTANCE.debug.info("Hooking into MythicMobs");
+class MythicMobsListener : Listener {
+    init {
+        ArmorMechanics.INSTANCE.debug.info("Hooking into MythicMobs")
     }
 
     @EventHandler
-    public void onMythicDropLoad(MythicDropLoadEvent event) {
-        if (event.getDropName().equalsIgnoreCase("armorMechanicsArmor")) {
-            event.register(new MythicMobsArmorDrop(event.getConfig(), event.getArgument()));
+    fun onMythicDropLoad(event: MythicDropLoadEvent) {
+        if (event.dropName.equals("armorMechanicsArmor", ignoreCase = true)) {
+            event.register(MythicMobsArmorDrop(event.config, event.argument))
         }
     }
 }

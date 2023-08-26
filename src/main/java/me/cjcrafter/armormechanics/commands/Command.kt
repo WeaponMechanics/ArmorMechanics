@@ -1,221 +1,222 @@
-package me.cjcrafter.armormechanics;
+@file:Suppress("UNCHECKED_CAST")
 
-import me.deecaad.core.MechanicsCore;
-import me.deecaad.core.commands.*;
-import me.deecaad.core.commands.arguments.EntityListArgumentType;
-import me.deecaad.core.commands.arguments.MapArgumentType;
-import me.deecaad.core.commands.arguments.StringArgumentType;
-import me.deecaad.core.compatibility.CompatibilityAPI;
-import me.deecaad.core.utils.EnumUtil;
-import me.deecaad.core.utils.StringUtil;
-import me.deecaad.weaponmechanics.WeaponMechanics;
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.EquipmentSlot;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.PluginDescriptionFile;
+package me.cjcrafter.armormechanics.commands
 
-import java.util.*;
-import java.util.function.Function;
+import me.cjcrafter.armormechanics.ArmorMechanics
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
+import me.deecaad.core.MechanicsCore
+import me.deecaad.core.commands.*
+import me.deecaad.core.commands.arguments.EntityListArgumentType
+import me.deecaad.core.commands.arguments.MapArgumentType
+import me.deecaad.core.commands.arguments.StringArgumentType
+import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.core.utils.EnumUtil
+import me.deecaad.core.utils.StringUtil
+import me.deecaad.weaponmechanics.WeaponMechanics
+import org.bukkit.Bukkit
+import org.bukkit.ChatColor
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Entity
+import org.bukkit.entity.EntityType
+import org.bukkit.entity.LivingEntity
+import org.bukkit.entity.Player
+import org.bukkit.inventory.EquipmentSlot
+import java.util.function.Function
+import javax.tools.Tool
 
-import static org.bukkit.ChatColor.*;
-
-@SuppressWarnings("unchecked")
-public class Command {
-
-    public static final char SYM = '\u27A2';
-
-    public static Function<CommandData, Tooltip[]> ARMOR_SUGGESTIONS = (data) -> {
-        return ArmorMechanics.INSTANCE.armors.keySet().stream().map(Tooltip::of).toArray(Tooltip[]::new);
-    };
-
-    public static Function<CommandData, Tooltip[]> SET_SUGGESTIONS = (data) -> {
-        return ArmorMechanics.INSTANCE.sets.keySet().stream().map(Tooltip::of).toArray(Tooltip[]::new);
-    };
-
-    public static void register() {
-
-        MapArgumentType giveDataMap = new MapArgumentType()
-                .with("dontEquip", MapArgumentType.INT(0, 1))
-                .with("forceEquip", MapArgumentType.INT(0, 1))
-                .with("preventRemove", MapArgumentType.INT(0, 1));
-
-        CommandBuilder command = new CommandBuilder("am")
-                .withAliases("armor", "armormechanics")
-                .withPermission("armormechanics.admin")
-                .withDescription("ArmorMechanics' main command")
-
-                .withSubcommand(new CommandBuilder("give")
-                        .withPermission("armormechanics.commands.give")
-                        .withDescription("Gives the target(s) the requested armor")
-                        .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to give the armor"))
-                        .withArgument(new Argument<>("armor", new StringArgumentType()).withDesc("Which armor to give").replace(ARMOR_SUGGESTIONS))
-                        .withArgument(new Argument<>("data", giveDataMap, new HashMap<>()).withDesc("How to equip the armor"))
-                        .executes(CommandExecutor.any((sender, args) -> {
-                            give(sender, (List<Entity>) args[0], (String) args[1], (HashMap<String, Object>) args[2]);
-                        })))
-
-                .withSubcommand(new CommandBuilder("get")
-                        .withPermission("armormechanics.commands.get")
-                        .withDescription("Gives you the requested armor")
-                        .withArgument(new Argument<>("armor", new StringArgumentType()).withDesc("Which armor to give").replace(ARMOR_SUGGESTIONS))
-                        .executes(CommandExecutor.entity((sender, args) -> {
-                            give(sender, Collections.singletonList(sender), (String) args[0], new HashMap<>());
-                        })))
-
-                .withSubcommand(new CommandBuilder("giveset")
-                        .withPermission("armormechanics.commands.giveset")
-                        .withDescription("Gives the target(s) the requested set of armor")
-                        .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to give the set"))
-                        .withArgument(new Argument<>("set", new StringArgumentType()).withDesc("Which set of armor to give").replace(SET_SUGGESTIONS))
-                        .withArgument(new Argument<>("data", giveDataMap, new HashMap<>()).withDesc("How to equip the armor"))
-                        .executes(CommandExecutor.any((sender, args) -> {
-                            ArmorSet set = ArmorMechanics.INSTANCE.sets.get((String) args[1]);
-                            if (set.getHelmet() != null) give(sender, (List<Entity>) args[0], set.getHelmet(), (Map<String, Object>) args[2]);
-                            if (set.getChestplate() != null) give(sender, (List<Entity>) args[0], set.getChestplate(), (Map<String, Object>) args[2]);
-                            if (set.getLeggings() != null) give(sender, (List<Entity>) args[0], set.getLeggings(), (Map<String, Object>) args[2]);
-                            if (set.getBoots() != null) give(sender, (List<Entity>) args[0], set.getBoots(), (Map<String, Object>) args[2]);
-                        })))
-
-                .withSubcommand(new CommandBuilder("clear")
-                        .withPermission("armormechanics.commands.clear")
-                        .withDescription("Clears the target's armor")
-                        .withArgument(new Argument<>("targets", new EntityListArgumentType()).withDesc("Which target(s) to clear"))
-                        .withArgument(new Argument<>("slots", new StringArgumentType().withLiteral("*"), "*").withDesc("Which slot(s) to clear").replace(SuggestionsBuilder.from("head", "chest", "legs", "feet")))
-                        .executes(CommandExecutor.any((sender, args) -> {
-                            clear(sender, (List<Entity>) args[0], (String) args[1]);
-                        })))
-
-                .withSubcommand(new CommandBuilder("reload")
-                        .withPermission("armormechanics.commands.reload")
-                        .withDescription("Reloads the plugin's configurations")
-                        .executes(CommandExecutor.any((sender, args) -> {
-                            ArmorMechanics.INSTANCE.reload().thenRunSync(() -> {
-                                sender.sendMessage(GREEN + "Reloaded ArmorMechanics");
-                            });
-                        })))
-
-                .withSubcommand(new CommandBuilder("info")
-                        .withPermission("armormechanics.commands.info")
-                        .withDescription("Displays information about ArmorMechanics")
-                        .executes(CommandExecutor.any((sender, args) -> {
-                            info(sender);
-                        })));
-
-        command.registerHelp(HelpCommandBuilder.HelpColor.from(GOLD, GRAY, SYM));
-        command.register();
+object Command {
+    const val SYM = '\u27A2'
+    var ARMOR_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
+        return@Function ArmorMechanics.INSTANCE.armors.keys.map { armorTitle -> Tooltip.of(armorTitle) }.toTypedArray()
     }
 
-    public static void give(CommandSender sender, List<Entity> entities, String title, Map<String, Object> data) {
+    var SET_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
+        return@Function ArmorMechanics.INSTANCE.sets.keys.map { setName -> Tooltip.of(setName) }.toTypedArray()
+    }
+
+    fun register() {
+        val giveDataMap = MapArgumentType()
+            .with("dontEquip", MapArgumentType.INT(0, 1))
+            .with("forceEquip", MapArgumentType.INT(0, 1))
+            .with("preventRemove", MapArgumentType.INT(0, 1))
+
+        val command = command("am") {
+            aliases("armor", "armormechanics")
+            permission("armormechanics.admin")
+            description("ArmorMechanics main command")
+
+            subcommand("give") {
+                permission("armormechanics.commands.give")
+                description("Gives the target(s) armor")
+
+                argument("targets", EntityListArgumentType()) {
+                    description = "Who to give armor to"
+                }
+                argument("armor", StringArgumentType()) {
+                    description = "Which armor to give"
+                    replace(ARMOR_SUGGESTIONS)
+                }
+                argument("data", giveDataMap) {
+                    description = "How to equip the armor, json input {}"
+                    default = HashMap()
+                }
+                executeAny { sender, args ->
+                    give(sender, args[0] as List<Entity>, args[1] as String, args[2] as Map<String?, Any>)
+                }
+            }
+
+            subcommand("get") {
+                permission("armormechanics.commands.get")
+                description("Give yourself armor")
+
+                argument("armor", StringArgumentType()) {
+                    description = "Which armor to give"
+                    replace(ARMOR_SUGGESTIONS)
+                }
+                argument("data", giveDataMap) {
+                    description = "How to equip the armor, json input {}"
+                    default = HashMap()
+                }
+                executeEntity { entity, args ->
+                    give(entity, listOf(entity as LivingEntity), args[0] as String, args[1] as Map<String?, Any>)
+                }
+            }
+
+            subcommand("giveset") {
+                permission("armormechanics.commands.giveset")
+                description("Give the target[s] a set of armor")
+
+                argument("targets", EntityListArgumentType()) {
+                    description = "Who to give armor to"
+                }
+                argument("set", StringArgumentType()) {
+                    description = "Which set to give"
+                    replace(SET_SUGGESTIONS)
+                }
+                argument("data", giveDataMap) {
+                    description = "How to equip the armor, json input {}"
+                    default = HashMap()
+                }
+                executeAny { sender, args ->
+                    val set = ArmorMechanics.INSTANCE.sets[args[1] as String]
+                    if (set == null) {
+                        sender.sendMessage("${ChatColor.RED}Unknown set '" + args[1] + "'")
+                        return@executeAny
+                    }
+
+                    val targets = args[0] as List<Entity>
+                    val data = args[2] as Map<String?, Any>
+                    set.helmet?.let { give(sender, targets, it, data) }
+                    set.chestplate?.let { give(sender, targets, it, data) }
+                    set.leggings?.let { give(sender, targets, it, data) }
+                    set.leggings?.let { give(sender, targets, it, data) }
+                }
+            }
+
+            subcommand("clear") {
+                permission("armormechanics.commands.clear")
+                description("Clears the target entity's armor")
+
+                argument("targets", EntityListArgumentType()) {
+                    description = "Which targets to clear"
+                }
+                argument("slots", StringArgumentType().withLiteral("*")) {
+                    description = "Which slot to clear"
+                    default = "*"
+                    replace(SuggestionsBuilder.from("head", "chest", "legs", "feet"))
+                }
+                executeAny { sender, args ->
+                    clear(sender, args[0] as List<Entity>, args[1] as String)
+                }
+            }
+
+            subcommand("reload") {
+                permission("armormechanics.commands.reload")
+                description("Reloads ArmorMechanics configuration")
+                executeAny { sender, args ->
+                    ArmorMechanics.INSTANCE.reload().thenRunSync(Runnable { sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics") })
+                }
+            }
+        }
+
+        command.registerHelp(HelpCommandBuilder.HelpColor.from(ChatColor.GOLD, ChatColor.GRAY, SYM))
+        command.register()
+    }
+
+    fun give(sender: CommandSender, entities: List<Entity>, title: String?, data: Map<String?, Any>) {
 
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
-        List<String> startsWith = new ArrayList<>();
-        Set<String> options = ArmorMechanics.INSTANCE.armors.keySet();
-        for (String temp : options) {
-            if (temp.toLowerCase(Locale.ROOT).startsWith(title.toLowerCase(Locale.ROOT)))
-                startsWith.add(title);
+        var title = title
+        val startsWith: MutableList<String?> = ArrayList()
+        val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
+        for (temp in options) {
+            if (temp.lowercase().startsWith(title!!.lowercase())) startsWith.add(title)
         }
-
-        title = StringUtil.didYouMean(title, startsWith.isEmpty() ? options : startsWith);
-        ItemStack armor = ArmorMechanics.INSTANCE.armors.get(title);
-
+        title = StringUtil.didYouMean(title, if (startsWith.isEmpty()) options else startsWith)
+        val armor = ArmorMechanics.INSTANCE.armors[title]
         if (armor == null) {
-            sender.sendMessage(RED + "Couldn't find armor '" + title + "'... Choose from " + options);
-            return;
+            sender.sendMessage(ChatColor.RED.toString() + "Couldn't find armor '" + title + "'... Choose from " + options)
+            return
         }
-
-        EquipmentSlot slot = ArmorMechanicsAPI.getEquipmentSlot(armor.getType());
-
-        boolean dontEquip = 1 == (int) data.getOrDefault("dontEquip", 0);
-        boolean force = 1 == (int) data.getOrDefault("forceEquip", 0);
-        boolean preventRemove = 1 == (int) data.getOrDefault("preventRemove", 0);
-
+        val slot = getEquipmentSlot(armor.type)!!
+        val dontEquip = 1 == (data["dontEquip"] ?: 0) as Int
+        val force = 1 == (data["forceEquip"] ?: 0) as Int
+        val preventRemove = 1 == (data["preventRemove"] ?: 0) as Int
         if (!force && preventRemove) {
-            sender.sendMessage(RED + "When using preventRemove, forceEquip must also be enabled!");
+            sender.sendMessage(ChatColor.RED.toString() + "When using preventRemove, forceEquip must also be enabled!")
         }
-
-        for (Entity entity : entities) {
-            if (!entity.getType().isAlive())
-                continue;
-
-            LivingEntity living = (LivingEntity) entity;
-            EntityEquipment equipment = living.getEquipment();
-
+        for (entity in entities) {
+            if (!entity.type.isAlive) continue
+            val living = entity as LivingEntity
+            val equipment = living.equipment
             if (!dontEquip && force) {
                 if (preventRemove) {
-                    ItemStack clone = armor.clone();
-                    CompatibilityAPI.getNBTCompatibility().setInt(clone, "ArmorMechanics", "prevent-remove", 1);
-                    ArmorMechanicsAPI.setItem(equipment, slot, clone);
-                    return;
+                    val clone = armor.clone()
+                    CompatibilityAPI.getNBTCompatibility().setInt(clone, "ArmorMechanics", "prevent-remove", 1)
+                    setItem(equipment!!, slot, clone)
+                    return
                 }
-
-                ArmorMechanicsAPI.setItem(equipment, slot, armor.clone());
-                return;
+                setItem(equipment!!, slot, armor.clone())
+                return
             }
-
-            if (!dontEquip && ArmorMechanicsAPI.getItem(equipment, slot) == null) {
-                ArmorMechanicsAPI.setItem(equipment, slot, armor.clone());
-                return;
+            if (!dontEquip && getItem(equipment!!, slot) == null) {
+                setItem(equipment, slot, armor.clone())
+                return
             }
-
-            if (living.getType() == EntityType.PLAYER) {
-                Player player = (Player) living;
-                HashMap<Integer, ItemStack> overflow = player.getInventory().addItem(armor.clone());
-
-                if (!overflow.isEmpty()) {
-                    sender.sendMessage(ChatColor.RED + player.getName() + "'s inventory was full!");
+            if (living.type == EntityType.PLAYER) {
+                val player = living as Player
+                val overflow = player.inventory.addItem(armor.clone())
+                if (overflow.isNotEmpty()) {
+                    sender.sendMessage(ChatColor.RED.toString() + player.name + "'s inventory was full!")
                 }
             }
         }
     }
 
-    public static void clear(CommandSender sender, List<Entity> targets, String slots) {
-        EquipmentSlot slot = "*".equals(slots) ? null : EquipmentSlot.valueOf(StringUtil.didYouMean(slots, EnumUtil.getOptions(EquipmentSlot.class)).toUpperCase(Locale.ROOT));
-
-        sender.sendMessage(GREEN + "Removing armor from " + targets.size() + (targets.size() == 1 ? "entity" : "entities"));
-
-        for (Entity target : targets) {
-            if (!target.getType().isAlive())
-                continue;
-
-            LivingEntity entity = (LivingEntity) target;
-            EntityEquipment equipment = entity.getEquipment();
-
+    fun clear(sender: CommandSender, targets: List<Entity>, slots: String) {
+        val slot = if ("*" == slots) null else EquipmentSlot.valueOf(
+            StringUtil.didYouMean(
+                slots, EnumUtil.getOptions(
+                    EquipmentSlot::class.java
+                )
+            ).uppercase()
+        )
+        sender.sendMessage(ChatColor.GREEN.toString() + "Removing armor from " + targets.size + if (targets.size == 1) "entity" else "entities")
+        for (target in targets) {
+            if (!target.type.isAlive) continue
+            val entity = target as LivingEntity
+            val equipment = entity.equipment
             if (slot == null) {
-                equipment.setBoots(null);
-                equipment.setLeggings(null);
-                equipment.setChestplate(null);
-                equipment.setHelmet(null);
+                equipment!!.boots = null
+                equipment.leggings = null
+                equipment.chestplate = null
+                equipment.helmet = null
             } else {
-                ArmorMechanicsAPI.setItem(equipment, slot, null);
+                setItem(equipment!!, slot, null)
             }
         }
-    }
-
-    public static void info(CommandSender sender) {
-        PluginDescriptionFile desc =  ArmorMechanics.INSTANCE.getDescription();
-        sender.sendMessage("" + GRAY + GOLD + BOLD + "Armor" + GRAY + BOLD + "Mechanics"
-                + GRAY + ", v" + ITALIC + desc.getVersion());
-
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " Authors: " + GRAY + String.join(", ", desc.getAuthors()));
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " Command:" + GRAY + " /armormechanics");
-
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " Server: " + GRAY + Bukkit.getName() + " " + Bukkit.getVersion());
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " MechanicsCore: " + GRAY + MechanicsCore.getPlugin().getDescription().getVersion());
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " WeaponMechanics: " + GRAY + WeaponMechanics.getPlugin().getDescription().getVersion());
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " Java: " + GRAY + System.getProperty("java.version"));
-
-        // Gets all supported plugins
-        Set<String> softDepends = new LinkedHashSet<>(desc.getSoftDepend());
-        softDepends.addAll(MechanicsCore.getPlugin().getDescription().getSoftDepend());
-        softDepends.removeIf(name -> Bukkit.getPluginManager().getPlugin(name) == null);
-        sender.sendMessage("  " + GRAY + SYM + GOLD + " Supported plugins: " + GRAY + String.join(", ", softDepends));
     }
 }

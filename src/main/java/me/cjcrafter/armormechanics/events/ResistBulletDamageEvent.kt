@@ -1,4 +1,3 @@
-package me.cjcrafter.armormechanics.events;
+package me.cjcrafter.armormechanics.events
 
-public class ResistBulletDamageEvent {
-}
+class ResistBulletDamageEvent

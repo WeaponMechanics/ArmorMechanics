@@ -1,52 +1,42 @@
-package me.cjcrafter.armormechanics.listeners;
+package me.cjcrafter.armormechanics.listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanics;
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI;
-import me.deecaad.core.events.EntityEquipmentEvent;
-import me.deecaad.core.placeholder.PlaceholderRequestEvent;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.scheduler.BukkitRunnable;
+import me.cjcrafter.armormechanics.ArmorMechanics
+import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import me.deecaad.core.events.EntityEquipmentEvent
+import org.bukkit.entity.LivingEntity
+import org.bukkit.event.EventHandler
+import org.bukkit.event.Listener
+import org.bukkit.scheduler.BukkitRunnable
 
-public class ArmorUpdateListener implements Listener {
+class ArmorUpdateListener : Listener {
 
     @EventHandler
-    public void onEquip(EntityEquipmentEvent event) {
-        if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Update_Armor"))
-            return;
-        if (!event.isEquipping())
-            return;
-
-        LivingEntity entity = (LivingEntity) event.getEntity();
+    fun onEquip(event: EntityEquipmentEvent) {
+        if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Update_Armor")) return
+        if (!event.isEquipping) return
+        val entity = event.entity as LivingEntity
 
         // We want to update the armor, but unfortunately we cannot modify the
         // event since it contains a COPY of the armor. So, we need to check 1
         // tick after the event and check to update it. If no armor is in that
         // slot anymore, we can just assume the player has already removed it.
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                EntityEquipment equipment = entity.getEquipment();
-                ItemStack item = ArmorMechanicsAPI.getItem(equipment, event.getSlot());
+        object : BukkitRunnable() {
+            override fun run() {
+                val equipment = entity.equipment
+                val item = ArmorMechanicsAPI.getItem(equipment!!, event.slot)
 
                 // Either not ArmorMechanics armor, or just not any armor at
                 // all. Either way, we don't need to update it.
-                if (ArmorMechanicsAPI.getArmorTitle(item) == null)
-                    return;
+                if (ArmorMechanicsAPI.getArmorTitle(item) == null) return
 
                 // Dupe protection, it is theoretically possible for a client
                 // to swap out the item with a different armor. Not a very useful
                 // dupe since it replaces the old armor, but still a potential bug
-                if (!event.getEquipped().equals(item))
-                    return;
+                if (event.equipped != item) return
 
-                ArmorMechanicsAPI.update(entity, item);
-                ArmorMechanicsAPI.setItem(equipment, event.getSlot(), item);
+                ArmorMechanicsAPI.update(entity, item!!)
+                ArmorMechanicsAPI.setItem(equipment, event.slot, item)
             }
-        }.runTask(ArmorMechanics.INSTANCE);
+        }.runTask(ArmorMechanics.INSTANCE)
     }
 }

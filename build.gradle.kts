@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "me.cjcrafter"
 version = "2.2.0"
@@ -8,6 +9,7 @@ plugins {
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.0"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    kotlin("jvm") version "1.7.20-RC"
 }
 
 configurations {
@@ -20,7 +22,8 @@ bukkit {
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
-    softDepend = listOf("MechanicsCore", "WeaponMechanics")
+    depend = listOf("MechanicsCore")
+    softDepend = listOf("WeaponMechanics")
 }
 
 repositories {
@@ -100,4 +103,14 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "16"
+}
+
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "16"
 }
