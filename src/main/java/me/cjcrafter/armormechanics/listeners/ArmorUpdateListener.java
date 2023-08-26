@@ -3,7 +3,9 @@ package me.cjcrafter.armormechanics.listeners;
 import me.cjcrafter.armormechanics.ArmorMechanics;
 import me.cjcrafter.armormechanics.ArmorMechanicsAPI;
 import me.deecaad.core.events.EntityEquipmentEvent;
+import me.deecaad.core.placeholder.PlaceholderRequestEvent;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.EntityEquipment;
@@ -36,7 +38,13 @@ public class ArmorUpdateListener implements Listener {
                 if (ArmorMechanicsAPI.getArmorTitle(item) == null)
                     return;
 
-                ArmorMechanicsAPI.update(item);
+                // Dupe protection, it is theoretically possible for a client
+                // to swap out the item with a different armor. Not a very useful
+                // dupe since it replaces the old armor, but still a potential bug
+                if (!event.getEquipped().equals(item))
+                    return;
+
+                ArmorMechanicsAPI.update(entity, item);
                 ArmorMechanicsAPI.setItem(equipment, event.getSlot(), item);
             }
         }.runTask(ArmorMechanics.INSTANCE);

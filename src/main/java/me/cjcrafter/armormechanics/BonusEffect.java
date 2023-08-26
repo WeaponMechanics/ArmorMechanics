@@ -27,50 +27,42 @@ import java.util.stream.Collectors;
 public class BonusEffect implements Serializer<BonusEffect> {
 
     private List<PotionEffect> potions;
-    private double bulletResistance;
-    private DoubleMap<String> perWeaponResistances;
     private Set<PotionEffectType> immunities;
     private Mechanics equipMechanics;
     private Mechanics dequipMechanics;
     private Mechanics damageMechanics;
 
+    // WeaponMechanics things
+    private double bulletResistance;
+    private DoubleMap<String> perWeaponBulletResistances;
+    private double explosionResistance;
+    private DoubleMap<String> perWeaponExplosionResistances;
+
     public BonusEffect() {
     }
 
-    public BonusEffect(List<PotionEffect> potions, double bulletResistance, DoubleMap<String> perWeaponResistances,
-                       Set<PotionEffectType> immunities, Mechanics equipMechanics, Mechanics dequipMechanics,
-                       Mechanics damageMechanics) {
+    public BonusEffect(List<PotionEffect> potions, Set<PotionEffectType> immunities, Mechanics equipMechanics,
+                       Mechanics dequipMechanics, Mechanics damageMechanics, double bulletResistance,
+                       DoubleMap<String> perWeaponBulletResistances, double explosionResistance, DoubleMap<String> perWeaponExplosionResistances) {
 
         this.potions = potions;
-        this.bulletResistance = bulletResistance;
-        this.perWeaponResistances = perWeaponResistances;
         this.immunities = immunities;
         this.equipMechanics = equipMechanics;
         this.dequipMechanics = dequipMechanics;
         this.damageMechanics = damageMechanics;
+
+        this.bulletResistance = bulletResistance;
+        this.perWeaponBulletResistances = perWeaponBulletResistances;
+        this.explosionResistance = explosionResistance;
+        this.perWeaponExplosionResistances = perWeaponExplosionResistances;
     }
 
     public List<PotionEffect> getPotions() {
         return potions;
     }
 
-    public double getBulletResistance() {
-        return bulletResistance;
-    }
-
-    public double getBulletResistance(String weaponTitle) {
-        if (perWeaponResistances.size() != 0 && perWeaponResistances.containsKey(weaponTitle))
-            return perWeaponResistances.get(weaponTitle);
-
-        return bulletResistance;
-    }
-
     public Set<PotionEffectType> getImmunities() {
         return immunities;
-    }
-
-    public DoubleMap<String> getPerWeaponResistances() {
-        return perWeaponResistances;
     }
 
     public Mechanics getEquipMechanics() {
@@ -90,6 +82,36 @@ public class BonusEffect implements Serializer<BonusEffect> {
             return;
 
         damageMechanics.use(new CastData((LivingEntity) event.getEntity(), null, null));
+    }
+
+    public double getBulletResistance() {
+        return bulletResistance;
+    }
+
+    public double getBulletResistance(String weaponTitle) {
+        if (perWeaponBulletResistances.containsKey(weaponTitle))
+            return perWeaponBulletResistances.get(weaponTitle);
+
+        return bulletResistance;
+    }
+
+    public DoubleMap<String> getPerWeaponBulletResistances() {
+        return perWeaponBulletResistances;
+    }
+
+    public double getExplosionResistance() {
+        return bulletResistance;
+    }
+
+    public double getExplosionResistance(String weaponTitle) {
+        if (perWeaponExplosionResistances.containsKey(weaponTitle))
+            return perWeaponExplosionResistances.get(weaponTitle);
+
+        return explosionResistance;
+    }
+
+    public DoubleMap<String> getPerWeaponExplosionResistances() {
+        return perWeaponExplosionResistances;
     }
 
     @Override
@@ -123,12 +145,12 @@ public class BonusEffect implements Serializer<BonusEffect> {
             }
         }
 
-        double bulletResistance = data.of("Bullet_Resistance.Base").assertRange(0.0, 1.0).getDouble(0.0);
+        double bulletResistance = data.of("Bullet_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0);
         List<String[]> perWeaponData = data.ofList("Bullet_Resistance.Per_Weapon")
                 .addArgument(String.class, true, true)
-                .addArgument(double.class, true).assertArgumentRange(0.0, 1.0)
+                .addArgument(double.class, true).assertArgumentRange(0.0, 2.0)
                 .assertList().get();
-        DoubleMap<String> perWeapon = new DoubleMap<>();
+        DoubleMap<String> perWeaponBulletResistances = new DoubleMap<>();
 
         for (int i = 0; i < perWeaponData.size(); i++) {
             String[] split = perWeaponData.get(i);
@@ -136,13 +158,23 @@ public class BonusEffect implements Serializer<BonusEffect> {
             String weapon = split[0];
             double resistance = Double.parseDouble(split[1]);
 
-            // Check if the weapon exists
-            List<String> allWeapons = WeaponMechanics.getWeaponHandler().getInfoHandler().getSortedWeaponList();
-            if (!allWeapons.contains(weapon)) {
-                throw new SerializerOptionsException(this, "Weapon", allWeapons, weapon, data.ofList("Bullet_Resistance.Per_Weapon").getLocation(i));
-            }
+            perWeaponBulletResistances.put(weapon, resistance);
+        }
 
-            perWeapon.put(weapon, resistance);
+        double explosionResistance = data.of("Explosion_Resistance.Base").assertRange(0.0, 2.0).getDouble(0.0);
+        List<String[]> perWeaponExplosionData = data.ofList("Explosion_Resistance.Per_Weapon")
+                .addArgument(String.class, true, true)
+                .addArgument(double.class, true).assertArgumentRange(0.0, 2.0)
+                .assertList().get();
+        DoubleMap<String> perWeaponExplosionResistances = new DoubleMap<>();
+
+        for (int i = 0; i < perWeaponExplosionData.size(); i++) {
+            String[] split = perWeaponData.get(i);
+
+            String weapon = split[0];
+            double resistance = Double.parseDouble(split[1]);
+
+            perWeaponExplosionResistances.put(weapon, resistance);
         }
 
         List<String[]> immunitiesStringList = data.ofList("Immune_Potions")
@@ -163,6 +195,7 @@ public class BonusEffect implements Serializer<BonusEffect> {
         Mechanics dequip = data.of("Dequip_Mechanics").serialize(Mechanics.class);
         Mechanics damage = data.of("Damage_Mechanics").serialize(Mechanics.class);
 
-        return new BonusEffect(potions, bulletResistance, perWeapon, new HashSet<>(immunities), equip, dequip, damage);
+        return new BonusEffect(potions, new HashSet<>(immunities), equip, dequip, damage, bulletResistance,
+                perWeaponBulletResistances, explosionResistance, perWeaponExplosionResistances);
     }
 }

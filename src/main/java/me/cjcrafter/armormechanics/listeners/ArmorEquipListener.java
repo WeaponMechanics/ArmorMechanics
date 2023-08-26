@@ -84,6 +84,13 @@ public class ArmorEquipListener implements Listener {
             return;
 
         BonusEffect bonus = ArmorMechanics.INSTANCE.effects.get(title);
+        if (bonus != null) {
+            if (bonus.getDequipMechanics() != null)
+                bonus.getDequipMechanics().use(new CastData(entity, title, item));
+
+            for (PotionEffect potion : bonus.getPotions())
+                entity.removePotionEffect(potion.getType());
+        }
 
         // Set bonus is a little weird, as we need to check if the user
         // previously had a set bonus, and if it needs to be removed.
@@ -92,14 +99,6 @@ public class ArmorEquipListener implements Listener {
         String chestplate = getArmorTitle(equipment.getChestplate());
         String leggings = getArmorTitle(equipment.getLeggings());
         String boots = getArmorTitle(equipment.getBoots());
-
-        if (bonus != null) {
-            if (bonus.getDequipMechanics() != null)
-                bonus.getDequipMechanics().use(new CastData(entity, title, item));
-
-            for (PotionEffect potion : bonus.getPotions())
-                entity.removePotionEffect(potion.getType());
-        }
 
         ArmorSet oldSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots);
         if (oldSet == null)

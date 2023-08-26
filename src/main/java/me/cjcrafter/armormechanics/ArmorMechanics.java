@@ -8,6 +8,7 @@ import me.deecaad.core.file.BukkitConfig;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.file.TaskChain;
+import me.deecaad.core.placeholder.PlaceholderMessage;
 import me.deecaad.core.utils.Debugger;
 import me.deecaad.core.utils.FileUtil;
 import me.deecaad.core.utils.LogLevel;
@@ -27,6 +28,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ArmorMechanics extends JavaPlugin {
@@ -39,6 +41,7 @@ public class ArmorMechanics extends JavaPlugin {
 
     public final Map<String, BonusEffect> effects = new HashMap<>();
     public final Map<String, ItemStack> armors = new HashMap<>();
+    public final Map<String, List<PlaceholderMessage>> lores = new HashMap<>();
     public final Map<String, ArmorSet> sets = new HashMap<>();
 
 

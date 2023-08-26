@@ -17,6 +17,7 @@ public class WeaponMechanicsDamageListener implements Listener {
     public void onDamage(WeaponDamageEntityEvent event) {
         double damage = event.getFinalDamage();
 
+
         // When a damage point is present, we should only account for the
         // armor AT that damage point. For example, if you are not wearing
         // a helmet and get headshot, you should not be protected by your

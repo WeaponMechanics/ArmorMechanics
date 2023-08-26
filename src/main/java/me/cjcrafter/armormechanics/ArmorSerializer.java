@@ -4,7 +4,7 @@ import me.deecaad.core.compatibility.CompatibilityAPI;
 import me.deecaad.core.file.SerializeData;
 import me.deecaad.core.file.SerializerException;
 import me.deecaad.core.file.serializers.ItemSerializer;
-import org.bukkit.Material;
+import me.deecaad.core.utils.AdventureUtil;
 import org.bukkit.inventory.ItemStack;
 
 import javax.annotation.Nonnull;
@@ -30,8 +30,13 @@ public class ArmorSerializer extends ItemSerializer {
         CompatibilityAPI.getNBTCompatibility().setString(item, "ArmorMechanics", "armor-title", title);
 
         // Register the effects
-        ArmorMechanics.INSTANCE.armors.put(title, item.clone()); // clone... just in case
+        ArmorMechanics.INSTANCE.armors.put(title, item);
         ArmorMechanics.INSTANCE.effects.put(title, effect);
+
+        AdventureUtil.setLore(item, AdventureUtil.getLore(item));
+
+        // Lore placeholder updating
+        AdventureUtil.updatePlaceholders(null, item);
 
         return super.serializeRecipe(data, item);
     }

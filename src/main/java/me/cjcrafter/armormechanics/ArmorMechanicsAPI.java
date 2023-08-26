@@ -1,21 +1,35 @@
 package me.cjcrafter.armormechanics;
 
+import me.cjcrafter.armormechanics.events.ArmorUpdateEvent;
+import me.deecaad.core.MechanicsCore;
 import me.deecaad.core.compatibility.CompatibilityAPI;
+import me.deecaad.core.lib.adventure.text.Component;
+import me.deecaad.core.lib.adventure.text.serializer.gson.GsonComponentSerializer;
+import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import me.deecaad.core.placeholder.PlaceholderMessage;
+import me.deecaad.core.placeholder.PlaceholderRequestEvent;
 import me.deecaad.core.utils.NumberUtil;
-import me.deecaad.core.utils.Debugger;
+import me.deecaad.core.utils.ReflectionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffectType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.lang.reflect.Field;
+import java.util.*;
 
 public class ArmorMechanicsAPI {
 
+    private static final Field loreField = ReflectionUtil.getField(ReflectionUtil.getCBClass("inventory.CraftMetaItem"), "lore");
 
     /**
      * Returns the armor-title associated with the given armor, or returns
@@ -259,10 +273,10 @@ public class ArmorMechanicsAPI {
      * <p>The following options are updated: Attributes, Enchantments, Display
      * name, Lore, Unbreakable, Material Type, Player Skull.
      *
-     * @param armor The non-null item to update.
+     * @param entity The entity involved.
+     * @param armor  The non-null item to update.
      */
-    public static void update(ItemStack armor) {
-        Debugger debug = ArmorMechanics.INSTANCE.debug;
+    public static void update(LivingEntity entity, ItemStack armor) {
         String title = getArmorTitle(armor);
 
         // Check if we should delete this item.
@@ -284,5 +298,7 @@ public class ArmorMechanicsAPI {
         armor.setType(template.getType());
         armor.setItemMeta(template.getItemMeta());
         armor.setDurability(durability);
+
+        Bukkit.getPluginManager().callEvent(new ArmorUpdateEvent(entity, armor, title));
     }
 }
