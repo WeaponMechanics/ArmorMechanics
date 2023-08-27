@@ -215,9 +215,13 @@ object ArmorMechanicsAPI {
         // We need to save the old durability and set it to the new item, since
         // setItemMeta will reset the item's durability.
         val durability = (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage
+        val old = armor.clone()
+
         val template = ArmorMechanics.INSTANCE.armors[title]
         armor.setType(template!!.type)
         armor.setItemMeta(template.itemMeta)
+        CompatibilityAPI.getNBTCompatibility().copyTagsFromTo(old, armor, null)
+
         (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage = durability!!
         Bukkit.getPluginManager().callEvent(ArmorUpdateEvent(entity!!, armor, title!!))
     }

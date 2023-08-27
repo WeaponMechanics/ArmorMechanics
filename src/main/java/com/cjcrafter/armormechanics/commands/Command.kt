@@ -15,6 +15,7 @@ import me.deecaad.core.commands.arguments.StringArgumentType
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.utils.EnumUtil
 import me.deecaad.core.utils.StringUtil
+import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
@@ -117,7 +118,7 @@ object Command {
                     set.helmet?.let { give(sender, targets, it, data) }
                     set.chestplate?.let { give(sender, targets, it, data) }
                     set.leggings?.let { give(sender, targets, it, data) }
-                    set.leggings?.let { give(sender, targets, it, data) }
+                    set.boots?.let { give(sender, targets, it, data) }
                 }
             }
 
@@ -176,28 +177,27 @@ object Command {
             sender.sendMessage(ChatColor.RED.toString() + "When using preventRemove, forceEquip must also be enabled!")
         }
         for (entity in entities) {
-            if (!entity.type.isAlive) continue
-            val living = entity as LivingEntity
-            val equipment = living.equipment
+            if (entity !is LivingEntity) continue
+            val equipment = entity.equipment ?: continue
+
             if (!dontEquip && force) {
                 if (preventRemove) {
                     val clone = armor.clone()
-                    CompatibilityAPI.getNBTCompatibility().setInt(clone, "ArmorMechanics", "prevent-remove", 1)
-                    setItem(equipment!!, slot, clone)
+                    CustomTag.PREVENT_REMOVE.setInteger(clone, 1)
+                    setItem(equipment, slot, clone)
                     return
                 }
-                setItem(equipment!!, slot, armor.clone())
-                return
-            }
-            if (!dontEquip && getItem(equipment!!, slot) == null) {
                 setItem(equipment, slot, armor.clone())
                 return
             }
-            if (living.type == EntityType.PLAYER) {
-                val player = living as Player
-                val overflow = player.inventory.addItem(armor.clone())
+            if (!dontEquip && getItem(equipment, slot) == null) {
+                setItem(equipment, slot, armor.clone())
+                return
+            }
+            if (entity is Player) {
+                val overflow = entity.inventory.addItem(armor.clone())
                 if (overflow.isNotEmpty()) {
-                    sender.sendMessage(ChatColor.RED.toString() + player.name + "'s inventory was full!")
+                    sender.sendMessage(ChatColor.RED.toString() + entity.name + "'s inventory was full!")
                 }
             }
         }

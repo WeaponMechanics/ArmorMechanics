@@ -28,7 +28,7 @@ class ArmorSerializer : ItemSerializer() {
 
         // Register the effects
         ArmorMechanics.INSTANCE.armors[title] = item
-        ArmorMechanics.INSTANCE.effects[title] = effect
+        if (effect != null) ArmorMechanics.INSTANCE.effects[title] = effect
         AdventureUtil.setLore(item, AdventureUtil.getLore(item)!!)
 
         // Lore placeholder updating
