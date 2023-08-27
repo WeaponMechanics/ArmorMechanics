@@ -1,4 +1,4 @@
-package me.cjcrafter.armormechanics.events
+package com.cjcrafter.armormechanics.events
 
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.HandlerList

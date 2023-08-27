@@ -1,14 +1,13 @@
-package me.cjcrafter.armormechanics.listeners
+package com.cjcrafter.armormechanics.listeners
 
+import com.cjcrafter.armormechanics.lib.MythicMobsArmorDrop
 import io.lumine.mythic.bukkit.events.MythicDropLoadEvent
-import me.cjcrafter.armormechanics.ArmorMechanics
-import me.cjcrafter.armormechanics.lib.MythicMobsArmorDrop
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 
 class MythicMobsListener : Listener {
     init {
-        ArmorMechanics.INSTANCE.debug.info("Hooking into MythicMobs")
+        com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.debug.info("Hooking into MythicMobs")
     }
 
     @EventHandler

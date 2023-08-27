@@ -1,4 +1,4 @@
-package me.cjcrafter.armormechanics
+package com.cjcrafter.armormechanics
 
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.Serializer
@@ -8,7 +8,6 @@ import me.deecaad.core.mechanics.CastData
 import me.deecaad.core.mechanics.Mechanics
 import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic
 import me.deecaad.core.utils.ReflectionUtil
-import me.deecaad.core.utils.primitive.DoubleMap
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
@@ -16,7 +15,6 @@ import org.bukkit.potion.PotionEffectType
 import java.util.*
 import java.util.stream.Collectors
 import javax.annotation.Nonnull
-import kotlin.collections.ArrayList
 
 class BonusEffect : Serializer<BonusEffect> {
     var potions: List<PotionEffect> = ArrayList()

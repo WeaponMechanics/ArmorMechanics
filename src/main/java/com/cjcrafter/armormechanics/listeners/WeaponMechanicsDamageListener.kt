@@ -1,7 +1,9 @@
-package me.cjcrafter.armormechanics.listeners
+package com.cjcrafter.armormechanics.listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.events.ResistBulletDamageEvent
 import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponDamageEntityEvent
+import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -19,6 +21,9 @@ class WeaponMechanicsDamageListener : Listener {
             else
                 effect.getBulletResistance(event.weaponTitle)
         }
-        event.finalDamage = damage * rate
+
+        val resistEvent = ResistBulletDamageEvent(event, rate)
+        Bukkit.getPluginManager().callEvent(resistEvent)
+        event.finalDamage = damage * resistEvent.rate
     }
 }

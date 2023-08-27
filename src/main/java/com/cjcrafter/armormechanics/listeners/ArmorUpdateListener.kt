@@ -1,7 +1,7 @@
-package me.cjcrafter.armormechanics.listeners
+package com.cjcrafter.armormechanics.listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanics
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.ArmorMechanics
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI
 import me.deecaad.core.events.EntityEquipmentEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler

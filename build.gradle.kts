@@ -1,8 +1,8 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-group = "me.cjcrafter"
-version = "2.2.0"
+group = "com.cjcrafter"
+version = "3.0.0"
 
 plugins {
     `java-library`
@@ -18,7 +18,7 @@ configurations {
 
 // See https://github.com/Minecrell/plugin-yml
 bukkit {
-    main = "me.cjcrafter.armormechanics.ArmorMechanics"
+    main = "com.cjcrafter.armormechanics.ArmorMechanics"
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
@@ -61,8 +61,8 @@ repositories {
 dependencies {
     compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     implementation("io.lumine:Mythic-Dist:5.0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:2.5.0-SNAPSHOT")
-    compileOnly("me.deecaad:weaponmechanics:2.7.0-SNAPSHOT")
+    compileOnly("me.deecaad:mechanicscore:2.5.0-SNAPSHOT2")
+    compileOnly("me.deecaad:weaponmechanics:2.7.0-SNAPSHOT2")
     implementation("org.bstats:bstats-bukkit:3.0.1")
     implementation("me.cjcrafter:mechanicsautodownload:1.1.2")
 }
@@ -78,6 +78,9 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate ("me.cjcrafter.auto", "me.cjcrafter.armormechanics.lib.auto") {
             include(dependency("me.cjcrafter:mechanicsautodownload"))
+        }
+        relocate ("kotlin.", "com.cjcrafter.armormechanics.lib.kotlin.") {
+            include(dependency("org.jetbrains.kotlin:"))
         }
     }
 }

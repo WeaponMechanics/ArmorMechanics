@@ -1,6 +1,7 @@
-package me.cjcrafter.armormechanics.listeners
+package com.cjcrafter.armormechanics.listeners
 
 import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -23,7 +24,7 @@ class PreventRemoveListener : Listener {
         if (event.whoClicked.hasPermission(permission)) return
         val item = event.clickedInventory!!.getItem(event.slot)
         if (item == null || !item.hasItemMeta()) return
-        val preventRemove = 1 == CompatibilityAPI.getNBTCompatibility().getInt(item, "ArmorMechanics", "prevent-remove")
+        val preventRemove = 1 == CustomTag.PREVENT_REMOVE.getInteger(item)
         event.isCancelled = preventRemove
     }
 }

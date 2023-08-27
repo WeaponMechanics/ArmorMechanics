@@ -1,4 +1,4 @@
-package me.cjcrafter.armormechanics.events
+package com.cjcrafter.armormechanics.events
 
 import me.deecaad.core.mechanics.Mechanics
 import org.bukkit.entity.Entity
@@ -7,13 +7,14 @@ import org.bukkit.event.entity.EntityEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.potion.PotionEffect
 
-class ArmorMechanicsDequipEvent(
+class ArmorMechanicsEquipEvent(
     what: Entity,
-    val armor: ItemStack?,
-    val armorTitle: String?,
-    var dequipMechanics: Mechanics?,
+    val armor: ItemStack,
+    val armorTitle: String,
+    var equipMechanics: Mechanics?,
     var potions: List<PotionEffect>
-) : EntityEvent(what) {
+) :
+    EntityEvent(what) {
 
     override fun getHandlers(): HandlerList {
         return handlerList

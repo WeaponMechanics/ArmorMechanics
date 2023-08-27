@@ -1,20 +1,15 @@
-package me.cjcrafter.armormechanics
+package com.cjcrafter.armormechanics
 
-import me.cjcrafter.armormechanics.events.ArmorUpdateEvent
+import com.cjcrafter.armormechanics.events.ArmorUpdateEvent
 import me.deecaad.core.compatibility.CompatibilityAPI
-import me.deecaad.core.utils.NumberUtil
-import me.deecaad.core.utils.ReflectionUtil
+import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.entity.Damageable
 import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
-import org.bukkit.potion.PotionEffectType
-import java.lang.IllegalArgumentException
-import javax.annotation.Nonnull
 
 object ArmorMechanicsAPI {
 
@@ -29,7 +24,7 @@ object ArmorMechanicsAPI {
         if (armor == null || !armor.hasItemMeta())
             return null
         else
-            return CompatibilityAPI.getNBTCompatibility().getString(armor, "ArmorMechanics", "armor-title")
+            return CustomTag.ARMOR_TITLE.getString(armor)
     }
 
     fun generateArmor(armorTitle: String?): ItemStack {
@@ -127,7 +122,14 @@ object ArmorMechanicsAPI {
      * @return The set associated with the 4 items, or null.
      */
     fun getSet(helmet: ItemStack?, chestplate: ItemStack?, leggings: ItemStack?, boots: ItemStack?): ArmorSet? {
-        return getSet(getArmorTitle(helmet), getArmorTitle(chestplate), getArmorTitle(leggings), getArmorTitle(boots))
+        return getSet(
+            getArmorTitle(
+                helmet
+            ),
+            getArmorTitle(chestplate),
+            getArmorTitle(leggings),
+            getArmorTitle(boots)
+        )
     }
 
     /**

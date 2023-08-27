@@ -1,15 +1,18 @@
-package me.cjcrafter.armormechanics.listeners
+package listeners
 
-import me.cjcrafter.armormechanics.ArmorMechanics
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.ArmorMechanics
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.events.ArmorMechanicsDequipEvent
+import com.cjcrafter.armormechanics.events.ArmorMechanicsEquipEvent
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.events.EntityEquipmentEvent
 import me.deecaad.core.mechanics.CastData
+import me.deecaad.weaponmechanics.utils.CustomTag
+import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.EquipmentSlot
-import java.lang.IllegalArgumentException
 
 class ArmorEquipListener : Listener {
 
@@ -42,14 +45,13 @@ class ArmorEquipListener : Listener {
             else -> throw IllegalArgumentException("impossible")
         }
 
+        val equipEvent = ArmorMechanicsEquipEvent(entity, item, title, bonus?.equipMechanics, ArrayList(bonus?.potions ?: listOf()))
+        Bukkit.getPluginManager().callEvent(equipEvent)
+        equipEvent.equipMechanics?.use(CastData(entity, title, item))
+        for (potion in equipEvent.potions)
+            entity.addPotionEffect(potion)
+
         val set = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots)
-        if (bonus != null) {
-            bonus.equipMechanics?.use(CastData(entity, title, item))
-            for (potion in bonus.potions)
-                entity.addPotionEffect(potion)
-        }
-
-
         if (set?.bonus != null) {
             set.bonus.equipMechanics?.use(CastData(entity, title, item))
             for (potion in set.bonus.potions)
@@ -60,21 +62,23 @@ class ArmorEquipListener : Listener {
     fun dequip(event: EntityEquipmentEvent) {
         val entity = event.entity as LivingEntity
         val item = event.dequipped
-        val title = CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
+        val title = ArmorMechanicsAPI.getArmorTitle(item)
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty()) return
         val bonus = ArmorMechanics.INSTANCE.effects[title]
-        if (bonus != null) {
-            bonus.dequipMechanics?.use(CastData(entity, title, item))
-            for (potion in bonus.potions)
-                entity.removePotionEffect(potion.type)
-        }
+
+        val dequipEvent = ArmorMechanicsDequipEvent(entity, item, title, bonus?.dequipMechanics, ArrayList(bonus?.potions ?: listOf()))
+        Bukkit.getPluginManager().callEvent(dequipEvent)
+
+        dequipEvent.dequipMechanics?.use(CastData(entity, title, item))
+        for (potion in dequipEvent.potions)
+            entity.removePotionEffect(potion.type)
 
         // Set bonus is a little weird, as we need to check if the user
         // previously had a set bonus, and if it needs to be removed.
-        val equipment = entity.equipment
-        var helmet = ArmorMechanicsAPI.getArmorTitle(equipment!!.helmet)
+        val equipment = entity.equipment!!
+        var helmet = ArmorMechanicsAPI.getArmorTitle(equipment.helmet)
         var chestplate = ArmorMechanicsAPI.getArmorTitle(equipment.chestplate)
         var leggings = ArmorMechanicsAPI.getArmorTitle(equipment.leggings)
         var boots = ArmorMechanicsAPI.getArmorTitle(equipment.boots)

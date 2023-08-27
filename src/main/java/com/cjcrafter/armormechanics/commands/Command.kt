@@ -1,21 +1,20 @@
 @file:Suppress("UNCHECKED_CAST")
 
-package me.cjcrafter.armormechanics.commands
+package com.cjcrafter.armormechanics.commands
 
-import me.cjcrafter.armormechanics.ArmorMechanics
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
-import me.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
-import me.deecaad.core.MechanicsCore
-import me.deecaad.core.commands.*
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
+import me.deecaad.core.commands.CommandData
+import me.deecaad.core.commands.HelpCommandBuilder
+import me.deecaad.core.commands.SuggestionsBuilder
+import me.deecaad.core.commands.Tooltip
 import me.deecaad.core.commands.arguments.EntityListArgumentType
 import me.deecaad.core.commands.arguments.MapArgumentType
 import me.deecaad.core.commands.arguments.StringArgumentType
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.utils.EnumUtil
 import me.deecaad.core.utils.StringUtil
-import me.deecaad.weaponmechanics.WeaponMechanics
-import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
@@ -24,16 +23,23 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
 import java.util.function.Function
-import javax.tools.Tool
 
 object Command {
     const val SYM = '\u27A2'
     var ARMOR_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function ArmorMechanics.INSTANCE.armors.keys.map { armorTitle -> Tooltip.of(armorTitle) }.toTypedArray()
+        return@Function com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors.keys.map { armorTitle ->
+            Tooltip.of(
+                armorTitle
+            )
+        }.toTypedArray()
     }
 
     var SET_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function ArmorMechanics.INSTANCE.sets.keys.map { setName -> Tooltip.of(setName) }.toTypedArray()
+        return@Function com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.sets.keys.map { setName ->
+            Tooltip.of(
+                setName
+            )
+        }.toTypedArray()
     }
 
     fun register() {
@@ -100,7 +106,7 @@ object Command {
                     default = HashMap()
                 }
                 executeAny { sender, args ->
-                    val set = ArmorMechanics.INSTANCE.sets[args[1] as String]
+                    val set = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.sets[args[1] as String]
                     if (set == null) {
                         sender.sendMessage("${ChatColor.RED}Unknown set '" + args[1] + "'")
                         return@executeAny
@@ -136,7 +142,8 @@ object Command {
                 permission("armormechanics.commands.reload")
                 description("Reloads ArmorMechanics configuration")
                 executeAny { sender, args ->
-                    ArmorMechanics.INSTANCE.reload().thenRunSync(Runnable { sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics") })
+                    com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.reload()
+                        .thenRunSync(Runnable { sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics") })
                 }
             }
         }
@@ -151,12 +158,12 @@ object Command {
         // make sure the given 'title' matches to an actual armor-title.
         var title = title
         val startsWith: MutableList<String?> = ArrayList()
-        val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
+        val options: Set<String> = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors.keys
         for (temp in options) {
             if (temp.lowercase().startsWith(title!!.lowercase())) startsWith.add(title)
         }
         title = StringUtil.didYouMean(title, if (startsWith.isEmpty()) options else startsWith)
-        val armor = ArmorMechanics.INSTANCE.armors[title]
+        val armor = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors[title]
         if (armor == null) {
             sender.sendMessage(ChatColor.RED.toString() + "Couldn't find armor '" + title + "'... Choose from " + options)
             return

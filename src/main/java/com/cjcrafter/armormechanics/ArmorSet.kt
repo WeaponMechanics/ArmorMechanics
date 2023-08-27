@@ -1,4 +1,4 @@
-package me.cjcrafter.armormechanics
+package com.cjcrafter.armormechanics
 
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.Serializer

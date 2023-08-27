@@ -1,4 +1,4 @@
-package me.cjcrafter.armormechanics.commands
+package com.cjcrafter.armormechanics.commands
 
 import me.deecaad.core.commands.*
 import me.deecaad.core.commands.arguments.CommandArgumentType
@@ -81,7 +81,7 @@ class KotlinCommand(val label: String) {
     }
 
     fun <T : CommandSender> execute(type: Class<T>, init: BiConsumer<T, Array<Any?>>) {
-        executor = object: CommandExecutor<T>(type) {
+        executor = object : CommandExecutor<T>(type) {
             override fun execute(sender: T, args: Array<Any?>) {
                 init.accept(sender, args)
             }

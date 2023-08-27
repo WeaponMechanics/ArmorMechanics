@@ -1,10 +1,11 @@
-package me.cjcrafter.armormechanics
+package com.cjcrafter.armormechanics
 
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.serializers.ItemSerializer
 import me.deecaad.core.utils.AdventureUtil
+import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.inventory.ItemStack
 import javax.annotation.Nonnull
 
@@ -23,7 +24,7 @@ class ArmorSerializer : ItemSerializer() {
         val effect = data.of("Bonus_Effects").serialize(BonusEffect::class.java)
 
         // Make sure the item knows what kind of armor it is
-        CompatibilityAPI.getNBTCompatibility().setString(item, "ArmorMechanics", "armor-title", title)
+        CustomTag.ARMOR_TITLE.setString(item, title)
 
         // Register the effects
         ArmorMechanics.INSTANCE.armors[title] = item
@@ -41,12 +42,11 @@ class ArmorSerializer : ItemSerializer() {
 
             // Let people turn off the isArmor() check since *technically*
             // any item can be equipped.
-            return if (!ArmorMechanics.INSTANCE.getConfig()
-                    .getBoolean("Prevent_Illegal_Armor", true)
-            ) true else (name == "PLAYER_HEAD" || name == "CARVED_PUMPKIN" || name.endsWith(
-                "_HELMET"
-            ) || name.endsWith("_CHESTPLATE")
-                    || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS"))
+            if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Prevent_Illegal_Armor", true))
+                return true
+
+            return name == "PLAYER_HEAD" || name == "CARVED_PUMPKIN" || name.endsWith("_HELMET")
+                    || name.endsWith("_CHESTPLATE") || name.endsWith("_LEGGINGS") || name.endsWith("_BOOTS")
         }
     }
 }

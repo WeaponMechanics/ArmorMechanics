@@ -1,7 +1,8 @@
-package me.cjcrafter.armormechanics
+package com.cjcrafter.armormechanics
 
-import me.cjcrafter.armormechanics.commands.Command
-import me.cjcrafter.armormechanics.listeners.*
+import com.cjcrafter.armormechanics.commands.Command
+import com.cjcrafter.armormechanics.listeners.*
+import listeners.ArmorEquipListener
 import me.cjcrafter.auto.UpdateChecker
 import me.cjcrafter.auto.UpdateInfo
 import me.deecaad.core.events.QueueSerializerEvent
@@ -92,7 +93,7 @@ class ArmorMechanics : JavaPlugin() {
         return TaskChain(this)
             .thenRunAsync(Runnable {
                 // Write config from jar to datafolder
-                if (!dataFolder.exists() ||  (dataFolder.listFiles()?.size ?: 0) == 0) {
+                if (!dataFolder.exists() || (dataFolder.listFiles()?.size ?: 0) == 0) {
                     debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)")
                     FileUtil.copyResourcesTo(classLoader.getResource("ArmorMechanics"), dataFolder.toPath())
                 }
