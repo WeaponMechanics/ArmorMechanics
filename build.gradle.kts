@@ -1,13 +1,15 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-group = "me.cjcrafter"
-version = "2.1.0"
+group = "com.cjcrafter"
+version = "3.0.0"
 
 plugins {
     `java-library`
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "7.1.0"
     id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
+    kotlin("jvm") version "1.7.20-RC"
 }
 
 configurations {
@@ -16,11 +18,12 @@ configurations {
 
 // See https://github.com/Minecrell/plugin-yml
 bukkit {
-    main = "me.cjcrafter.armormechanics.ArmorMechanics"
+    main = "com.cjcrafter.armormechanics.ArmorMechanics"
     apiVersion = "1.13"
 
     authors = listOf("CJCrafter")
-    softDepend = listOf("MechanicsCore", "WeaponMechanics")
+    depend = listOf("MechanicsCore")
+    softDepend = listOf("WeaponMechanics")
 }
 
 repositories {
@@ -56,10 +59,10 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT")
     implementation("io.lumine:Mythic-Dist:5.0.1-SNAPSHOT")
-    compileOnly("me.deecaad:mechanicscore:2.4.1")
-    compileOnly("me.deecaad:weaponmechanics:2.4.1")
+    compileOnly("me.deecaad:mechanicscore:2.5.0-SNAPSHOT2")
+    compileOnly("me.deecaad:weaponmechanics:2.7.0-SNAPSHOT2")
     implementation("org.bstats:bstats-bukkit:3.0.1")
     implementation("me.cjcrafter:mechanicsautodownload:1.1.2")
 }
@@ -75,6 +78,9 @@ tasks.named<ShadowJar>("shadowJar") {
         }
         relocate ("me.cjcrafter.auto", "me.cjcrafter.armormechanics.lib.auto") {
             include(dependency("me.cjcrafter:mechanicsautodownload"))
+        }
+        relocate ("kotlin.", "com.cjcrafter.armormechanics.lib.kotlin.") {
+            include(dependency("org.jetbrains.kotlin:"))
         }
     }
 }
@@ -100,4 +106,14 @@ tasks {
     processResources {
         filteringCharset = Charsets.UTF_8.name() // We want UTF-8 for everything
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    jvmTarget = "16"
+}
+
+val compileTestKotlin: KotlinCompile by tasks
+compileTestKotlin.kotlinOptions {
+    jvmTarget = "16"
 }
