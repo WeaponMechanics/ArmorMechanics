@@ -14,6 +14,7 @@ class ResistBulletDamageEvent(
     }
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

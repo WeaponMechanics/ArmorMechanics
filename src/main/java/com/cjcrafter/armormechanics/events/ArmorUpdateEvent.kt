@@ -16,6 +16,7 @@ class ArmorUpdateEvent(
     }
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }

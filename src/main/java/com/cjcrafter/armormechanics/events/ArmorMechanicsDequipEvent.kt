@@ -20,6 +20,7 @@ class ArmorMechanicsDequipEvent(
     }
 
     companion object {
+        @JvmStatic
         val handlerList = HandlerList()
     }
 }
