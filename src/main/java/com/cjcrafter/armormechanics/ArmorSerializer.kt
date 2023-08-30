@@ -27,11 +27,10 @@ class ArmorSerializer : ItemSerializer() {
         CustomTag.ARMOR_TITLE.setString(item, title)
 
         // Register the effects
-        ArmorMechanics.INSTANCE.armors[title] = item.clone() // clone so we don't update placeholders
+        ArmorMechanics.INSTANCE.armors[title] = item
         if (effect != null) ArmorMechanics.INSTANCE.effects[title] = effect
 
         // Lore placeholder updating
-        AdventureUtil.updatePlaceholders(null, item)
         return super.serializeRecipe(data, item)
     }
 
