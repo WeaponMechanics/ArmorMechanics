@@ -2,6 +2,7 @@
 
 package com.cjcrafter.armormechanics.commands
 
+import com.cjcrafter.armormechanics.ArmorMechanics
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
@@ -13,6 +14,7 @@ import me.deecaad.core.commands.arguments.EntityListArgumentType
 import me.deecaad.core.commands.arguments.MapArgumentType
 import me.deecaad.core.commands.arguments.StringArgumentType
 import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.core.utils.EnumUtil
 import me.deecaad.core.utils.StringUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
@@ -28,7 +30,7 @@ import java.util.function.Function
 object Command {
     const val SYM = '\u27A2'
     var ARMOR_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors.keys.map { armorTitle ->
+        return@Function ArmorMechanics.INSTANCE.armors.keys.map { armorTitle ->
             Tooltip.of(
                 armorTitle
             )
@@ -36,7 +38,7 @@ object Command {
     }
 
     var SET_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.sets.keys.map { setName ->
+        return@Function ArmorMechanics.INSTANCE.sets.keys.map { setName ->
             Tooltip.of(
                 setName
             )
@@ -107,7 +109,7 @@ object Command {
                     default = HashMap()
                 }
                 executeAny { sender, args ->
-                    val set = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.sets[args[1] as String]
+                    val set = ArmorMechanics.INSTANCE.sets[args[1] as String]
                     if (set == null) {
                         sender.sendMessage("${ChatColor.RED}Unknown set '" + args[1] + "'")
                         return@executeAny
@@ -143,7 +145,7 @@ object Command {
                 permission("armormechanics.commands.reload")
                 description("Reloads ArmorMechanics configuration")
                 executeAny { sender, args ->
-                    com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.reload()
+                    ArmorMechanics.INSTANCE.reload()
                         .thenRunSync(Runnable { sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics") })
                 }
             }
@@ -159,12 +161,12 @@ object Command {
         // make sure the given 'title' matches to an actual armor-title.
         var title = title
         val startsWith: MutableList<String?> = ArrayList()
-        val options: Set<String> = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors.keys
+        val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
         for (temp in options) {
             if (temp.lowercase().startsWith(title!!.lowercase())) startsWith.add(title)
         }
         title = StringUtil.didYouMean(title, if (startsWith.isEmpty()) options else startsWith)
-        val armor = com.cjcrafter.armormechanics.ArmorMechanics.INSTANCE.armors[title]
+        val armor = ArmorMechanics.INSTANCE.armors[title]
         if (armor == null) {
             sender.sendMessage(ChatColor.RED.toString() + "Couldn't find armor '" + title + "'... Choose from " + options)
             return
@@ -180,22 +182,24 @@ object Command {
             if (entity !is LivingEntity) continue
             val equipment = entity.equipment ?: continue
 
+            val clone = armor.clone()
+            AdventureUtil.updatePlaceholders(entity as? Player, clone)
+
             if (!dontEquip && force) {
                 if (preventRemove) {
-                    val clone = armor.clone()
                     CustomTag.PREVENT_REMOVE.setInteger(clone, 1)
                     setItem(equipment, slot, clone)
                     return
                 }
-                setItem(equipment, slot, armor.clone())
+                setItem(equipment, slot, clone)
                 return
             }
             if (!dontEquip && getItem(equipment, slot) == null) {
-                setItem(equipment, slot, armor.clone())
+                setItem(equipment, slot, clone)
                 return
             }
             if (entity is Player) {
-                val overflow = entity.inventory.addItem(armor.clone())
+                val overflow = entity.inventory.addItem(clone)
                 if (overflow.isNotEmpty()) {
                     sender.sendMessage(ChatColor.RED.toString() + entity.name + "'s inventory was full!")
                 }
