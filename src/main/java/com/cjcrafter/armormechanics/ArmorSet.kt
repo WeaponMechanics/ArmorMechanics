@@ -31,7 +31,7 @@ class ArmorSet : Serializer<ArmorSet> {
         val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
         var allNull = true
         for (i in temp.indices) {
-            val key = temp[i]
+            val key = temp[i]!!
 
             // The title is allowed to be null, since a user may want to have a
             // set of armor that doesn't include, for example, a helmet.
@@ -63,7 +63,7 @@ class ArmorSet : Serializer<ArmorSet> {
             )
         }
 
-        val bonus = data.of("Bonus_Effects").assertExists().serialize(BonusEffect::class.java)
+        val bonus = data.of("Bonus_Effects").assertExists().serialize(BonusEffect::class.java)!!
         ArmorMechanics.INSTANCE.effects[data.key] = bonus
         val set = ArmorSet(bonus, temp[0], temp[1], temp[2], temp[3])
         ArmorMechanics.INSTANCE.sets[data.key] = set

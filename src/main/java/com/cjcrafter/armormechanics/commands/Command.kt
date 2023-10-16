@@ -155,7 +155,7 @@ object Command {
         command.register()
     }
 
-    fun give(sender: CommandSender, entities: List<Entity>, title: String?, data: Map<String?, Any>) {
+    fun give(sender: CommandSender, entities: List<Entity>, title: String, data: Map<String?, Any>) {
 
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
