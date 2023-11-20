@@ -6,6 +6,7 @@ import com.cjcrafter.armormechanics.ArmorMechanics
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
+import com.cjcrafter.armormechanics.events.ArmorGenerateEvent
 import me.deecaad.core.commands.CommandData
 import me.deecaad.core.commands.HelpCommandBuilder
 import me.deecaad.core.commands.SuggestionsBuilder
@@ -13,15 +14,14 @@ import me.deecaad.core.commands.Tooltip
 import me.deecaad.core.commands.arguments.EntityListArgumentType
 import me.deecaad.core.commands.arguments.MapArgumentType
 import me.deecaad.core.commands.arguments.StringArgumentType
-import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.core.utils.EnumUtil
 import me.deecaad.core.utils.StringUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
+import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
 import org.bukkit.entity.Entity
-import org.bukkit.entity.EntityType
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
@@ -50,6 +50,7 @@ object Command {
             .with("dontEquip", MapArgumentType.INT(0, 1))
             .with("forceEquip", MapArgumentType.INT(0, 1))
             .with("preventRemove", MapArgumentType.INT(0, 1))
+            .with("attachments", MapArgumentType.LIST("[]"))
 
         val command = command("am") {
             aliases("armor", "armormechanics")
@@ -171,6 +172,7 @@ object Command {
             sender.sendMessage(ChatColor.RED.toString() + "Couldn't find armor '" + title + "'... Choose from " + options)
             return
         }
+
         val slot = getEquipmentSlot(armor.type)!!
         val dontEquip = 1 == (data["dontEquip"] ?: 0) as Int
         val force = 1 == (data["forceEquip"] ?: 0) as Int
@@ -182,7 +184,11 @@ object Command {
             if (entity !is LivingEntity) continue
             val equipment = entity.equipment ?: continue
 
+            // Let other plugins modify generated armor
             val clone = armor.clone()
+            val event = ArmorGenerateEvent(sender, entity, clone, title)
+            Bukkit.getPluginManager().callEvent(event)
+
             AdventureUtil.updatePlaceholders(entity as? Player, clone)
 
             if (!dontEquip && force) {
