@@ -1,0 +1,111 @@
+package com.cjcrafter.armormechanics.listeners
+
+import com.cjcrafter.armormechanics.durability.DurabilityManager.changeDurability
+import com.cjcrafter.armormechanics.durability.DurabilityManager.getDurability
+import me.deecaad.core.compatibility.CompatibilityAPI
+import org.bukkit.Material
+import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
+import org.bukkit.event.Listener
+import org.bukkit.event.inventory.PrepareAnvilEvent
+import org.bukkit.event.inventory.PrepareItemCraftEvent
+import org.bukkit.event.player.PlayerItemDamageEvent
+import org.bukkit.event.player.PlayerItemMendEvent
+import org.bukkit.inventory.ItemStack
+
+class DurabilityListener : Listener {
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    fun onItemDamaged(event: PlayerItemDamageEvent) {
+        changeDurability(event.item, -event.damage)
+    }
+
+    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
+    fun onItemMend(event: PlayerItemMendEvent) {
+        changeDurability(event.item, event.repairAmount)
+    }
+
+    @EventHandler
+    fun onRepairAnvil(event: PrepareAnvilEvent) {
+        var totalDurability = 0
+        val contents = event.inventory.contents.filter{ it != null && it.type != Material.AIR }
+        if (contents.size != 2) {
+            event.result = null
+            return
+        }
+        val resultItem: ItemStack = event.result ?: return
+        val titles = ArrayList<String>()
+        contents.forEach { item ->
+            if(item != null && item.type.maxDurability > 0) {
+                val title =
+                    CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
+                titles.add(title)
+                totalDurability += getDurability(item)
+            }
+        }
+        if(titles.distinct().size != 1) {
+            event.result = null
+            return
+        }
+        changeDurability(resultItem, totalDurability-getDurability(resultItem))
+        event.result = resultItem
+    }
+/*
+    @EventHandler
+    fun onRepairItem(event: InventoryClickEvent) {
+        println("Asama 1")
+        val damageable = event.currentItem?.itemMeta as? Damageable ?: return
+        if ((event.clickedInventory == null || event.clickedInventory!!.type != InventoryType.ANVIL
+                    || event.slotType != InventoryType.SlotType.RESULT || event.currentItem == null) || event.currentItem!!.type.isAir || getDurability(
+                event.currentItem!!
+            ) == -1
+        ) {
+            return
+        }
+        println("Asama 2")
+        val item = event.currentItem!!.clone()
+        val otherItems = event.clickedInventory!!.contents.filterNotNull().filter { it != event.currentItem }
+        println(otherItems.map { it?.itemMeta?.displayName })
+        val titles = ArrayList<String>()
+        otherItems.forEach { item ->
+            if(item != null && item.type.maxDurability > 0) {
+                val title =
+                    CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
+                titles.add(title)
+            }
+        }
+        if(titles.distinct().size != 1) {
+            event.currentItem = null
+            return
+        }
+        val totalDurability = otherItems.sumOf { getDurability(it) }
+        println(totalDurability)
+        val maxDurability = getMaxDurability(event.currentItem!!)
+        val newDurability = maxDurability - totalDurability
+        changeDurability(item, newDurability)
+        event.currentItem = item
+    }
+*/
+
+    @EventHandler
+    fun onRepairCraft(event: PrepareItemCraftEvent) {
+        if(!event.isRepair) return
+        var totalDurability = 0
+        val contents = event.inventory.contents.drop(1).filter{ it != null && it.type != Material.AIR }
+        val resultItem: ItemStack = contents[0].clone()
+        val titles = ArrayList<String>()
+        contents.forEach { item ->
+            if(item != null && item.type.maxDurability > 0) {
+                val title =
+                    CompatibilityAPI.getNBTCompatibility().getString(item, "ArmorMechanics", "armor-title")
+                titles.add(title)
+                totalDurability += getDurability(item)
+            }
+        }
+        if(titles.distinct().size != 1) {
+            event.inventory.result = null
+            return
+        }
+        changeDurability(resultItem, totalDurability-getDurability(resultItem))
+        event.inventory.result = resultItem
+    }
+}

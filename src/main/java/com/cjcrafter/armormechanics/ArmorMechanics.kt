@@ -62,6 +62,7 @@ class ArmorMechanics : JavaPlugin() {
         pm.registerEvents(ArmorUpdateListener(), this)
         pm.registerEvents(BlockPlaceListener(), this)
         pm.registerEvents(DamageMechanicListener(), this)
+        pm.registerEvents(DurabilityListener(), this)
         pm.registerEvents(ImmunePotionCanceller(), this)
         pm.registerEvents(PreventRemoveListener(), this)
 
@@ -201,6 +202,8 @@ class ArmorMechanics : JavaPlugin() {
     }
 
     companion object {
+        val DURABILITY_PRE = ChatColor.GRAY.toString() + "Durability: "
+        val DURABILITY = DURABILITY_PRE + ChatColor.GREEN + "%d" + ChatColor.WHITE + "/" + ChatColor.GREEN + "%d"
         lateinit var INSTANCE: ArmorMechanics
     }
 }

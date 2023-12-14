@@ -1,10 +1,10 @@
 package com.cjcrafter.armormechanics
 
-import me.deecaad.core.compatibility.CompatibilityAPI
+import  com.cjcrafter.armormechanics.durability.DurabilityManager.setDurability
+import com.cjcrafter.armormechanics.durability.DurabilityManager.setMaxDurability
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.serializers.ItemSerializer
-import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.inventory.ItemStack
 import javax.annotation.Nonnull
@@ -20,6 +20,26 @@ class ArmorSerializer : ItemSerializer() {
             "Material was not a valid armor type",
             SerializerException.forValue(item.type)
         )
+
+
+        if (data.has("Item-Durability")) {
+            val durability = data.of("Item-Durability").getInt(0)
+            if (durability > 0) {
+                setDurability(item, durability)
+                setMaxDurability(item, durability)
+                val meta = item.itemMeta
+                val lore = ArrayList<String>()
+                if (meta!!.hasLore()) {
+                    lore.addAll(meta.lore!!)
+                }
+                lore.add(String.format(ArmorMechanics.DURABILITY, durability, durability))
+                meta.lore = lore
+                item.itemMeta = meta
+            }
+        }
+
+
+
         val title = data.key
         val effect = data.of("Bonus_Effects").serialize(BonusEffect::class.java)
 
