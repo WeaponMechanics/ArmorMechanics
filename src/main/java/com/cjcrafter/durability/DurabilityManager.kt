@@ -1,4 +1,4 @@
-package com.cjcrafter.armormechanics.durability
+package com.cjcrafter.durability
 
 import com.cjcrafter.armormechanics.ArmorMechanics
 import org.bukkit.NamespacedKey
