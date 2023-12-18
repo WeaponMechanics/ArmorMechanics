@@ -6,8 +6,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
-import java.util.List
-
 object DurabilityManager {
     private val DURABILITY: NamespacedKey = NamespacedKey(ArmorMechanics.INSTANCE, "armor-durability")
     private val DURABILITY_MAX: NamespacedKey = NamespacedKey(ArmorMechanics.INSTANCE, "armor-durability-max")
@@ -30,7 +28,7 @@ object DurabilityManager {
 
             damageable.damage = item.type.maxDurability - (durability*item.type.maxDurability)/maxDurability
             if (damageable.hasLore()) {
-                val lore: ArrayList<String> = ArrayList<String>(damageable.getLore())
+                val lore: ArrayList<String> = ArrayList(damageable.getLore()!!)
                 for (i in lore.indices) {
                     if (lore[i].startsWith(ArmorMechanics.DURABILITY_PRE)) {
                         lore[i] = java.lang.String.format(ArmorMechanics.DURABILITY, durability, maxDurability)
@@ -39,7 +37,7 @@ object DurabilityManager {
                 damageable.setLore(lore)
             } else {
                 damageable.setLore(
-                    List.of(
+                    listOf(
                         java.lang.String.format(
                             ArmorMechanics.DURABILITY,
                             durability,
@@ -57,23 +55,23 @@ object DurabilityManager {
 
     fun getMaxDurability(item: ItemStack): Int {
         val meta: ItemMeta = item.getItemMeta()!!
-        return meta.getPersistentDataContainer().getOrDefault<Int, Int>(DURABILITY_MAX, PersistentDataType.INTEGER, -1)
+        return meta.getPersistentDataContainer().getOrDefault(DURABILITY_MAX, PersistentDataType.INTEGER, -1)
     }
 
     fun getDurability(item: ItemStack): Int {
         val meta: ItemMeta = item.getItemMeta()!!
-        return meta.getPersistentDataContainer().getOrDefault<Int, Int>(DURABILITY, PersistentDataType.INTEGER, -1)
+        return meta.getPersistentDataContainer().getOrDefault(DURABILITY, PersistentDataType.INTEGER, -1)
     }
 
     fun setMaxDurability(item: ItemStack, value: Int) {
         val meta: ItemMeta = item.getItemMeta()!!
-        meta.getPersistentDataContainer().set<Int, Int>(DURABILITY_MAX, PersistentDataType.INTEGER, value)
+        meta.getPersistentDataContainer().set(DURABILITY_MAX, PersistentDataType.INTEGER, value)
         item.setItemMeta(meta)
     }
 
     fun setDurability(item: ItemStack, value: Int) {
         val meta: ItemMeta = item.getItemMeta()!!
-        meta.getPersistentDataContainer().set<Int, Int>(DURABILITY, PersistentDataType.INTEGER, value)
+        meta.getPersistentDataContainer().set(DURABILITY, PersistentDataType.INTEGER, value)
         item.setItemMeta(meta)
     }
 }
