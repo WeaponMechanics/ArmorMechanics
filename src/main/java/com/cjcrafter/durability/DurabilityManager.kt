@@ -26,7 +26,7 @@ object DurabilityManager {
 
 
 
-            damageable.damage = item.type.maxDurability - (durability*item.type.maxDurability)/maxDurability
+            damageable.damage = item.type.maxDurability - (durability * item.type.maxDurability) / maxDurability
             if (damageable.hasLore()) {
                 val lore: ArrayList<String> = ArrayList(damageable.getLore()!!)
                 for (i in lore.indices) {
@@ -47,31 +47,31 @@ object DurabilityManager {
                 )
             }
         } else {
-            damageable.setDamage(item.getType().getMaxDurability().toInt())
-            item.setAmount(0)
+            damageable.damage = item.type.maxDurability.toInt()
+            item.amount = 0
         }
-        item.setItemMeta(damageable)
+        item.itemMeta = damageable
     }
 
     fun getMaxDurability(item: ItemStack): Int {
-        val meta: ItemMeta = item.getItemMeta()!!
-        return meta.getPersistentDataContainer().getOrDefault(DURABILITY_MAX, PersistentDataType.INTEGER, -1)
+        val meta: ItemMeta = item.itemMeta!!
+        return meta.persistentDataContainer.getOrDefault(DURABILITY_MAX, PersistentDataType.INTEGER, -1)
     }
 
     fun getDurability(item: ItemStack): Int {
-        val meta: ItemMeta = item.getItemMeta()!!
-        return meta.getPersistentDataContainer().getOrDefault(DURABILITY, PersistentDataType.INTEGER, -1)
+        val meta: ItemMeta = item.itemMeta!!
+        return meta.persistentDataContainer.getOrDefault(DURABILITY, PersistentDataType.INTEGER, -1)
     }
 
     fun setMaxDurability(item: ItemStack, value: Int) {
-        val meta: ItemMeta = item.getItemMeta()!!
-        meta.getPersistentDataContainer().set(DURABILITY_MAX, PersistentDataType.INTEGER, value)
-        item.setItemMeta(meta)
+        val meta: ItemMeta = item.itemMeta!!
+        meta.persistentDataContainer.set(DURABILITY_MAX, PersistentDataType.INTEGER, value)
+        item.itemMeta = meta
     }
 
     fun setDurability(item: ItemStack, value: Int) {
-        val meta: ItemMeta = item.getItemMeta()!!
-        meta.getPersistentDataContainer().set(DURABILITY, PersistentDataType.INTEGER, value)
-        item.setItemMeta(meta)
+        val meta: ItemMeta = item.itemMeta!!
+        meta.persistentDataContainer.set(DURABILITY, PersistentDataType.INTEGER, value)
+        item.itemMeta = meta
     }
 }
