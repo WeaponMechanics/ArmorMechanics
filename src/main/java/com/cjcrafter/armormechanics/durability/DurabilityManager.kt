@@ -1,14 +1,10 @@
-package com.cjcrafter.durability
+package com.cjcrafter.armormechanics.durability
 
 import com.cjcrafter.armormechanics.ArmorMechanics
-import org.bukkit.NamespacedKey
+import me.deecaad.core.compatibility.CompatibilityAPI
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
-import org.bukkit.inventory.meta.ItemMeta
-import org.bukkit.persistence.PersistentDataType
 object DurabilityManager {
-    private val DURABILITY: NamespacedKey = NamespacedKey(ArmorMechanics.INSTANCE, "armor-durability")
-    private val DURABILITY_MAX: NamespacedKey = NamespacedKey(ArmorMechanics.INSTANCE, "armor-durability-max")
     fun changeDurability(item: ItemStack, change: Int) {
         if (getDurability(item) == -1) {
             return
@@ -23,15 +19,12 @@ object DurabilityManager {
         }
 
         if (durability > 0) {
-
-
-
             damageable.damage = item.type.maxDurability - (durability * item.type.maxDurability) / maxDurability
             if (damageable.hasLore()) {
                 val lore: ArrayList<String> = ArrayList(damageable.getLore()!!)
                 for (i in lore.indices) {
-                    if (lore[i].startsWith(ArmorMechanics.DURABILITY_PRE)) {
-                        lore[i] = java.lang.String.format(ArmorMechanics.DURABILITY, durability, maxDurability)
+                    if (lore[i].startsWith(ArmorMechanics.DURABILITY_PREFIX)) {
+                        lore[i] = java.lang.String.format(ArmorMechanics.DURABILITY_FORMAT, durability, maxDurability)
                     }
                 }
                 damageable.setLore(lore)
@@ -39,7 +32,7 @@ object DurabilityManager {
                 damageable.setLore(
                     listOf(
                         java.lang.String.format(
-                            ArmorMechanics.DURABILITY,
+                            ArmorMechanics.DURABILITY_FORMAT,
                             durability,
                             maxDurability
                         )
@@ -54,24 +47,22 @@ object DurabilityManager {
     }
 
     fun getMaxDurability(item: ItemStack): Int {
-        val meta: ItemMeta = item.itemMeta!!
-        return meta.persistentDataContainer.getOrDefault(DURABILITY_MAX, PersistentDataType.INTEGER, -1)
+        return if (CompatibilityAPI.getNBTCompatibility().hasInt(item, "ArmorMechanics", "armor-durability-max")) {
+            CompatibilityAPI.getNBTCompatibility().getInt(item, "ArmorMechanics", "armor-durability-max")
+        } else -1
     }
 
     fun getDurability(item: ItemStack): Int {
-        val meta: ItemMeta = item.itemMeta!!
-        return meta.persistentDataContainer.getOrDefault(DURABILITY, PersistentDataType.INTEGER, -1)
+        return if (CompatibilityAPI.getNBTCompatibility().hasInt(item, "ArmorMechanics", "armor-durability")) {
+            CompatibilityAPI.getNBTCompatibility().getInt(item, "ArmorMechanics", "armor-durability")
+        } else -1
     }
 
     fun setMaxDurability(item: ItemStack, value: Int) {
-        val meta: ItemMeta = item.itemMeta!!
-        meta.persistentDataContainer.set(DURABILITY_MAX, PersistentDataType.INTEGER, value)
-        item.itemMeta = meta
+        CompatibilityAPI.getNBTCompatibility().setInt(item, "ArmorMechanics", "armor-durability-max", value)
     }
 
     fun setDurability(item: ItemStack, value: Int) {
-        val meta: ItemMeta = item.itemMeta!!
-        meta.persistentDataContainer.set(DURABILITY, PersistentDataType.INTEGER, value)
-        item.itemMeta = meta
+        CompatibilityAPI.getNBTCompatibility().setInt(item, "ArmorMechanics", "armor-durability", value)
     }
 }
