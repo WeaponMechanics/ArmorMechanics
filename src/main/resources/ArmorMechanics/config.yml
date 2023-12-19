@@ -33,3 +33,8 @@ Delete_Old_Armor: false
 # server instead of just a /am reload. This will force all players to relog and
 # their armor will be updated.
 Update_Armor: true
+
+# These settings are for setting maximum durability for armor.
+# You can use Item_Durability attribute on armors to use this feature.
+Durability_Prefix: '<gray>Durability: '
+Durability_Format: "<green>%d<white>/<green>%d"
