@@ -22,8 +22,8 @@ class ArmorSerializer : ItemSerializer() {
         )
 
 
-        if (data.has("Item-Durability")) {
-            val durability = data.of("Item-Durability").getInt(0)
+        if (data.has("Item_Durability")) {
+            val durability = data.of("Item_Durability").getInt(0)
             if (durability > 0) {
                 setDurability(item, durability)
                 setMaxDurability(item, durability)
@@ -32,7 +32,7 @@ class ArmorSerializer : ItemSerializer() {
                 if (meta!!.hasLore()) {
                     lore.addAll(meta.lore!!)
                 }
-                lore.add(String.format(ArmorMechanics.DURABILITY, durability, durability))
+                lore.add(String.format(ArmorMechanics.DURABILITY_FORMAT, durability, durability))
                 meta.lore = lore
                 item.itemMeta = meta
             }

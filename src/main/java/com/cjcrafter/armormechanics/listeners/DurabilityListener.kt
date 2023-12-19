@@ -1,7 +1,7 @@
 package com.cjcrafter.armormechanics.listeners
 
-import com.cjcrafter.durability.DurabilityManager.changeDurability
-import com.cjcrafter.durability.DurabilityManager.getDurability
+import com.cjcrafter.armormechanics.durability.DurabilityManager.changeDurability
+import com.cjcrafter.armormechanics.durability.DurabilityManager.getDurability
 import me.deecaad.core.compatibility.CompatibilityAPI
 import org.bukkit.Material
 import org.bukkit.event.EventHandler

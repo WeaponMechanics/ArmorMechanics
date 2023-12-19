@@ -14,6 +14,7 @@ import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
 import me.deecaad.core.utils.ReflectionUtil
+import me.deecaad.core.utils.StringUtil
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 import org.bukkit.Bukkit
@@ -101,6 +102,9 @@ class ArmorMechanics : JavaPlugin() {
             })
             .thenRunSync(Runnable {
                 reloadConfig()
+                // Reload durability prefix and format
+                DURABILITY_PREFIX = StringUtil.colorAdventure(config.getString("Durability_Prefix"))!!
+                DURABILITY_FORMAT = DURABILITY_PREFIX + StringUtil.colorAdventure(config.getString("Durability_Format"))!!
 
                 // Clear old data
                 effects.clear()
@@ -202,8 +206,8 @@ class ArmorMechanics : JavaPlugin() {
     }
 
     companion object {
-        val DURABILITY_PRE = ChatColor.GRAY.toString() + "Durability: "
-        val DURABILITY = DURABILITY_PRE + ChatColor.GREEN + "%d" + ChatColor.WHITE + "/" + ChatColor.GREEN + "%d"
         lateinit var INSTANCE: ArmorMechanics
+        var DURABILITY_PREFIX = StringUtil.colorAdventure(INSTANCE.config.getString("Durability_Prefix"))!!
+        var DURABILITY_FORMAT = DURABILITY_PREFIX + StringUtil.colorAdventure(INSTANCE.config.getString("Durability_Format"))!!
     }
 }
