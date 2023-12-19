@@ -207,7 +207,7 @@ class ArmorMechanics : JavaPlugin() {
 
     companion object {
         lateinit var INSTANCE: ArmorMechanics
-        var DURABILITY_PREFIX = StringUtil.colorAdventure(INSTANCE.config.getString("Durability_Prefix"))!!
-        var DURABILITY_FORMAT = DURABILITY_PREFIX + StringUtil.colorAdventure(INSTANCE.config.getString("Durability_Format"))!!
+        lateinit var DURABILITY_PREFIX: String
+        lateinit var DURABILITY_FORMAT: String
     }
 }
