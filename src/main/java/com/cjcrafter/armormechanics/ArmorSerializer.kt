@@ -2,9 +2,11 @@ package com.cjcrafter.armormechanics
 
 import  com.cjcrafter.armormechanics.durability.DurabilityManager.setDurability
 import com.cjcrafter.armormechanics.durability.DurabilityManager.setMaxDurability
+import me.deecaad.core.MechanicsCore
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.serializers.ItemSerializer
+import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer
 import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.inventory.ItemStack
 import javax.annotation.Nonnull
@@ -32,7 +34,9 @@ class ArmorSerializer : ItemSerializer() {
                 if (meta!!.hasLore()) {
                     lore.addAll(meta.lore!!)
                 }
-                lore.add(String.format(ArmorMechanics.DURABILITY_FORMAT, durability, durability))
+                val component = MechanicsCore.getPlugin().message.deserialize(java.lang.String.format(ArmorMechanics.DURABILITY_FORMAT, durability, durability))
+                val legacy = LegacyComponentSerializer.legacySection().serialize(component)
+                lore.add(ArmorMechanics.DURABILITY_PREFIX + legacy)
                 meta.lore = lore
                 item.itemMeta = meta
             }

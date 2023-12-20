@@ -5,11 +5,13 @@ import com.cjcrafter.armormechanics.listeners.*
 import listeners.ArmorEquipListener
 import me.cjcrafter.auto.UpdateChecker
 import me.cjcrafter.auto.UpdateInfo
+import me.deecaad.core.MechanicsCore
 import me.deecaad.core.events.QueueSerializerEvent
 import me.deecaad.core.file.BukkitConfig
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.TaskChain
+import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer
 import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
@@ -103,8 +105,8 @@ class ArmorMechanics : JavaPlugin() {
             .thenRunSync(Runnable {
                 reloadConfig()
                 // Reload durability prefix and format
-                DURABILITY_PREFIX = StringUtil.colorAdventure(config.getString("Durability_Prefix"))!!
-                DURABILITY_FORMAT = DURABILITY_PREFIX + StringUtil.colorAdventure(config.getString("Durability_Format"))!!
+                DURABILITY_PREFIX = LegacyComponentSerializer.legacySection().serialize(MechanicsCore.getPlugin().message.deserialize(StringUtil.colorAdventure(config.getString("Durability_Prefix"))!!))
+                DURABILITY_FORMAT = StringUtil.colorAdventure(config.getString("Durability_Format"))!!
 
                 // Clear old data
                 effects.clear()

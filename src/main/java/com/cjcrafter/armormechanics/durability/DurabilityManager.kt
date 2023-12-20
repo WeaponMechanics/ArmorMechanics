@@ -1,9 +1,13 @@
 package com.cjcrafter.armormechanics.durability
 
 import com.cjcrafter.armormechanics.ArmorMechanics
+import me.deecaad.core.MechanicsCore
 import me.deecaad.core.compatibility.CompatibilityAPI
+import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.ItemMeta
+
 object DurabilityManager {
     fun changeDurability(item: ItemStack, change: Int) {
         if (getDurability(item) == -1) {
@@ -20,22 +24,20 @@ object DurabilityManager {
 
         if (durability > 0) {
             damageable.damage = item.type.maxDurability - (durability * item.type.maxDurability) / maxDurability
-            if (damageable.hasLore()) {
-                val lore: ArrayList<String> = ArrayList(damageable.getLore()!!)
-                for (i in lore.indices) {
-                    if (lore[i].startsWith(ArmorMechanics.DURABILITY_PREFIX)) {
-                        lore[i] = java.lang.String.format(ArmorMechanics.DURABILITY_FORMAT, durability, maxDurability)
-                    }
-                }
-                damageable.setLore(lore)
+            if ((damageable as ItemMeta).hasLore()) {
+                val lore: ArrayList<String> = ArrayList((damageable as ItemMeta).lore!!)
+                val loreClone = lore.toMutableList()
+                val index = loreClone.indexOfFirst { it.startsWith(ArmorMechanics.DURABILITY_PREFIX) }
+                val component = MechanicsCore.getPlugin().message.deserialize(java.lang.String.format(ArmorMechanics.DURABILITY_FORMAT, durability, maxDurability))
+                val legacy = LegacyComponentSerializer.legacySection().serialize(component)
+                loreClone[index] = ArmorMechanics.DURABILITY_PREFIX + legacy
+                (damageable as ItemMeta).lore = loreClone
             } else {
-                damageable.setLore(
-                    listOf(
-                        java.lang.String.format(
-                            ArmorMechanics.DURABILITY_FORMAT,
-                            durability,
-                            maxDurability
-                        )
+                (damageable as ItemMeta).lore = listOf(
+                    java.lang.String.format(
+                        ArmorMechanics.DURABILITY_FORMAT,
+                        durability,
+                        maxDurability
                     )
                 )
             }
