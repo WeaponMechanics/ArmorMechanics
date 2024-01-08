@@ -37,4 +37,4 @@ Update_Armor: true
 # These settings are for setting maximum durability for armor.
 # You can use Item_Durability attribute on armors to use this feature.
 Durability_Prefix: '<gray>Durability: '
-Durability_Format: "<green>%d<white>/<green>%d"
+Durability_Format: "<green><durability_current><white>/<green><durability_max>"

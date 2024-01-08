@@ -1,6 +1,7 @@
 package com.cjcrafter.armormechanics
 
 import com.cjcrafter.armormechanics.commands.Command
+import com.cjcrafter.armormechanics.durability.registerDurabilityPlaceholders
 import com.cjcrafter.armormechanics.listeners.*
 import listeners.ArmorEquipListener
 import me.cjcrafter.auto.UpdateChecker
@@ -54,6 +55,7 @@ class ArmorMechanics : JavaPlugin() {
             server.pluginManager.disablePlugin(this)
             return
         }
+        registerDurabilityPlaceholders()
     }
 
     override fun onEnable() {

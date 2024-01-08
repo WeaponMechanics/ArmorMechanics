@@ -1,9 +1,10 @@
 package com.cjcrafter.armormechanics.durability
 
 import com.cjcrafter.armormechanics.ArmorMechanics
-import me.deecaad.core.MechanicsCore
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer
+import me.deecaad.core.placeholder.PlaceholderData
+import me.deecaad.core.placeholder.PlaceholderMessage
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
@@ -28,16 +29,17 @@ object DurabilityManager {
                 val lore: ArrayList<String> = ArrayList((damageable as ItemMeta).lore!!)
                 val loreClone = lore.toMutableList()
                 val index = loreClone.indexOfFirst { it.startsWith(ArmorMechanics.DURABILITY_PREFIX) }
-                val component = MechanicsCore.getPlugin().message.deserialize(java.lang.String.format(ArmorMechanics.DURABILITY_FORMAT, durability, maxDurability))
+                val placeholderMessage =  PlaceholderMessage(ArmorMechanics.DURABILITY_FORMAT)
+                val component = placeholderMessage.replaceAndDeserialize(PlaceholderData.of(null, item, null, null))
                 val legacy = LegacyComponentSerializer.legacySection().serialize(component)
                 loreClone[index] = ArmorMechanics.DURABILITY_PREFIX + legacy
                 (damageable as ItemMeta).lore = loreClone
             } else {
                 (damageable as ItemMeta).lore = listOf(
-                    java.lang.String.format(
-                        ArmorMechanics.DURABILITY_FORMAT,
-                        durability,
-                        maxDurability
+                    ArmorMechanics.DURABILITY_PREFIX + LegacyComponentSerializer.legacySection().serialize(
+                        PlaceholderMessage(
+                            ArmorMechanics.DURABILITY_FORMAT
+                        ).replaceAndDeserialize(PlaceholderData.of(null, item, null, null))
                     )
                 )
             }
