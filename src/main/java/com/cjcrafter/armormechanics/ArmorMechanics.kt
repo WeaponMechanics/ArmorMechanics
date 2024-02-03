@@ -2,9 +2,10 @@ package com.cjcrafter.armormechanics
 
 import com.cjcrafter.armormechanics.commands.Command
 import com.cjcrafter.armormechanics.listeners.*
+import com.jeff_media.updatechecker.UpdateCheckSource
+import com.jeff_media.updatechecker.UpdateChecker
+import com.jeff_media.updatechecker.UserAgentBuilder
 import listeners.ArmorEquipListener
-import me.cjcrafter.auto.UpdateChecker
-import me.cjcrafter.auto.UpdateInfo
 import me.deecaad.core.events.QueueSerializerEvent
 import me.deecaad.core.file.BukkitConfig
 import me.deecaad.core.file.SerializeData
@@ -16,22 +17,19 @@ import me.deecaad.core.utils.LogLevel
 import me.deecaad.core.utils.ReflectionUtil
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
-import org.bukkit.Bukkit
-import org.bukkit.ChatColor
 import org.bukkit.configuration.file.FileConfiguration
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Callable
 
 class ArmorMechanics : JavaPlugin() {
+
     lateinit var debug: Debugger
     private var metrics: Metrics? = null
-    private var update: UpdateChecker? = null
     val effects: MutableMap<String, BonusEffect> = HashMap()
     val armors: MutableMap<String, ItemStack> = HashMap()
     val sets: MutableMap<String, ArmorSet> = HashMap()
@@ -182,22 +180,12 @@ class ArmorMechanics : JavaPlugin() {
     }
 
     private fun registerUpdateChecker() {
-        update = UpdateChecker(this, UpdateChecker.github("WeaponMechanics", "ArmorMechanics"))
-        val listener: Listener = object : Listener {
-            @EventHandler
-            fun onJoin(event: PlayerJoinEvent) {
-                if (event.player.isOp) {
-                    TaskChain(this@ArmorMechanics)
-                        .thenRunAsync { callback: Any? -> update!!.hasUpdate() }
-                        .thenRunSync { callback: Any? ->
-                            val update = callback as UpdateInfo?
-                            if (callback != null) event.player.sendMessage(ChatColor.RED.toString() + "ArmorMechanics is out of date! " + update!!.current + " -> " + update.newest)
-                            null
-                        }
-                }
-            }
-        }
-        Bukkit.getPluginManager().registerEvents(listener, this)
+        debug.debug("Registering SpigotUpdateChecker")
+        UpdateChecker(this, UpdateCheckSource.SPIGOT, "103179")
+            .setNotifyOpsOnJoin(true)
+            .setUserAgent(UserAgentBuilder().addPluginNameAndVersion())
+            .checkEveryXHours(24.0)
+            .checkNow()
     }
 
     companion object {
