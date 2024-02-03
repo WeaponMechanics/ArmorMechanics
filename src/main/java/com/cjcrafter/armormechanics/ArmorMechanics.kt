@@ -1,19 +1,23 @@
 package com.cjcrafter.armormechanics
 
 import com.cjcrafter.armormechanics.commands.Command
+import com.cjcrafter.armormechanics.durability.registerDurabilityPlaceholders
 import com.cjcrafter.armormechanics.listeners.*
 import listeners.ArmorEquipListener
 import me.cjcrafter.auto.UpdateChecker
 import me.cjcrafter.auto.UpdateInfo
+import me.deecaad.core.MechanicsCore
 import me.deecaad.core.events.QueueSerializerEvent
 import me.deecaad.core.file.BukkitConfig
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.TaskChain
+import me.deecaad.core.lib.adventure.text.serializer.legacy.LegacyComponentSerializer
 import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
 import me.deecaad.core.utils.ReflectionUtil
+import me.deecaad.core.utils.StringUtil
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 import org.bukkit.Bukkit
@@ -51,6 +55,7 @@ class ArmorMechanics : JavaPlugin() {
             server.pluginManager.disablePlugin(this)
             return
         }
+        registerDurabilityPlaceholders()
     }
 
     override fun onEnable() {
@@ -62,6 +67,7 @@ class ArmorMechanics : JavaPlugin() {
         pm.registerEvents(ArmorUpdateListener(), this)
         pm.registerEvents(BlockPlaceListener(), this)
         pm.registerEvents(DamageMechanicListener(), this)
+        pm.registerEvents(DurabilityListener(), this)
         pm.registerEvents(ImmunePotionCanceller(), this)
         pm.registerEvents(PreventRemoveListener(), this)
 
@@ -100,6 +106,9 @@ class ArmorMechanics : JavaPlugin() {
             })
             .thenRunSync(Runnable {
                 reloadConfig()
+                // Reload durability prefix and format
+                DURABILITY_PREFIX = LegacyComponentSerializer.legacySection().serialize(MechanicsCore.getPlugin().message.deserialize(StringUtil.colorAdventure(config.getString("Durability_Prefix"))!!))
+                DURABILITY_FORMAT = StringUtil.colorAdventure(config.getString("Durability_Format"))!!
 
                 // Clear old data
                 effects.clear()
@@ -202,5 +211,7 @@ class ArmorMechanics : JavaPlugin() {
 
     companion object {
         lateinit var INSTANCE: ArmorMechanics
+        lateinit var DURABILITY_PREFIX: String
+        lateinit var DURABILITY_FORMAT: String
     }
 }
