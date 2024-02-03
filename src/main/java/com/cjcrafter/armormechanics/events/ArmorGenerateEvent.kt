@@ -10,7 +10,8 @@ class ArmorGenerateEvent(
     val sender: CommandSender,
     val entity: LivingEntity,
     val armor: ItemStack,
-    val armorTitle: String
+    val armorTitle: String,
+    val data: Map<String, Any>,
 ) : EntityEvent(entity) {
 
     override fun getHandlers(): HandlerList {

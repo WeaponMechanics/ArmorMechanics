@@ -73,7 +73,7 @@ object Command {
                     default = HashMap()
                 }
                 executeAny { sender, args ->
-                    give(sender, args[0] as List<Entity>, args[1] as String, args[2] as Map<String?, Any>)
+                    give(sender, args[0] as List<Entity>, args[1] as String, args[2] as Map<String, Any>)
                 }
             }
 
@@ -90,7 +90,7 @@ object Command {
                     default = HashMap()
                 }
                 executeEntity { entity, args ->
-                    give(entity, listOf(entity as LivingEntity), args[0] as String, args[1] as Map<String?, Any>)
+                    give(entity, listOf(entity as LivingEntity), args[0] as String, args[1] as Map<String, Any>)
                 }
             }
 
@@ -117,7 +117,7 @@ object Command {
                     }
 
                     val targets = args[0] as List<Entity>
-                    val data = args[2] as Map<String?, Any>
+                    val data = args[2] as Map<String, Any>
                     set.helmet?.let { give(sender, targets, it, data) }
                     set.chestplate?.let { give(sender, targets, it, data) }
                     set.leggings?.let { give(sender, targets, it, data) }
@@ -156,7 +156,7 @@ object Command {
         command.register()
     }
 
-    fun give(sender: CommandSender, entities: List<Entity>, title: String, data: Map<String?, Any>) {
+    fun give(sender: CommandSender, entities: List<Entity>, title: String, data: Map<String, Any>) {
 
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
@@ -186,7 +186,7 @@ object Command {
 
             // Let other plugins modify generated armor
             val clone = armor.clone()
-            val event = ArmorGenerateEvent(sender, entity, clone, title)
+            val event = ArmorGenerateEvent(sender, entity, clone, title, data)
             Bukkit.getPluginManager().callEvent(event)
 
             AdventureUtil.updatePlaceholders(entity as? Player, clone)
