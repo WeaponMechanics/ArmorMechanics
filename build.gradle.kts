@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.cjcrafter"
-version = "3.0.2"
+version = "3.0.3"
 
 plugins {
     `java-library`
@@ -35,8 +35,8 @@ dependencies {
 
     compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.3.5")
-    compileOnly("com.cjcrafter:mechanicscore:3.2.5")
-    compileOnly("com.cjcrafter:weaponmechanics:3.2.6")
+    compileOnly("com.cjcrafter:mechanicscore:3.3.0")
+    compileOnly("com.cjcrafter:weaponmechanics:3.3.0")
 }
 
 tasks.shadowJar {

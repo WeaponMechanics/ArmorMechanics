@@ -161,10 +161,10 @@ object Command {
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
         var title = title
-        val startsWith: MutableList<String?> = ArrayList()
+        val startsWith: MutableList<String> = ArrayList()
         val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
         for (temp in options) {
-            if (temp.lowercase().startsWith(title!!.lowercase())) startsWith.add(title)
+            if (temp.lowercase().startsWith(title.lowercase())) startsWith.add(title)
         }
         title = StringUtil.didYouMean(title, if (startsWith.isEmpty()) options else startsWith)
         val armor = ArmorMechanics.INSTANCE.armors[title]
