@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.cjcrafter"
-version = "3.0.3"
+version = "3.0.4"
 
 plugins {
     `java-library`
