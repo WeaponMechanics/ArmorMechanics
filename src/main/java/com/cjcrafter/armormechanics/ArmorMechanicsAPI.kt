@@ -81,7 +81,7 @@ object ArmorMechanicsAPI {
             EquipmentSlot.CHEST -> equipment.chestplate = item
             EquipmentSlot.LEGS -> equipment.leggings = item
             EquipmentSlot.FEET -> equipment.boots = item
-            EquipmentSlot.HAND, EquipmentSlot.OFF_HAND -> throw IllegalArgumentException("Invalid slot $slot")
+            else -> throw IllegalArgumentException("Invalid slot $slot")
         }
     }
 

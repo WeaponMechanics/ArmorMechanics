@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.cjcrafter"
-version = "3.0.4"
+version = "3.0.5"
 
 plugins {
     `java-library`
@@ -33,10 +33,10 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.1")
     implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
 
-    compileOnly("org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.3.5")
-    compileOnly("com.cjcrafter:mechanicscore:3.3.0")
-    compileOnly("com.cjcrafter:weaponmechanics:3.3.0")
+    compileOnly("com.cjcrafter:mechanicscore:3.4.1")
+    compileOnly("com.cjcrafter:weaponmechanics:3.4.1")
 }
 
 tasks.shadowJar {
@@ -57,7 +57,7 @@ tasks.shadowJar {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }
 

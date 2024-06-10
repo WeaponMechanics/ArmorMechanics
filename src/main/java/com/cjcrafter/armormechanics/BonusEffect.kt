@@ -7,6 +7,7 @@ import me.deecaad.core.file.SerializerOptionsException
 import me.deecaad.core.mechanics.CastData
 import me.deecaad.core.mechanics.Mechanics
 import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic
+import me.deecaad.core.utils.MinecraftVersions
 import me.deecaad.core.utils.ReflectionUtil
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
@@ -86,7 +87,7 @@ class BonusEffect : Serializer<BonusEffect> {
                 // TODO 1.20 has actual infinite instead of MAX_VALUE, check it out
                 val base: PotionEffect = (list[i] as PotionMechanic).potion
                 var effect = PotionEffect(base.type, Int.MAX_VALUE, base.amplifier, base.isAmbient, base.hasParticles())
-                if (ReflectionUtil.getMCVersion() > 13) {
+                if (MinecraftVersions.UPDATE_AQUATIC.isAtLeast()) {
                     effect = PotionEffect(
                         base.type,
                         Int.MAX_VALUE,

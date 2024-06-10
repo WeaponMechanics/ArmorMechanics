@@ -14,6 +14,7 @@ import me.deecaad.core.file.TaskChain
 import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
+import me.deecaad.core.utils.MinecraftVersions
 import me.deecaad.core.utils.ReflectionUtil
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
@@ -39,12 +40,13 @@ class ArmorMechanics : JavaPlugin() {
         val level = getConfig().getInt("Debug_Level", 2)
         val printTraces = getConfig().getBoolean("Print_Traces", false)
         debug = Debugger(logger, level, printTraces)
-        if (ReflectionUtil.getMCVersion() < 13) {
+        if (!MinecraftVersions.UPDATE_AQUATIC.isAtLeast()) {
             debug.error(
                 "  !!!!! ERROR !!!!!",
                 "  !!!!! ERROR !!!!!",
                 "  !!!!! ERROR !!!!!",
-                "  Plugin only supports Minecraft 1.13 and higher"
+                "  Plugin only supports Minecraft 1.13 and higher",
+                "  Found version: ${MinecraftVersions.CURRENT}",
             )
             server.pluginManager.disablePlugin(this)
             return
