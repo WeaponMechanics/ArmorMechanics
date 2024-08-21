@@ -4,11 +4,11 @@ group = "com.cjcrafter"
 version = "3.0.5"
 
 plugins {
+    kotlin("jvm") version "1.9.21"
     `java-library`
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
-    kotlin("jvm") version "1.9.21"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
 // See https://github.com/Minecrell/plugin-yml
@@ -33,7 +33,7 @@ dependencies {
     implementation("org.bstats:bstats-bukkit:3.0.1")
     implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
 
-    compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("io.lumine:Mythic-Dist:5.3.5")
     compileOnly("com.cjcrafter:mechanicscore:3.4.1")
     compileOnly("com.cjcrafter:weaponmechanics:3.4.1")
