@@ -4,11 +4,11 @@ group = "com.cjcrafter"
 version = "3.0.5"
 
 plugins {
+    kotlin("jvm") version "1.9.21"
     `java-library`
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
-    kotlin("jvm") version "1.9.21"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
 // See https://github.com/Minecrell/plugin-yml
