@@ -64,6 +64,7 @@ class ArmorMechanics : JavaPlugin() {
         pm.registerEvents(DamageMechanicListener(), this)
         pm.registerEvents(ImmunePotionCanceller(), this)
         pm.registerEvents(PreventRemoveListener(), this)
+        pm.registerEvents(DurabilityListener(), this)
 
         if (pm.getPlugin("WeaponMechanics") != null) {
             pm.registerEvents(WeaponMechanicsDamageListener(), this)
