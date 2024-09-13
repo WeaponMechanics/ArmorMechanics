@@ -1,10 +1,10 @@
 package com.cjcrafter.armormechanics
 
-import me.deecaad.core.compatibility.CompatibilityAPI
+import com.cjcrafter.armormechanics.durability.applyCustomDurabilitiesToItem
+import com.cjcrafter.armormechanics.durability.setMaxDurability
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.serializers.ItemSerializer
-import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.inventory.ItemStack
 import javax.annotation.Nonnull
@@ -22,6 +22,13 @@ class ArmorSerializer : ItemSerializer() {
         )
         val title = data.key
         val effect = data.of("Bonus_Effects").serialize(BonusEffect::class.java)
+
+        val maxDurability = data.of("Max_Durability").assertRange(1, Int.MAX_VALUE).getInt(-99)
+
+        if (maxDurability != -99) {
+            val damage = data.of("Durability").assertRange(0, maxDurability - 1).getInt(0)
+            item.applyCustomDurabilitiesToItem(damage, maxDurability)
+        }
 
         // Make sure the item knows what kind of armor it is
         CustomTag.ARMOR_TITLE.setString(item, title)
