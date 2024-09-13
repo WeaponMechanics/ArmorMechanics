@@ -83,3 +83,12 @@ fun getProportion(durability: Int, maxDurability: Int): Float {
 fun getFromProportion(proportion: Float, maxDurability: Int): Int {
     return (proportion * maxDurability).toInt()
 }
+
+fun ItemStack.applyCustomDurabilitiesToItem(damage: Int, maxDurability: Int) {
+    CustomTag.MAX_DURABILITY.setInteger(this, maxDurability)
+    CustomTag.DURABILITY.setInteger(this, maxDurability - damage)
+
+    setMaxDurability(maxDurability)
+    val maxDura = getMaxDurability()
+    this.setItemDamage(maxDura - getFromProportion(getProportion(maxDurability - damage, maxDurability), maxDura))
+}

@@ -1,7 +1,6 @@
 package com.cjcrafter.armormechanics
 
-import com.cjcrafter.armormechanics.durability.setCustomDurability
-import com.cjcrafter.armormechanics.durability.setItemDamage
+import com.cjcrafter.armormechanics.durability.applyCustomDurabilitiesToItem
 import com.cjcrafter.armormechanics.durability.setMaxDurability
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
@@ -27,15 +26,8 @@ class ArmorSerializer : ItemSerializer() {
         val maxDurability = data.of("Max_Durability").assertRange(1, Int.MAX_VALUE).getInt(-99)
 
         if (maxDurability != -99) {
-            CustomTag.MAX_DURABILITY.setInteger(item, maxDurability)
-            item.setMaxDurability(maxDurability)
-
-            val durability = data.of("Durability").assertRange(0, maxDurability - 1).getInt(-99)
-
-            if (durability > 0 && maxDurability != 99) {
-                CustomTag.DURABILITY.setInteger(item, maxDurability - durability)
-                item.setItemDamage(durability)
-            }
+            val damage = data.of("Durability").assertRange(0, maxDurability - 1).getInt(0)
+            item.applyCustomDurabilitiesToItem(damage, maxDurability)
         }
 
         // Make sure the item knows what kind of armor it is

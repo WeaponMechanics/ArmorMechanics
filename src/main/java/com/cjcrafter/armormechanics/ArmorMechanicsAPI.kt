@@ -1,5 +1,6 @@
 package com.cjcrafter.armormechanics
 
+import com.cjcrafter.armormechanics.durability.*
 import com.cjcrafter.armormechanics.events.ArmorUpdateEvent
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.weaponmechanics.utils.CustomTag
@@ -10,6 +11,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
 
 object ArmorMechanicsAPI {
 
@@ -214,8 +216,10 @@ object ArmorMechanicsAPI {
 
         // We need to save the old durability and set it to the new item, since
         // setItemMeta will reset the item's durability.
-        //TODO fix here
-        val durability = (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage
+
+        val oldHasCustomDura = CustomTag.MAX_DURABILITY.hasInteger(armor)
+        val damage = if (oldHasCustomDura) armor.getCustomMaxDurability()!! - armor.getCustomDurability()!! else armor.getItemDamage()
+
         val old = armor.clone()
 
         val template = ArmorMechanics.INSTANCE.armors[title]
@@ -223,7 +227,14 @@ object ArmorMechanicsAPI {
         armor.setItemMeta(template.itemMeta)
         CompatibilityAPI.getNBTCompatibility().copyTagsFromTo(old, armor, null)
 
-        (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage = durability!!
+        val newCustomMaxDurability = template.getCustomMaxDurability()
+
+        if (newCustomMaxDurability != null) {
+            armor.applyCustomDurabilitiesToItem(damage, newCustomMaxDurability)
+        } else {
+            armor.setItemDamage(damage)
+        }
+
         Bukkit.getPluginManager().callEvent(ArmorUpdateEvent(entity!!, armor, title!!))
     }
 }
