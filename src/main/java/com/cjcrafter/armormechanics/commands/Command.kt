@@ -146,8 +146,9 @@ object Command {
                 permission("armormechanics.commands.reload")
                 description("Reloads ArmorMechanics configuration")
                 executeAny { sender, args ->
-                    ArmorMechanics.INSTANCE.reload()
-                        .thenRunSync(Runnable { sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics") })
+                    ArmorMechanics.INSTANCE.reload().thenRun {
+                        sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics")
+                    }
                 }
             }
         }

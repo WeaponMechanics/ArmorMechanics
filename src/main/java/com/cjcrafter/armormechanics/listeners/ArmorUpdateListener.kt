@@ -6,7 +6,6 @@ import me.deecaad.core.events.EntityEquipmentEvent
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.scheduler.BukkitRunnable
 
 class ArmorUpdateListener : Listener {
 
@@ -20,23 +19,21 @@ class ArmorUpdateListener : Listener {
         // event since it contains a COPY of the armor. So, we need to check 1
         // tick after the event and check to update it. If no armor is in that
         // slot anymore, we can just assume the player has already removed it.
-        object : BukkitRunnable() {
-            override fun run() {
-                val equipment = entity.equipment
-                val item = ArmorMechanicsAPI.getItem(equipment!!, event.slot)
+        ArmorMechanics.INSTANCE.scheduler.entity(entity).runDelayed(Runnable {
+            val equipment = entity.equipment
+            val item = ArmorMechanicsAPI.getItem(equipment!!, event.slot)
 
-                // Either not ArmorMechanics armor, or just not any armor at
-                // all. Either way, we don't need to update it.
-                if (ArmorMechanicsAPI.getArmorTitle(item) == null) return
+            // Either not ArmorMechanics armor, or just not any armor at
+            // all. Either way, we don't need to update it.
+            if (ArmorMechanicsAPI.getArmorTitle(item) == null) return@Runnable
 
-                // Dupe protection, it is theoretically possible for a client
-                // to swap out the item with a different armor. Not a very useful
-                // dupe since it replaces the old armor, but still a potential bug
-                if (event.equipped != item) return
+            // Dupe protection, it is theoretically possible for a client
+            // to swap out the item with a different armor. Not a very useful
+            // dupe since it replaces the old armor, but still a potential bug
+            if (event.equipped != item) return@Runnable
 
-                ArmorMechanicsAPI.update(entity, item!!)
-                ArmorMechanicsAPI.setItem(equipment, event.slot, item)
-            }
-        }.runTask(ArmorMechanics.INSTANCE)
+            ArmorMechanicsAPI.update(entity, item!!)
+            ArmorMechanicsAPI.setItem(equipment, event.slot, item)
+        }, 1L)
     }
 }

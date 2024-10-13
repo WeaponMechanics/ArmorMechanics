@@ -1,20 +1,21 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.cjcrafter"
-version = "3.0.5"
+version = "3.1.0"
 
 plugins {
     `java-library`
-    `maven-publish`
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-    id("net.minecrell.plugin-yml.bukkit") version "0.5.2"
     kotlin("jvm") version "1.9.21"
+    `maven-publish`
+    id("com.gradleup.shadow") version "8.3.3"
+    id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
 }
 
 // See https://github.com/Minecrell/plugin-yml
 bukkit {
     main = "com.cjcrafter.armormechanics.ArmorMechanics"
     apiVersion = "1.13"
+    foliaSupported = true
 
     authors = listOf("CJCrafter")
     depend = listOf("MechanicsCore")
@@ -22,6 +23,7 @@ bukkit {
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
 
     maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
@@ -34,9 +36,10 @@ dependencies {
     implementation("com.jeff_media:SpigotUpdateChecker:3.0.3")
 
     compileOnly("org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT")
-    compileOnly("io.lumine:Mythic-Dist:5.3.5")
-    compileOnly("com.cjcrafter:mechanicscore:3.4.1")
-    compileOnly("com.cjcrafter:weaponmechanics:3.4.1")
+    compileOnly("io.lumine:Mythic-Dist:5.7.2")
+    compileOnly("com.cjcrafter:foliascheduler:0.6.0")
+    compileOnly("com.cjcrafter:mechanicscore:3.4.13-FOLIA")
+    compileOnly("com.cjcrafter:weaponmechanics:3.4.14-FOLIA")
 }
 
 tasks.shadowJar {

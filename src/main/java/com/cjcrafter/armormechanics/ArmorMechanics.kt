@@ -2,6 +2,9 @@ package com.cjcrafter.armormechanics
 
 import com.cjcrafter.armormechanics.commands.Command
 import com.cjcrafter.armormechanics.listeners.*
+import com.cjcrafter.foliascheduler.FoliaCompatibility
+import com.cjcrafter.foliascheduler.ServerImplementation
+import com.cjcrafter.foliascheduler.TaskImplementation
 import com.jeff_media.updatechecker.UpdateCheckSource
 import com.jeff_media.updatechecker.UpdateChecker
 import com.jeff_media.updatechecker.UserAgentBuilder
@@ -10,12 +13,10 @@ import me.deecaad.core.events.QueueSerializerEvent
 import me.deecaad.core.file.BukkitConfig
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
-import me.deecaad.core.file.TaskChain
 import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
 import me.deecaad.core.utils.MinecraftVersions
-import me.deecaad.core.utils.ReflectionUtil
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 import org.bukkit.configuration.file.FileConfiguration
@@ -26,10 +27,12 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import java.io.File
 import java.util.concurrent.Callable
+import java.util.concurrent.CompletableFuture
 
 class ArmorMechanics : JavaPlugin() {
 
     lateinit var debug: Debugger
+    lateinit var scheduler: ServerImplementation
     private var metrics: Metrics? = null
     val effects: MutableMap<String, BonusEffect> = HashMap()
     val armors: MutableMap<String, ItemStack> = HashMap()
@@ -40,6 +43,7 @@ class ArmorMechanics : JavaPlugin() {
         val level = getConfig().getInt("Debug_Level", 2)
         val printTraces = getConfig().getBoolean("Print_Traces", false)
         debug = Debugger(logger, level, printTraces)
+        scheduler = FoliaCompatibility(this).serverImplementation
         if (!MinecraftVersions.UPDATE_AQUATIC.isAtLeast()) {
             debug.error(
                 "  !!!!! ERROR !!!!!",
@@ -89,16 +93,15 @@ class ArmorMechanics : JavaPlugin() {
         }
     }
 
-    fun reload(): TaskChain {
-        return TaskChain(this)
-            .thenRunAsync(Runnable {
-                // Write config from jar to datafolder
-                if (!dataFolder.exists() || (dataFolder.listFiles()?.size ?: 0) == 0) {
-                    debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)")
-                    FileUtil.copyResourcesTo(classLoader.getResource("ArmorMechanics"), dataFolder.toPath())
-                }
-            })
-            .thenRunSync(Runnable {
+    fun reload(): CompletableFuture<TaskImplementation<Void>> {
+        return scheduler.async().runNow(Runnable {
+            // Write config from jar to datafolder
+            if (!dataFolder.exists() || (dataFolder.listFiles()?.size ?: 0) == 0) {
+                debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)")
+                FileUtil.copyResourcesTo(classLoader.getResource("ArmorMechanics"), dataFolder.toPath())
+            }
+        }).asFuture().thenCompose {
+            scheduler.global().run(Runnable {
                 reloadConfig()
 
                 // Clear old data
@@ -136,7 +139,8 @@ class ArmorMechanics : JavaPlugin() {
                         e.log(debug)
                     }
                 }
-            })
+            }).asFuture()
+        }
     }
 
     private fun registerBStats() {
