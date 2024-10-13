@@ -5,7 +5,7 @@ import io.lumine.mythic.api.adapters.AbstractItemStack
 import io.lumine.mythic.api.config.MythicLineConfig
 import io.lumine.mythic.api.drops.DropMetadata
 import io.lumine.mythic.api.drops.IItemDrop
-import io.lumine.mythic.bukkit.adapters.BukkitItemStack
+import io.lumine.mythic.bukkit.adapters.item.ItemComponentBukkitItemStack
 import me.deecaad.core.utils.StringUtil
 
 class MythicMobsArmorDrop(config: MythicLineConfig, argument: String?) : IItemDrop {
@@ -32,6 +32,6 @@ class MythicMobsArmorDrop(config: MythicLineConfig, argument: String?) : IItemDr
 
         // Just in case MythicMobs edits this item, we want to use a clone
         // to avoid possible modification.
-        return BukkitItemStack(item!!.clone())
+        return ItemComponentBukkitItemStack(item!!.clone())
     }
 }
