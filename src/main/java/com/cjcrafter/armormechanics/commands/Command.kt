@@ -3,15 +3,12 @@
 package com.cjcrafter.armormechanics.commands
 
 import com.cjcrafter.armormechanics.ArmorMechanics
-import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
-import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
-import com.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI
 import com.cjcrafter.armormechanics.events.ArmorGenerateEvent
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.kotlindsl.anyExecutor
 import dev.jorel.commandapi.kotlindsl.commandAPICommand
 import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyEntities
-import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyPlayers
 import dev.jorel.commandapi.kotlindsl.stringArgument
 import dev.jorel.commandapi.kotlindsl.subcommand
 import me.deecaad.core.commands.CommandHelpBuilder
@@ -32,11 +29,8 @@ import org.bukkit.entity.Entity
 import org.bukkit.entity.LivingEntity
 import org.bukkit.entity.Player
 import org.bukkit.inventory.EquipmentSlot
-import java.util.function.Function
 
 object Command {
-    const val SYM = '\u27A2'
-
     fun register() {
         val armorDataMapArgument =
             CustomMapArgument(
@@ -188,7 +182,7 @@ object Command {
             return
         }
 
-        val slot = getEquipmentSlot(armor.type)!!
+        val slot = ArmorMechanicsAPI.guessEquipmentSlot(armor)!!
         val dontEquip = 1 == (data["dontEquip"] ?: 0) as Int
         val force = 1 == (data["forceEquip"] ?: 0) as Int
         val preventRemove = 1 == (data["preventRemove"] ?: 0) as Int
@@ -209,14 +203,10 @@ object Command {
             if (!dontEquip && force) {
                 if (preventRemove) {
                     CustomTag.PREVENT_REMOVE.setInteger(clone, 1)
-                    setItem(equipment, slot, clone)
+                    equipment.setItem(slot, clone)
                     return
                 }
-                setItem(equipment, slot, clone)
-                return
-            }
-            if (!dontEquip && getItem(equipment, slot) == null) {
-                setItem(equipment, slot, clone)
+                equipment.setItem(slot, clone)
                 return
             }
             if (entity is Player) {
@@ -240,14 +230,14 @@ object Command {
         for (target in targets) {
             if (!target.type.isAlive) continue
             val entity = target as LivingEntity
-            val equipment = entity.equipment
+            val equipment = entity.equipment!!
             if (slot == null) {
-                equipment!!.boots = null
+                equipment.boots = null
                 equipment.leggings = null
                 equipment.chestplate = null
                 equipment.helmet = null
             } else {
-                setItem(equipment!!, slot, null)
+                equipment.setItem(slot, null)
             }
         }
     }

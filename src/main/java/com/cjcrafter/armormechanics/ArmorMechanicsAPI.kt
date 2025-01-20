@@ -10,6 +10,7 @@ import org.bukkit.entity.LivingEntity
 import org.bukkit.inventory.EntityEquipment
 import org.bukkit.inventory.EquipmentSlot
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.ItemMeta
 
 object ArmorMechanicsAPI {
 
@@ -34,55 +35,22 @@ object ArmorMechanicsAPI {
         return ArmorMechanics.INSTANCE.armors[armorTitle]!!.clone()
     }
 
-    /**
-     * Returns the expected [EquipmentSlot] that the given material
-     * would be worn on. However, using commands or plugins may allow players
-     * to equip armor in other slots.
-     *
-     * @param mat The non-null material to check.
-     * @return The associated equipment slot, or null.
-     */
-    fun getEquipmentSlot(mat: Material): EquipmentSlot? {
-        val name = mat.name
-        if (name.endsWith("BOOTS")) return EquipmentSlot.FEET
-        if (name.endsWith("LEGGINGS")) return EquipmentSlot.LEGS
+    fun guessEquipmentSlot(item: ItemStack): EquipmentSlot? {
+        // Support for new 1.21.4 equippable slot
+        if (item.hasItemMeta()) {
+            val meta = item.itemMeta!!
+            if (meta.hasEquippable())
+                return meta.equippable.slot
+        }
+
+        val name = item.type.name
+        if (name.endsWith("HELMET")) return EquipmentSlot.HEAD
         if (name.endsWith("CHESTPLATE")) return EquipmentSlot.CHEST
-        if (name.endsWith("HELMET") || name == "PLAYER_HEAD" || name == "CARVED_PUMPKIN") return EquipmentSlot.HEAD
-        else return null
-    }
+        if (name.endsWith("LEGGINGS")) return EquipmentSlot.LEGS
+        if (name.endsWith("BOOTS")) return EquipmentSlot.FEET
 
-    /**
-     * Version safe method for [EntityEquipment.getItem].
-     *
-     * @param equipment The non-null equipment the entity is wearing.
-     * @param slot      The non-null slot to check.
-     * @return The nullable item in that slot.
-     */
-    fun getItem(equipment: EntityEquipment, slot: EquipmentSlot): ItemStack? {
-        return when (slot) {
-            EquipmentSlot.HEAD -> equipment.helmet
-            EquipmentSlot.CHEST -> equipment.chestplate
-            EquipmentSlot.LEGS -> equipment.leggings
-            EquipmentSlot.FEET -> equipment.boots
-            else -> null
-        }
-    }
-
-    /**
-     * Version safe method for [EntityEquipment.setItem].
-     *
-     * @param equipment The non-null equipment the entity is wearing.
-     * @param slot      The non-null slot to set.
-     * @param item      The item to use, or null.
-     */
-    fun setItem(equipment: EntityEquipment, slot: EquipmentSlot, item: ItemStack?) {
-        when (slot) {
-            EquipmentSlot.HEAD -> equipment.helmet = item
-            EquipmentSlot.CHEST -> equipment.chestplate = item
-            EquipmentSlot.LEGS -> equipment.leggings = item
-            EquipmentSlot.FEET -> equipment.boots = item
-            else -> throw IllegalArgumentException("Invalid slot $slot")
-        }
+        if (name == Material.PLAYER_HEAD.name) return EquipmentSlot.HEAD
+        return null
     }
 
     /**
@@ -123,9 +91,7 @@ object ArmorMechanicsAPI {
      */
     fun getSet(helmet: ItemStack?, chestplate: ItemStack?, leggings: ItemStack?, boots: ItemStack?): ArmorSet? {
         return getSet(
-            getArmorTitle(
-                helmet
-            ),
+            getArmorTitle(helmet),
             getArmorTitle(chestplate),
             getArmorTitle(leggings),
             getArmorTitle(boots)
@@ -207,7 +173,7 @@ object ArmorMechanicsAPI {
         // Check if we should delete this item.
         // If the armor no longer exists, we cannot update its properties.
         if (!ArmorMechanics.INSTANCE.armors.containsKey(title)) {
-            val deleteOld = ArmorMechanics.INSTANCE.getConfig().getBoolean("Delete_Old_Armor", false)
+            val deleteOld = ArmorMechanics.INSTANCE.config.getBoolean("Delete_Old_Armor", false)
             if (deleteOld) armor.amount = 0
             return
         }

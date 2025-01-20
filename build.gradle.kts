@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "com.cjcrafter"
-version = "3.1.0"
+version = "4.0.0"
 
 plugins {
     `java-library`
@@ -58,6 +58,7 @@ tasks.shadowJar {
     }
 
     relocate("kotlin.", "me.deecaad.core.lib.kotlin.")
+    relocate("net.kyori", "me.deecaad.core.lib")
     relocate("com.cjcrafter.foliascheduler", "me.deecaad.core.lib.scheduler")
     relocate("dev.jorel.commandapi", "me.deecaad.core.lib.commandapi")
 }
