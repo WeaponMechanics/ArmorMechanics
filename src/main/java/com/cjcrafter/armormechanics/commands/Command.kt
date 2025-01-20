@@ -7,17 +7,24 @@ import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getEquipmentSlot
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.getItem
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI.setItem
 import com.cjcrafter.armormechanics.events.ArmorGenerateEvent
-import me.deecaad.core.commands.CommandData
-import me.deecaad.core.commands.HelpCommandBuilder
-import me.deecaad.core.commands.SuggestionsBuilder
-import me.deecaad.core.commands.Tooltip
-import me.deecaad.core.commands.arguments.EntityListArgumentType
-import me.deecaad.core.commands.arguments.MapArgumentType
-import me.deecaad.core.commands.arguments.StringArgumentType
+import dev.jorel.commandapi.arguments.ArgumentSuggestions
+import dev.jorel.commandapi.kotlindsl.anyExecutor
+import dev.jorel.commandapi.kotlindsl.commandAPICommand
+import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyEntities
+import dev.jorel.commandapi.kotlindsl.entitySelectorArgumentManyPlayers
+import dev.jorel.commandapi.kotlindsl.stringArgument
+import dev.jorel.commandapi.kotlindsl.subcommand
+import me.deecaad.core.commands.CommandHelpBuilder
+import me.deecaad.core.commands.CustomMapArgument
+import me.deecaad.core.file.simple.BooleanSerializer
+import me.deecaad.core.file.simple.CsvSerializer
+import me.deecaad.core.file.simple.StringSerializer
 import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.core.utils.EnumUtil
 import me.deecaad.core.utils.StringUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
+import net.kyori.adventure.text.format.NamedTextColor
+import net.kyori.adventure.text.format.Style
 import org.bukkit.Bukkit
 import org.bukkit.ChatColor
 import org.bukkit.command.CommandSender
@@ -29,132 +36,139 @@ import java.util.function.Function
 
 object Command {
     const val SYM = '\u27A2'
-    var ARMOR_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function ArmorMechanics.INSTANCE.armors.keys.map { armorTitle ->
-            Tooltip.of(
-                armorTitle
-            )
-        }.toTypedArray()
-    }
-
-    var SET_SUGGESTIONS = Function<CommandData, Array<Tooltip>> {
-        return@Function ArmorMechanics.INSTANCE.sets.keys.map { setName ->
-            Tooltip.of(
-                setName
-            )
-        }.toTypedArray()
-    }
 
     fun register() {
-        val giveDataMap = MapArgumentType()
-            .with("dontEquip", MapArgumentType.INT(0, 1))
-            .with("forceEquip", MapArgumentType.INT(0, 1))
-            .with("preventRemove", MapArgumentType.INT(0, 1))
-            .with("attachments", MapArgumentType.LIST("[]"))
+        val armorDataMapArgument =
+            CustomMapArgument(
+                "data",
+                mapOf(
+                    "dontEquip" to BooleanSerializer(),
+                    "forceEquip" to BooleanSerializer(),
+                    "preventRemove" to BooleanSerializer(),
+                    "attachments" to CsvSerializer(StringSerializer()),
+                )
+            )
 
-        val command = command("am") {
-            aliases("armor", "armormechanics")
-            permission("armormechanics.admin")
-            description("ArmorMechanics main command")
+        commandAPICommand("am") {
+            withAliases("armor", "armormechanics")
+            withPermission("armormechanics.admin")
+            withShortDescription("ArmorMechanics main command")
 
             subcommand("give") {
-                permission("armormechanics.commands.give")
-                description("Gives the target(s) armor")
+                withPermission("armormechanics.commands.give")
+                withShortDescription("Gives the target(s) armor")
 
-                argument("targets", EntityListArgumentType()) {
-                    description = "Who to give armor to"
+                entitySelectorArgumentManyEntities("targets")
+                stringArgument("armor") {
+                    replaceSuggestions(
+                        ArgumentSuggestions.strings {
+                            val options = ArmorMechanics.INSTANCE.armors.keys
+                            options.toTypedArray()
+                        }
+                    )
                 }
-                argument("armor", StringArgumentType()) {
-                    description = "Which armor to give"
-                    replace(ARMOR_SUGGESTIONS)
-                }
-                argument("data", giveDataMap) {
-                    description = "How to equip the armor, json input {}"
-                    default = HashMap()
-                }
-                executeAny { sender, args ->
-                    give(sender, args[0] as List<Entity>, args[1] as String, args[2] as Map<String, Any>)
+                withArguments(armorDataMapArgument)
+
+                anyExecutor { sender, args ->
+                    val targets = args["targets"] as List<Entity>
+                    val armorTitle = args["armor"] as String
+                    val data = args["data"] as? Map<String, Any> ?: mutableMapOf()
+
+                    give(sender, targets, armorTitle, data)
                 }
             }
 
             subcommand("get") {
-                permission("armormechanics.commands.get")
-                description("Give yourself armor")
+                withPermission("armormechanics.commands.get")
+                withShortDescription("Gives yourself armor")
 
-                argument("armor", StringArgumentType()) {
-                    description = "Which armor to give"
-                    replace(ARMOR_SUGGESTIONS)
+                stringArgument("armor") {
+                    replaceSuggestions(
+                        ArgumentSuggestions.strings {
+                            val options = ArmorMechanics.INSTANCE.armors.keys
+                            options.toTypedArray()
+                        }
+                    )
                 }
-                argument("data", giveDataMap) {
-                    description = "How to equip the armor, json input {}"
-                    default = HashMap()
-                }
-                executeEntity { entity, args ->
-                    give(entity, listOf(entity as LivingEntity), args[0] as String, args[1] as Map<String, Any>)
+                withArguments(armorDataMapArgument)
+
+                anyExecutor { sender, args ->
+                    val armorTitle = args["armor"] as String
+                    val data = args["data"] as? Map<String, Any> ?: mutableMapOf()
+
+                    give(sender, listOf(sender as Player), armorTitle, data)
                 }
             }
 
             subcommand("giveset") {
-                permission("armormechanics.commands.giveset")
-                description("Give the target[s] a set of armor")
+                withPermission("armormechanics.commands.giveset")
+                withShortDescription("Gives the target(s) a set of armor")
 
-                argument("targets", EntityListArgumentType()) {
-                    description = "Who to give armor to"
+                entitySelectorArgumentManyEntities("targets")
+                stringArgument("set") {
+                    replaceSuggestions(
+                        ArgumentSuggestions.strings {
+                            val options = ArmorMechanics.INSTANCE.sets.keys
+                            options.toTypedArray()
+                        }
+                    )
                 }
-                argument("set", StringArgumentType()) {
-                    description = "Which set to give"
-                    replace(SET_SUGGESTIONS)
-                }
-                argument("data", giveDataMap) {
-                    description = "How to equip the armor, json input {}"
-                    default = HashMap()
-                }
-                executeAny { sender, args ->
-                    val set = ArmorMechanics.INSTANCE.sets[args[1] as String]
+                withArguments(armorDataMapArgument)
+
+                anyExecutor { sender, args ->
+                    val targets = args["targets"] as List<Entity>
+                    val setTitle = args["set"] as String
+                    val data = args["data"] as? Map<String, Any> ?: mutableMapOf()
+
+                    val set = ArmorMechanics.INSTANCE.sets[setTitle]
                     if (set == null) {
-                        sender.sendMessage("${ChatColor.RED}Unknown set '" + args[1] + "'")
-                        return@executeAny
+                        sender.sendMessage("${ChatColor.RED}Unknown set '$setTitle'")
+                        return@anyExecutor
                     }
 
-                    val targets = args[0] as List<Entity>
-                    val data = args[2] as Map<String, Any>
-                    set.helmet?.let { give(sender, targets, it, data) }
-                    set.chestplate?.let { give(sender, targets, it, data) }
-                    set.leggings?.let { give(sender, targets, it, data) }
-                    set.boots?.let { give(sender, targets, it, data) }
+                    give(sender, targets, set.helmet ?: "", data)
+                    give(sender, targets, set.chestplate ?: "", data)
+                    give(sender, targets, set.leggings ?: "", data)
+                    give(sender, targets, set.boots ?: "", data)
                 }
             }
 
             subcommand("clear") {
-                permission("armormechanics.commands.clear")
-                description("Clears the target entity's armor")
+                withPermission("armormechanics.commands.clear")
+                withShortDescription("Clears the target(s) armor")
 
-                argument("targets", EntityListArgumentType()) {
-                    description = "Which targets to clear"
+                entitySelectorArgumentManyEntities("targets")
+                stringArgument("slots") {
+                    replaceSuggestions(
+                        ArgumentSuggestions.strings {
+                            val options = EnumUtil.getOptions(EquipmentSlot::class.java)
+                            options.toTypedArray()
+                        }
+                    )
                 }
-                argument("slots", StringArgumentType().withLiteral("*")) {
-                    description = "Which slot to clear"
-                    default = "*"
-                    replace(SuggestionsBuilder.from("head", "chest", "legs", "feet"))
-                }
-                executeAny { sender, args ->
-                    clear(sender, args[0] as List<Entity>, args[1] as String)
+
+                anyExecutor { sender, args ->
+                    val targets = args["targets"] as List<Entity>
+                    val slots = args["slots"] as String
+
+                    clear(sender, targets, slots)
                 }
             }
 
             subcommand("reload") {
-                permission("armormechanics.commands.reload")
-                description("Reloads ArmorMechanics configuration")
-                executeAny { sender, args ->
+                withPermission("armormechanics.commands.reload")
+                withShortDescription("Reloads ArmorMechanics configuration")
+
+                anyExecutor { sender, args ->
                     ArmorMechanics.INSTANCE.reload().thenRun {
                         sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics")
                     }
                 }
             }
-        }
 
-        command.registerHelp(HelpCommandBuilder.HelpColor.from(ChatColor.GOLD, ChatColor.GRAY, SYM))
-        command.register()
+            val helpBuilder = CommandHelpBuilder(Style.style(NamedTextColor.GOLD), Style.style(NamedTextColor.GRAY))
+            helpBuilder.register(this)
+        }
     }
 
     fun give(sender: CommandSender, entities: List<Entity>, title: String, data: Map<String, Any>) {

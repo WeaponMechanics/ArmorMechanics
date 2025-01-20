@@ -16,7 +16,6 @@ import me.deecaad.core.file.SerializerException
 import me.deecaad.core.utils.Debugger
 import me.deecaad.core.utils.FileUtil
 import me.deecaad.core.utils.LogLevel
-import me.deecaad.core.utils.MinecraftVersions
 import org.bstats.bukkit.Metrics
 import org.bstats.charts.SimplePie
 import org.bukkit.configuration.file.FileConfiguration
@@ -44,17 +43,6 @@ class ArmorMechanics : JavaPlugin() {
         val printTraces = getConfig().getBoolean("Print_Traces", false)
         debug = Debugger(logger, level, printTraces)
         scheduler = FoliaCompatibility(this).serverImplementation
-        if (!MinecraftVersions.UPDATE_AQUATIC.isAtLeast()) {
-            debug.error(
-                "  !!!!! ERROR !!!!!",
-                "  !!!!! ERROR !!!!!",
-                "  !!!!! ERROR !!!!!",
-                "  Plugin only supports Minecraft 1.13 and higher",
-                "  Found version: ${MinecraftVersions.CURRENT}",
-            )
-            server.pluginManager.disablePlugin(this)
-            return
-        }
     }
 
     override fun onEnable() {

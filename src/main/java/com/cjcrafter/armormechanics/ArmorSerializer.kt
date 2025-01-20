@@ -1,13 +1,12 @@
 package com.cjcrafter.armormechanics
 
-import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.SerializerException
 import me.deecaad.core.file.serializers.ItemSerializer
-import me.deecaad.core.utils.AdventureUtil
 import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.inventory.ItemStack
 import javax.annotation.Nonnull
+import kotlin.jvm.optionals.getOrNull
 
 class ArmorSerializer : ItemSerializer() {
 
@@ -18,10 +17,10 @@ class ArmorSerializer : ItemSerializer() {
         if (!isArmor(item)) throw data.exception(
             "Type",
             "Material was not a valid armor type",
-            SerializerException.forValue(item.type)
+            "For value: ${item.type}"
         )
-        val title = data.key
-        val effect = data.of("Bonus_Effects").serialize(BonusEffect::class.java)
+        val title = data.key!!
+        val effect = data.of("Bonus_Effects").serialize(BonusEffect::class.java).getOrNull()
 
         // Make sure the item knows what kind of armor it is
         CustomTag.ARMOR_TITLE.setString(item, title)
@@ -40,7 +39,7 @@ class ArmorSerializer : ItemSerializer() {
 
             // Let people turn off the isArmor() check since *technically*
             // any item can be equipped.
-            if (!ArmorMechanics.INSTANCE.getConfig().getBoolean("Prevent_Illegal_Armor", true))
+            if (!ArmorMechanics.INSTANCE.config.getBoolean("Prevent_Illegal_Armor", true))
                 return true
 
             return name == "PLAYER_HEAD" || name == "CARVED_PUMPKIN" || name.endsWith("_HELMET")

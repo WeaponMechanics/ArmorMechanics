@@ -220,9 +220,12 @@ object ArmorMechanicsAPI {
         val template = ArmorMechanics.INSTANCE.armors[title]
         armor.setType(template!!.type)
         armor.setItemMeta(template.itemMeta)
-        CompatibilityAPI.getNBTCompatibility().copyTagsFromTo(old, armor, null)
 
-        (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage = durability!!
+        val meta = armor.itemMeta!!
+        old.itemMeta!!.persistentDataContainer.copyTo(meta.persistentDataContainer, true)
+        (meta as? org.bukkit.inventory.meta.Damageable)?.damage = durability!!
+        armor.setItemMeta(meta)
+
         Bukkit.getPluginManager().callEvent(ArmorUpdateEvent(entity!!, armor, title!!))
     }
 }
