@@ -3,8 +3,8 @@ package com.cjcrafter.armormechanics
 import me.deecaad.core.file.SerializeData
 import me.deecaad.core.file.Serializer
 import me.deecaad.core.file.SerializerException
-import me.deecaad.core.file.SerializerOptionsException
 import javax.annotation.Nonnull
+import kotlin.jvm.optionals.getOrNull
 
 class ArmorSet : Serializer<ArmorSet> {
     lateinit var bonus: BonusEffect
@@ -35,7 +35,7 @@ class ArmorSet : Serializer<ArmorSet> {
 
             // The title is allowed to be null, since a user may want to have a
             // set of armor that doesn't include, for example, a helmet.
-            val title = data.of(key).assertType(String::class.java).get<String?>(null)
+            val title = data.of(key).get(String::class.java).getOrNull()
             if (title == null) {
                 temp[i] = null
                 continue
@@ -44,13 +44,11 @@ class ArmorSet : Serializer<ArmorSet> {
             // Ensure that the requested armor-title matches to an existing
             // piece of armor.
             allNull = false
-            if (!options.contains(title)) throw SerializerOptionsException(
-                this,
-                "Armor Title",
-                options,
-                title,
-                data.of(key).location
-            )
+            if (!options.contains(title)) {
+                throw SerializerException.builder()
+                    .locationRaw(data.of(key).location)
+                    .buildInvalidOption(title, options)
+            }
 
             // Store the title for the serialized object
             temp[i] = title
@@ -63,10 +61,10 @@ class ArmorSet : Serializer<ArmorSet> {
             )
         }
 
-        val bonus = data.of("Bonus_Effects").assertExists().serialize(BonusEffect::class.java)!!
-        ArmorMechanics.INSTANCE.effects[data.key] = bonus
+        val bonus = data.of("Bonus_Effects").assertExists().serialize(BonusEffect::class.java).get()
+        ArmorMechanics.INSTANCE.effects[data.key!!] = bonus
         val set = ArmorSet(bonus, temp[0], temp[1], temp[2], temp[3])
-        ArmorMechanics.INSTANCE.sets[data.key] = set
+        ArmorMechanics.INSTANCE.sets[data.key!!] = set
         return set
     }
 }

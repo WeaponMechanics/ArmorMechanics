@@ -24,8 +24,8 @@ Scuba_Helmet:
     - RESPIRATION 3
     - AQUA_AFFINITY 1
   Attributes:
-    - GENERIC_ARMOR 2 HEAD
-    - GENERIC_MOVEMENT_SPEED -0.003 HEAD
+    - armor 2 HEAD
+    - movement_speed -0.003 HEAD
 
 Scuba_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -39,7 +39,7 @@ Scuba_Chestplate:
     - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
-    - GENERIC_MOVEMENT_SPEED -0.003 CHEST
+    - movement_speed -0.003 CHEST
   Leather_Color: "#0000F0"
 
 Scuba_Leggings:
@@ -54,7 +54,7 @@ Scuba_Leggings:
     - "<gray>Allows infinite breath under water"
   Hide_Flags: true
   Attributes:
-    - GENERIC_MOVEMENT_SPEED -0.003 LEGS
+    - movement_speed -0.003 LEGS
   Leather_Color: "#0000F0"
 
 Scuba_Boots:
@@ -72,7 +72,7 @@ Scuba_Boots:
   Enchantments:
     - DEPTH_STRIDER 4
   Attributes:
-    - GENERIC_MOVEMENT_SPEED -0.003 FEET
+    - movement_speed -0.003 FEET
   Leather_Color: "#0000F0"
 
 ###########################################################
@@ -97,7 +97,7 @@ Tactical_Helmet:
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
-    - GENERIC_ARMOR 2 HEAD
+    - armor 2 HEAD
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.04
@@ -117,7 +117,7 @@ Tactical_Chestplate:
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
-    - GENERIC_ARMOR 6 CHEST
+    - armor 6 CHEST
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.07
@@ -135,7 +135,7 @@ Tactical_Leggings:
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
-    - GENERIC_ARMOR 5 LEGS
+    - armor 5 LEGS
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.05
@@ -154,8 +154,8 @@ Tactical_Boots:
   Hide_Flags: true
   Leather_Color: "#4b5320"
   Attributes:
-    - GENERIC_MOVEMENT_SPEED 0.002 FEET
-    - GENERIC_ARMOR 2 FEET
+    - movement_speed 0.002 FEET
+    - armor 2 FEET
   Bonus_Effects:
     Bullet_Resistance:
       Base: 0.04
@@ -178,7 +178,7 @@ Radiation_Helmet:
     - "<gray>Prevents you from getting poisoned or withered"
   Hide_Flags: true
   Attributes:
-    - GENERIC_ARMOR 2 HEAD
+    - armor 2 HEAD
 
 Radiation_Chestplate:
   Type: LEATHER_CHESTPLATE
@@ -235,9 +235,9 @@ Heavy_Helmet:
   Hide_Flags: true
   Unbreakable: true
   Attributes:
-    - GENERIC_MAX_HEALTH 5 head
-    - GENERIC_KNOCKBACK_RESISTANCE 0.25 head
-    - GENERIC_MOVEMENT_SPEED -0.07 head
+    - max_health 5 head
+    - knockback_resistance 0.25 head
+    - movement_speed -0.07 head
   Enchantments:
     - PROTECTION 5
 
@@ -255,9 +255,9 @@ Heavy_Chestplate:
   Hide_Flags: true
   Unbreakable: true
   Attributes:
-    - GENERIC_MAX_HEALTH 5 chest
-    - GENERIC_KNOCKBACK_RESISTANCE 0.25 chest
-    - GENERIC_MOVEMENT_SPEED -0.07 chest
+    - max_health 5 chest
+    - knockback_resistance 0.25 chest
+    - movement_speed -0.07 chest
   Enchantments:
     - PROTECTION 5
 
@@ -275,9 +275,9 @@ Heavy_Leggings:
   Hide_Flags: true
   Unbreakable: true
   Attributes:
-    - GENERIC_MAX_HEALTH 5 legs
-    - GENERIC_KNOCKBACK_RESISTANCE 0.25 legs
-    - GENERIC_MOVEMENT_SPEED -0.07 legs
+    - max_health 5 legs
+    - knockback_resistance 0.25 legs
+    - movement_speed -0.07 legs
   Enchantments:
     - PROTECTION 5
 
@@ -295,8 +295,8 @@ Heavy_Boots:
   Hide_Flags: true
   Unbreakable: true
   Attributes:
-    - GENERIC_MAX_HEALTH 5 feet
-    - GENERIC_KNOCKBACK_RESISTANCE 0.25 feet
-    - GENERIC_MOVEMENT_SPEED -0.07 feet
+    - max_health 5 feet
+    - knockback_resistance 0.25 feet
+    - movement_speed -0.07 feet
   Enchantments:
     - PROTECTION 5

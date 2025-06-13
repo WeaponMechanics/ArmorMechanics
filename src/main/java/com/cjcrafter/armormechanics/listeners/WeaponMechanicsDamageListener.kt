@@ -2,6 +2,7 @@ package com.cjcrafter.armormechanics.listeners
 
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI
 import com.cjcrafter.armormechanics.events.ResistBulletDamageEvent
+import me.deecaad.weaponmechanics.weapon.damage.ExplosionDamageSource
 import me.deecaad.weaponmechanics.weapon.weaponevents.WeaponDamageEntityEvent
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -16,7 +17,7 @@ class WeaponMechanicsDamageListener : Listener {
         val effects = ArmorMechanicsAPI.getBonusEffects(event.victim)
         var rate = 1.0
         for (effect in effects) {
-            rate -= if (event.isExplosion)
+            rate -= if (event.source is ExplosionDamageSource)
                 effect.getExplosionResistance(event.weaponTitle)
             else
                 effect.getBulletResistance(event.weaponTitle)
