@@ -61,7 +61,7 @@ object Command {
                         }
                     )
                 }
-                withArguments(armorDataMapArgument)
+                withOptionalArguments(armorDataMapArgument)
 
                 anyExecutor { sender, args ->
                     val targets = args["targets"] as List<Entity>
@@ -84,7 +84,7 @@ object Command {
                         }
                     )
                 }
-                withArguments(armorDataMapArgument)
+                withOptionalArguments(armorDataMapArgument)
 
                 anyExecutor { sender, args ->
                     val armorTitle = args["armor"] as String
@@ -107,7 +107,7 @@ object Command {
                         }
                     )
                 }
-                withArguments(armorDataMapArgument)
+                withOptionalArguments(armorDataMapArgument)
 
                 anyExecutor { sender, args ->
                     val targets = args["targets"] as List<Entity>
@@ -132,7 +132,7 @@ object Command {
                 withShortDescription("Clears the target(s) armor")
 
                 entitySelectorArgumentManyEntities("targets")
-                stringArgument("slots") {
+                stringArgument("slots", optional = true) {
                     replaceSuggestions(
                         ArgumentSuggestions.strings {
                             val options = EnumUtil.getOptions(EquipmentSlot::class.java)
@@ -143,7 +143,7 @@ object Command {
 
                 anyExecutor { sender, args ->
                     val targets = args["targets"] as List<Entity>
-                    val slots = args["slots"] as String
+                    val slots = args["slots"] as? String
 
                     clear(sender, targets, slots)
                 }
@@ -183,9 +183,9 @@ object Command {
         }
 
         val slot = ArmorMechanicsAPI.guessEquipmentSlot(armor)!!
-        val dontEquip = 1 == (data["dontEquip"] ?: 0) as Int
-        val force = 1 == (data["forceEquip"] ?: 0) as Int
-        val preventRemove = 1 == (data["preventRemove"] ?: 0) as Int
+        val dontEquip = data["dontEquip"] as? Boolean ?: false
+        val force = data["forceEquip"] as? Boolean ?: false
+        val preventRemove = data["preventRemove"] as? Boolean ?: false
         if (!force && preventRemove) {
             sender.sendMessage(ChatColor.RED.toString() + "When using preventRemove, forceEquip must also be enabled!")
         }
@@ -218,14 +218,7 @@ object Command {
         }
     }
 
-    fun clear(sender: CommandSender, targets: List<Entity>, slots: String) {
-        val slot = if ("*" == slots) null else EquipmentSlot.valueOf(
-            StringUtil.didYouMean(
-                slots, EnumUtil.getOptions(
-                    EquipmentSlot::class.java
-                )
-            ).uppercase()
-        )
+    fun clear(sender: CommandSender, targets: List<Entity>, slot: EquipmentSlot?) {
         sender.sendMessage(ChatColor.GREEN.toString() + "Removing armor from " + targets.size + if (targets.size == 1) "entity" else "entities")
         for (target in targets) {
             if (!target.type.isAlive) continue
