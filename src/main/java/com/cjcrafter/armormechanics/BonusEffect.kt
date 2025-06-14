@@ -7,22 +7,21 @@ import me.deecaad.core.file.simple.DoubleSerializer
 import me.deecaad.core.file.simple.RegistryValueSerializer
 import me.deecaad.core.file.simple.StringSerializer
 import me.deecaad.core.mechanics.CastData
-import me.deecaad.core.mechanics.Mechanics
+import me.deecaad.core.mechanics.MechanicManager
 import me.deecaad.core.mechanics.defaultmechanics.PotionMechanic
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.*
-import javax.annotation.Nonnull
 import kotlin.jvm.optionals.getOrNull
 
 class BonusEffect : Serializer<BonusEffect> {
     var potions: List<PotionEffect> = ArrayList()
     var immunities: Set<PotionEffectType> = HashSet()
-    var equipMechanics: Mechanics? = null
-    var dequipMechanics: Mechanics? = null
-    var damageMechanics: Mechanics? = null
+    var equipMechanics: MechanicManager? = null
+    var dequipMechanics: MechanicManager? = null
+    var damageMechanics: MechanicManager? = null
 
     // WeaponMechanics things
     var bulletResistance = 0.0
@@ -30,13 +29,17 @@ class BonusEffect : Serializer<BonusEffect> {
     var explosionResistance = 0.0
     var perWeaponExplosionResistances: Map<String, Double> = HashMap()
 
+    /**
+     * Default constructor for serializer.
+     */
     constructor()
+
     constructor(
         potions: List<PotionEffect>,
         immunities: Set<PotionEffectType>,
-        equipMechanics: Mechanics?,
-        dequipMechanics: Mechanics?,
-        damageMechanics: Mechanics?,
+        equipMechanics: MechanicManager?,
+        dequipMechanics: MechanicManager?,
+        damageMechanics: MechanicManager?,
         bulletResistance: Double,
         perWeaponBulletResistances: Map<String, Double>,
         explosionResistance: Double,
@@ -70,10 +73,9 @@ class BonusEffect : Serializer<BonusEffect> {
         return "Bonus_Effects"
     }
 
-    @Nonnull
     @Throws(SerializerException::class)
     override fun serialize(data: SerializeData): BonusEffect {
-        val mechanics = data.of("Potion_Effects").serialize(Mechanics::class.java).getOrNull()
+        val mechanics = data.of("Potion_Effects").serialize(MechanicManager::class.java).getOrNull()
         val potions: MutableList<PotionEffect> = ArrayList()
         if (mechanics != null) {
             val list = mechanics.mechanics
@@ -136,9 +138,9 @@ class BonusEffect : Serializer<BonusEffect> {
             immunities.addAll(split[0].get() as List<PotionEffectType>)
         }
 
-        val equip = data.of("Equip_Mechanics").serialize(Mechanics::class.java).getOrNull()
-        val dequip = data.of("Dequip_Mechanics").serialize(Mechanics::class.java).getOrNull()
-        val damage = data.of("Damage_Mechanics").serialize(Mechanics::class.java).getOrNull()
+        val equip = data.of("Equip_Mechanics").serialize(MechanicManager::class.java).getOrNull()
+        val dequip = data.of("Dequip_Mechanics").serialize(MechanicManager::class.java).getOrNull()
+        val damage = data.of("Damage_Mechanics").serialize(MechanicManager::class.java).getOrNull()
 
         return BonusEffect(
             potions, HashSet(immunities), equip, dequip, damage, bulletResistance,

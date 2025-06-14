@@ -1,146 +1,114 @@
 package com.cjcrafter.armormechanics
 
 import com.cjcrafter.armormechanics.commands.Command
-import com.cjcrafter.armormechanics.listeners.*
-import com.cjcrafter.foliascheduler.FoliaCompatibility
-import com.cjcrafter.foliascheduler.ServerImplementation
-import com.cjcrafter.foliascheduler.TaskImplementation
-import com.jeff_media.updatechecker.UpdateCheckSource
-import com.jeff_media.updatechecker.UpdateChecker
-import com.jeff_media.updatechecker.UserAgentBuilder
-import listeners.ArmorEquipListener
+import com.cjcrafter.armormechanics.listeners.ArmorEquipListener
+import com.cjcrafter.armormechanics.listeners.ArmorUpdateListener
+import com.cjcrafter.armormechanics.listeners.BlockPlaceListener
+import com.cjcrafter.armormechanics.listeners.DamageMechanicListener
+import com.cjcrafter.armormechanics.listeners.ImmunePotionCanceller
+import com.cjcrafter.armormechanics.listeners.MythicMobsListener
+import com.cjcrafter.armormechanics.listeners.PreventRemoveListener
+import com.cjcrafter.armormechanics.listeners.WeaponMechanicsDamageListener
+import me.deecaad.core.MechanicsPlugin
 import me.deecaad.core.events.QueueSerializerEvent
-import me.deecaad.core.file.BukkitConfig
-import me.deecaad.core.file.SerializeData
-import me.deecaad.core.file.SerializerException
-import me.deecaad.core.utils.Debugger
-import me.deecaad.core.utils.FileUtil
-import me.deecaad.core.utils.LogLevel
-import org.bstats.bukkit.Metrics
+import me.deecaad.core.file.Configuration
+import me.deecaad.core.file.FastConfiguration
+import me.deecaad.core.file.IValidator
+import me.deecaad.core.file.JarInstancer
+import me.deecaad.core.file.RootFileReader
+import me.deecaad.core.file.SearchMode
+import me.deecaad.core.file.SerializerInstancer
 import org.bstats.charts.SimplePie
-import org.bukkit.configuration.file.FileConfiguration
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.inventory.ItemStack
-import org.bukkit.plugin.java.JavaPlugin
-import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
+import java.util.jar.JarFile
 
-class ArmorMechanics : JavaPlugin() {
+class ArmorMechanics : MechanicsPlugin(bStatsId = 15777) {
 
-    lateinit var debug: Debugger
-    lateinit var scheduler: ServerImplementation
-    private var metrics: Metrics? = null
-    val effects: MutableMap<String, BonusEffect> = HashMap()
-    val armors: MutableMap<String, ItemStack> = HashMap()
-    val sets: MutableMap<String, ArmorSet> = HashMap()
+    var armorConfigurations: Configuration = FastConfiguration()
+        private set
+    var setConfigurations: Configuration = FastConfiguration()
+        private set
 
     override fun onLoad() {
         INSTANCE = this
-        val level = getConfig().getInt("Debug_Level", 2)
-        val printTraces = getConfig().getBoolean("Print_Traces", false)
-        debug = Debugger(logger, level, printTraces)
-        scheduler = FoliaCompatibility(this).serverImplementation
+        super.onLoad()
     }
 
-    override fun onEnable() {
-        reload()
-        registerBStats()
-        registerUpdateChecker()
-        val pm = server.pluginManager
-        pm.registerEvents(ArmorEquipListener(), this)
-        pm.registerEvents(ArmorUpdateListener(), this)
-        pm.registerEvents(BlockPlaceListener(), this)
-        pm.registerEvents(DamageMechanicListener(), this)
-        pm.registerEvents(ImmunePotionCanceller(), this)
-        pm.registerEvents(PreventRemoveListener(), this)
-
-        if (pm.getPlugin("WeaponMechanics") != null) {
-            pm.registerEvents(WeaponMechanicsDamageListener(), this)
-        }
-
-        // Try to hook into MythicMobs, an error will be thrown if the user is
-        // using any version below v5.0.0
-        if (pm.getPlugin("MythicMobs") != null) {
-            try {
-                pm.registerEvents(MythicMobsListener(), this)
-            } catch (e: Throwable) {
-                debug.log(LogLevel.ERROR, "Could not hook into MythicMobs", e)
-            }
-        }
+    override fun handleCommands(): CompletableFuture<Void> {
         Command.register()
-
-        // Automatically reload ArmorMechanics if WeaponMechanics reloads.
-        object : Listener {
-            @EventHandler
-            fun onQueue(event: QueueSerializerEvent) {
-                if ("WeaponMechanics" == event.sourceName) reload()
-            }
-        }
+        return super.handleCommands()
     }
 
-    fun reload(): CompletableFuture<TaskImplementation<Void>> {
-        return scheduler.async().runNow(Runnable {
-            // Write config from jar to datafolder
-            if (!dataFolder.exists() || (dataFolder.listFiles()?.size ?: 0) == 0) {
-                debug.info("Copying files from jar (This process may take up to 30 seconds during the first load!)")
-                FileUtil.copyResourcesTo(classLoader.getResource("ArmorMechanics"), dataFolder.toPath())
-            }
-        }).asFuture().thenCompose {
-            scheduler.global().run(Runnable {
-                reloadConfig()
+    override fun handleConfigs(): CompletableFuture<Void> {
+        // Look for all serializers/validators in the jar
+        val jar = JarFile(file)
+        val serializers = SerializerInstancer(jar).createAllInstances(classLoader, SearchMode.ON_DEMAND)
+        val validators = JarInstancer(jar).createAllInstances(IValidator::class.java, classLoader, SearchMode.ON_DEMAND)
 
-                // Clear old data
-                effects.clear()
-                armors.clear()
-                sets.clear()
+        val event = QueueSerializerEvent(this, dataFolder)
+        event.addSerializers(serializers)
+        event.addValidators(validators)
+        server.pluginManager.callEvent(event)
 
-                // Serialize armor types
-                val armorFile = File(dataFolder, "Armor.yml")
-                val armorConfig: FileConfiguration = YamlConfiguration.loadConfiguration(armorFile)
-                for (key in armorConfig.getKeys(false)) {
-                    val serializer = ArmorSerializer()
-                    val data = SerializeData(serializer, armorFile, key, BukkitConfig(armorConfig))
-                    try {
-                        serializer.serialize(data)
-                    } catch (e: SerializerException) {
-                        e.log(debug)
-                    }
-                }
-                if (armors.isEmpty()) {
-                    debug.error(
-                        "Couldn't find any armors from '$armorFile'",
-                        "Keys: " + armorConfig.getKeys(false)
-                    )
-                    return@Runnable
-                }
-                val setFile = File(dataFolder, "Set.yml")
-                val setConfig: FileConfiguration = YamlConfiguration.loadConfiguration(setFile)
-                for (key in setConfig.getKeys(false)) {
-                    val serializer = ArmorSet()
-                    val data = SerializeData(serializer, setFile, key, BukkitConfig(setConfig))
-                    try {
-                        serializer.serialize(data)
-                    } catch (e: SerializerException) {
-                        e.log(debug)
-                    }
-                }
-            }).asFuture()
-        }
+        armorConfigurations = RootFileReader(this, Armor::class.java, "armors")
+            .withSerializers(event.serializers)
+            .withValidators(event.validators)
+            .assertFiles()
+            .read()
+        debugger.info("Loaded ${armorConfigurations.keys(deep=false).size}")
+
+        setConfigurations = RootFileReader(this, ArmorSet::class.java, "sets")
+            .withSerializers(event.serializers)
+            .withValidators(event.validators)
+            .assertFiles()
+            .read()
+        debugger.info("Loaded ${setConfigurations.keys(deep=false).size}")
+
+        return super.handleConfigs()
     }
 
-    private fun registerBStats() {
-        if (metrics != null) return
-        debug.debug("Registering bStats")
+    override fun handleListeners(): CompletableFuture<Void> {
+        server.pluginManager.run {
+            val plugin = this@ArmorMechanics
+            registerEvents(ArmorEquipListener(), plugin)
+            registerEvents(ArmorUpdateListener(), plugin)
+            registerEvents(BlockPlaceListener(), plugin)
+            registerEvents(DamageMechanicListener(), plugin)
+            registerEvents(ImmunePotionCanceller(), plugin)
+            registerEvents(PreventRemoveListener(), plugin)
 
-        // See https://bstats.org/plugin/bukkit/ArmorMechanics/15777. This is
-        // the bStats plugin id used to track information.
-        val id = 15777
-        metrics = Metrics(this, id)
+            if (getPlugin("WeaponMechanics") != null) {
+                registerEvents(WeaponMechanicsDamageListener(), plugin)
+            }
+
+            // Try to hook into MythicMobs, an error will be thrown if the user is
+            // using any version below v5.0.0
+            if (getPlugin("MythicMobs") != null) {
+                try {
+                    registerEvents(MythicMobsListener(), plugin)
+                } catch (e: Throwable) {
+                    debugger.severe("Could not hook into MythicMobs", e)
+                }
+            }
+
+            // Automatically reload ArmorMechanics if WeaponMechanics reloads.
+            registerEvents(object : Listener {
+                @EventHandler
+                fun onQueue(event: QueueSerializerEvent) {
+                    if ("WeaponMechanics" == event.sourceName) reload()
+                }
+            }, plugin)
+        }
+
+        return super.handleListeners()
+    }
+
+    override fun handleMetrics(): CompletableFuture<Void> {
         metrics!!.addCustomChart(SimplePie("registered_armors", Callable {
-            val count = armors.size
+            val count = armorConfigurations.keys(deep=false).size
             if (count <= 10) {
                 return@Callable "0-10"
             } else if (count <= 20) {
@@ -156,7 +124,7 @@ class ArmorMechanics : JavaPlugin() {
             }
         }))
         metrics!!.addCustomChart(SimplePie("registered_sets", Callable {
-            val count = sets.size
+            val count = setConfigurations.keys(deep=false).size
             if (count <= 2) {
                 return@Callable "0-2"
             } else if (count <= 5) {
@@ -171,18 +139,15 @@ class ArmorMechanics : JavaPlugin() {
                 return@Callable ">50"
             }
         }))
-    }
-
-    private fun registerUpdateChecker() {
-        debug.debug("Registering SpigotUpdateChecker")
-        UpdateChecker(this, UpdateCheckSource.SPIGOT, "103179")
-            .setNotifyOpsOnJoin(true)
-            .setUserAgent(UserAgentBuilder().addPluginNameAndVersion())
-            .checkEveryXHours(24.0)
-            .checkNow()
+        return super.handleMetrics()
     }
 
     companion object {
-        lateinit var INSTANCE: ArmorMechanics
+        private lateinit var INSTANCE: ArmorMechanics
+
+        @JvmStatic
+        fun getInstance(): ArmorMechanics {
+            return INSTANCE
+        }
     }
 }

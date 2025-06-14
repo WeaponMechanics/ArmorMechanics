@@ -11,7 +11,7 @@ class ArmorUpdateListener : Listener {
 
     @EventHandler
     fun onEquip(event: EntityEquipmentEvent) {
-        if (!ArmorMechanics.INSTANCE.config.getBoolean("Update_Armor")) return
+        if (!ArmorMechanics.getInstance().configuration.getBoolean("Update_Armor")) return
         if (!event.isEquipping) return
         val entity = event.entity as LivingEntity
 
@@ -19,7 +19,7 @@ class ArmorUpdateListener : Listener {
         // event since it contains a COPY of the armor. So, we need to check 1
         // tick after the event and check to update it. If no armor is in that
         // slot anymore, we can just assume the player has already removed it.
-        ArmorMechanics.INSTANCE.scheduler.entity(entity).runDelayed(Runnable {
+        ArmorMechanics.getInstance().foliaScheduler.entity(entity).runDelayed(Runnable {
             val equipment = entity.equipment!!
             val item = equipment.getItem(event.slot)
 

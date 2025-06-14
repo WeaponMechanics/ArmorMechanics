@@ -1,5 +1,6 @@
 package com.cjcrafter.armormechanics.events
 
+import me.deecaad.core.mechanics.MechanicManager
 import me.deecaad.core.mechanics.Mechanics
 import org.bukkit.entity.Entity
 import org.bukkit.event.HandlerList
@@ -11,7 +12,7 @@ class ArmorMechanicsDequipEvent(
     what: Entity,
     val armor: ItemStack,
     val armorTitle: String,
-    var dequipMechanics: Mechanics?,
+    var dequipMechanics: MechanicManager?,
     var potions: List<PotionEffect>
 ) : EntityEvent(what) {
 

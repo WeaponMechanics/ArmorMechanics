@@ -1,18 +1,19 @@
-package listeners
+package com.cjcrafter.armormechanics.listeners
 
 import com.cjcrafter.armormechanics.ArmorMechanics
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.BonusEffect
 import com.cjcrafter.armormechanics.events.ArmorMechanicsDequipEvent
 import com.cjcrafter.armormechanics.events.ArmorMechanicsEquipEvent
 import me.deecaad.core.compatibility.CompatibilityAPI
 import me.deecaad.core.events.EntityEquipmentEvent
 import me.deecaad.core.mechanics.CastData
-import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.Bukkit
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.inventory.EquipmentSlot
+import kotlin.text.get
 
 class ArmorEquipListener : Listener {
 
@@ -30,7 +31,7 @@ class ArmorEquipListener : Listener {
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty()) return
-        val bonus = ArmorMechanics.INSTANCE.effects[title]
+        val bonus = ArmorMechanics.getInstance().armorConfigurations.get<BonusEffect>("$title.Bonus_Effects")
 
         // Determine which set they will be wearing after the armor is equipped
         var helmet = equipment!!.helmet
@@ -66,7 +67,7 @@ class ArmorEquipListener : Listener {
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty()) return
-        val bonus = ArmorMechanics.INSTANCE.effects[title]
+        val bonus = ArmorMechanics.getInstance().armorConfigurations.get<BonusEffect>(title)
 
         val dequipEvent = ArmorMechanicsDequipEvent(entity, item, title, bonus?.dequipMechanics, ArrayList(bonus?.potions ?: listOf()))
         Bukkit.getPluginManager().callEvent(dequipEvent)

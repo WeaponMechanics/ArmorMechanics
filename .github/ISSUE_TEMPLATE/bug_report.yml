@@ -1,0 +1,55 @@
+name: Bug Report
+description: Report any errors or bugs or other behavior related issues here.
+labels: [ bug, new ]
+body:
+
+  - type: textarea
+    attributes:
+      label: Current/Expected Behavior
+      description: A clear and concise description of what the bug is.
+      placeholder: |
+        In here you should explain what is currently happening, and what you expected to happen instead.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. Use this config
+        2. Spawn this weapon
+        3. Shoot it at a player
+        4. etc...
+        
+        ```yaml
+        Config:
+          Should: "Go in here"  # If you need to copy-paste config
+        ```
+        
+        Recording a video is the best way for us to find the bug!
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Log File
+      description: |
+        Please drag and drop your latest.log file into this section.
+      placeholder: |
+        To insert files:
+        1. Try dragging and dropping files
+        2. Try copying and pasting files
+        3. If you are having trouble uploading files, use https://paste.gg
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Anything else?
+      description: |
+        Have a video? Screenshots? Any other important information? Please include it here.
+
+        Tip: You can "drag and drop" files into the text box to upload images, logs, videos, or other files.
+    validations:
+      required: false
