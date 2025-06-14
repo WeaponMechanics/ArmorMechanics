@@ -67,9 +67,9 @@ class ArmorEquipListener : Listener {
 
         // When the equipped armor is not from ArmorMechanics, skip
         if (title == null || title.isEmpty()) return
-        val bonus = ArmorMechanics.getInstance().armorConfigurations.get<BonusEffect>(title)
+        val bonus = ArmorMechanics.getInstance().armorConfigurations.get<BonusEffect>("$title.Bonus_Effects")
 
-        val dequipEvent = ArmorMechanicsDequipEvent(entity, item, title, bonus?.dequipMechanics, ArrayList(bonus?.potions ?: listOf()))
+        val dequipEvent = ArmorMechanicsDequipEvent(entity, item, title, bonus?.dequipMechanics, bonus?.potions?.toMutableList() ?: mutableListOf())
         Bukkit.getPluginManager().callEvent(dequipEvent)
 
         dequipEvent.dequipMechanics?.use(CastData(entity, title, item))

@@ -13,7 +13,7 @@ class ArmorMechanicsDequipEvent(
     val armor: ItemStack,
     val armorTitle: String,
     var dequipMechanics: MechanicManager?,
-    var potions: List<PotionEffect>
+    var potions: MutableList<PotionEffect>
 ) : EntityEvent(what) {
 
     override fun getHandlers(): HandlerList {
