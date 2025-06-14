@@ -58,14 +58,14 @@ class ArmorMechanics : MechanicsPlugin(bStatsId = 15777) {
             .withValidators(event.validators)
             .assertFiles()
             .read()
-        debugger.info("Loaded ${armorConfigurations.keys(deep=false).size}")
+        debugger.info("Loaded ${armorConfigurations.keys(deep = false).size} armors")
 
         setConfigurations = RootFileReader(this, ArmorSet::class.java, "sets")
             .withSerializers(event.serializers)
             .withValidators(event.validators)
             .assertFiles()
             .read()
-        debugger.info("Loaded ${setConfigurations.keys(deep=false).size}")
+        debugger.info("Loaded ${setConfigurations.keys(deep = false).size} sets")
 
         return super.handleConfigs()
     }
@@ -94,13 +94,16 @@ class ArmorMechanics : MechanicsPlugin(bStatsId = 15777) {
                 }
             }
 
-            // Automatically reload ArmorMechanics if WeaponMechanics reloads.
-            registerEvents(object : Listener {
-                @EventHandler
-                fun onQueue(event: QueueSerializerEvent) {
-                    if ("WeaponMechanics" == event.sourceName) reload()
-                }
-            }, plugin)
+            // Automatically reload ArmorMechanics if WeaponMechanics reloads (only after 20 ticks to avoid
+            // the first load from WM)
+            foliaScheduler.global().runDelayed(Runnable {
+                registerEvents(object : Listener {
+                    @EventHandler
+                    fun onQueue(event: QueueSerializerEvent) {
+                        if ("WeaponMechanics" == event.sourceName) reload()
+                    }
+                }, plugin)
+            }, 20L)
         }
 
         return super.handleListeners()
@@ -108,7 +111,7 @@ class ArmorMechanics : MechanicsPlugin(bStatsId = 15777) {
 
     override fun handleMetrics(): CompletableFuture<Void> {
         metrics!!.addCustomChart(SimplePie("registered_armors", Callable {
-            val count = armorConfigurations.keys(deep=false).size
+            val count = armorConfigurations.keys(deep = false).size
             if (count <= 10) {
                 return@Callable "0-10"
             } else if (count <= 20) {
@@ -124,7 +127,7 @@ class ArmorMechanics : MechanicsPlugin(bStatsId = 15777) {
             }
         }))
         metrics!!.addCustomChart(SimplePie("registered_sets", Callable {
-            val count = setConfigurations.keys(deep=false).size
+            val count = setConfigurations.keys(deep = false).size
             if (count <= 2) {
                 return@Callable "0-2"
             } else if (count <= 5) {

@@ -48,7 +48,7 @@ object Command {
         commandAPICommand("am") {
             withAliases("armor", "armormechanics")
             withPermission("armormechanics.admin")
-            withShortDescription("ArmorMexchanics main command")
+            withShortDescription("ArmorMechanics main command")
 
             subcommand("give") {
                 withPermission("armormechanics.commands.give")
