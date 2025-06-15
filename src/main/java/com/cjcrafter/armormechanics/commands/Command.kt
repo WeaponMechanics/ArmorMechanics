@@ -104,7 +104,7 @@ object Command {
                 stringArgument("set") {
                     replaceSuggestions(
                         ArgumentSuggestions.strings {
-                            val options = ArmorMechanics.getInstance().armorConfigurations.keys(deep=false)
+                            val options = ArmorMechanics.getInstance().setConfigurations.keys(deep=false)
                             options.toTypedArray()
                         }
                     )
