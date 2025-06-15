@@ -19,8 +19,8 @@ class ArmorEquipListener : Listener {
 
     @EventHandler
     fun onEquip(event: EntityEquipmentEvent) {
-        if (event.isEquipping && event.isArmor) equip(event)
         if (event.isDequipping && event.isArmor) dequip(event)
+        if (event.isEquipping && event.isArmor) equip(event)
     }
 
     fun equip(event: EntityEquipmentEvent) {
@@ -78,11 +78,21 @@ class ArmorEquipListener : Listener {
 
         // Set bonus is a little weird, as we need to check if the user
         // previously had a set bonus, and if it needs to be removed.
+        // This code is done weirdly (by setting the changed armor both
+        // for old set and new set) for support with <1.21.5 versions,
+        // which bukkit's EntityEquipment did not update instantly
         val equipment = entity.equipment!!
         var helmet = ArmorMechanicsAPI.getArmorTitle(equipment.helmet)
         var chestplate = ArmorMechanicsAPI.getArmorTitle(equipment.chestplate)
         var leggings = ArmorMechanicsAPI.getArmorTitle(equipment.leggings)
         var boots = ArmorMechanicsAPI.getArmorTitle(equipment.boots)
+        when (event.slot) {
+            EquipmentSlot.HEAD -> helmet = title
+            EquipmentSlot.CHEST -> chestplate = title
+            EquipmentSlot.LEGS -> leggings = title
+            EquipmentSlot.FEET -> boots = title
+            else -> throw IllegalArgumentException("impossible")
+        }
         val oldSet = ArmorMechanicsAPI.getSet(helmet, chestplate, leggings, boots) ?: return
         when (event.slot) {
             EquipmentSlot.HEAD -> helmet = null
