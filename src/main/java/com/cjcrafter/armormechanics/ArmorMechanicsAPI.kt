@@ -28,11 +28,13 @@ object ArmorMechanicsAPI {
             return CustomTag.ARMOR_TITLE.getString(armor)
     }
 
-    fun generateArmor(armorTitle: String?): ItemStack {
-        require(armorTitle != null) { "Unknown armor-title '$armorTitle'" }
-        require(ArmorMechanics.INSTANCE.armors.containsKey(armorTitle)) { "Unknown armor-title '$armorTitle'" }
+    fun generateArmor(armorTitle: String): ItemStack {
+        val armor = ArmorMechanics.getInstance().armorConfigurations.get<Armor>(armorTitle)
+        require(armor != null) {
+            "Armor with title '$armorTitle' does not exist in the configuration."
+        }
 
-        return ArmorMechanics.INSTANCE.armors[armorTitle]!!.clone()
+        return armor.generateItemStack()
     }
 
     fun guessEquipmentSlot(item: ItemStack): EquipmentSlot? {
@@ -54,7 +56,7 @@ object ArmorMechanicsAPI {
     }
 
     /**
-     * Shorthand for [.getSet].
+     * Shorthand for [getSet].
      *
      * @param entity The non-null entity to check.
      * @return The set the entity is wearing, or null.
@@ -124,7 +126,9 @@ object ArmorMechanicsAPI {
 
         // Since an armor title may belong to multiple sets, we must check each
         // set to determine whether the player is wearing a set.
-        for (set in ArmorMechanics.INSTANCE.sets.values) {
+        val config = ArmorMechanics.getInstance().setConfigurations
+        val allSets = config.values().filterIsInstance<ArmorSet>()
+        for (set in allSets) {
             if (set.helmet != null && set.helmet != helmet) continue
             if (set.chestplate != null && set.chestplate != chestplate) continue
             if (set.leggings != null && set.leggings != leggings) continue
@@ -144,11 +148,11 @@ object ArmorMechanicsAPI {
         val set = getSet(helmet, chestplate, leggings, boots)
         val temp = ArrayList<BonusEffect>()
 
-        val effects = ArmorMechanics.INSTANCE.effects
-        effects[helmet]?.let { temp.add(it) }
-        effects[chestplate]?.let { temp.add(it) }
-        effects[leggings]?.let { temp.add(it) }
-        effects[boots]?.let { temp.add(it) }
+        val config = ArmorMechanics.getInstance().armorConfigurations
+        config.get<BonusEffect>("$helmet.Bonus_Effects")?.let { temp.add(it) }
+        config.get<BonusEffect>("$chestplate.Bonus_Effects")?.let { temp.add(it) }
+        config.get<BonusEffect>("$leggings.Bonus_Effects")?.let { temp.add(it) }
+        config.get<BonusEffect>("$boots.Bonus_Effects")?.let { temp.add(it) }
         set?.bonus?.let { temp.add(it) }
 
         return temp
@@ -168,12 +172,12 @@ object ArmorMechanicsAPI {
      * @param armor  The non-null item to update.
      */
     fun update(entity: LivingEntity?, armor: ItemStack) {
-        val title = getArmorTitle(armor)
+        val title = getArmorTitle(armor) ?: return
 
         // Check if we should delete this item.
         // If the armor no longer exists, we cannot update its properties.
-        if (!ArmorMechanics.INSTANCE.armors.containsKey(title)) {
-            val deleteOld = ArmorMechanics.INSTANCE.config.getBoolean("Delete_Old_Armor", false)
+        if (!ArmorMechanics.getInstance().armorConfigurations.hasObject(title)) {
+            val deleteOld = ArmorMechanics.getInstance().configuration.getBoolean("Delete_Old_Armor", false)
             if (deleteOld) armor.amount = 0
             return
         }
@@ -183,9 +187,10 @@ object ArmorMechanicsAPI {
         val durability = (armor.itemMeta as? org.bukkit.inventory.meta.Damageable)?.damage
         val old = armor.clone()
 
-        val template = ArmorMechanics.INSTANCE.armors[title]
-        armor.setType(template!!.type)
-        armor.setItemMeta(template.itemMeta)
+        val template = ArmorMechanics.getInstance().armorConfigurations.get<Armor>(title)!!
+        val templateItem = template.generateItemStack()
+        armor.setType(templateItem.type)
+        armor.setItemMeta(templateItem.itemMeta)
 
         val meta = armor.itemMeta!!
         old.itemMeta!!.persistentDataContainer.copyTo(meta.persistentDataContainer, true)

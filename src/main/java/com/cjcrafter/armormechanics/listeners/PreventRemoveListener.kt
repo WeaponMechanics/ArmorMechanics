@@ -1,6 +1,6 @@
 package com.cjcrafter.armormechanics.listeners
 
-import me.deecaad.core.compatibility.CompatibilityAPI
+import com.cjcrafter.armormechanics.ArmorMechanics
 import me.deecaad.weaponmechanics.utils.CustomTag
 import org.bukkit.Bukkit
 import org.bukkit.event.EventHandler
@@ -10,16 +10,18 @@ import org.bukkit.event.inventory.InventoryType
 import org.bukkit.permissions.Permission
 
 class PreventRemoveListener : Listener {
-    private val permission: Permission
-
-    init {
-        permission = Permission("armormechanics.preventremovebypass")
-        permission.setDescription("Allow users to remove armor which normally can't be removed")
-        Bukkit.getPluginManager().addPermission(permission)
-    }
+    private lateinit var permission: Permission
 
     @EventHandler(ignoreCancelled = true)
     fun onClick(event: InventoryClickEvent) {
+        if (!::permission.isInitialized) {
+            permission = Bukkit.getPluginManager().getPermission("armormechanics.preventremovebypass")
+                ?: run {
+                    ArmorMechanics.getInstance().debugger.warning("Permission 'armormechanics.preventremovebypass' not found!")
+                    return
+                }
+        }
+
         if (event.slotType != InventoryType.SlotType.ARMOR) return
         if (event.whoClicked.hasPermission(permission)) return
         val item = event.clickedInventory!!.getItem(event.slot)

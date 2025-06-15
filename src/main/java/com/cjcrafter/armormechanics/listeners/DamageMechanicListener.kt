@@ -1,5 +1,6 @@
 package com.cjcrafter.armormechanics.listeners
 
+import com.cjcrafter.armormechanics.ArmorMechanicsAPI
 import me.deecaad.core.mechanics.CastData
 import org.bukkit.entity.LivingEntity
 import org.bukkit.event.EventHandler
@@ -13,7 +14,7 @@ class DamageMechanicListener : Listener {
         val entity = event.entity
         if (entity !is LivingEntity) return
 
-        for (effect in com.cjcrafter.armormechanics.ArmorMechanicsAPI.getBonusEffects(entity)) {
+        for (effect in ArmorMechanicsAPI.getBonusEffects(entity)) {
             effect.damageMechanics?.use(CastData(entity, null, null))
         }
     }

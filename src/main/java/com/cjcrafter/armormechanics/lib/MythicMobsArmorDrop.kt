@@ -1,5 +1,6 @@
 package com.cjcrafter.armormechanics.lib
 
+import com.cjcrafter.armormechanics.Armor
 import com.cjcrafter.armormechanics.ArmorMechanics
 import io.lumine.mythic.api.adapters.AbstractItemStack
 import io.lumine.mythic.api.config.MythicLineConfig
@@ -17,9 +18,10 @@ class MythicMobsArmorDrop(config: MythicLineConfig, argument: String?) : IItemDr
         // Since we want to ignore spelling/capitalization errors, we should
         // make sure the given 'title' matches to an actual armor-title.
         val startsWith: MutableSet<String> = HashSet()
-        var options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
+        var options: Set<String> = ArmorMechanics.getInstance().armorConfigurations.keys(deep=false)
         for (temp in options) {
-            if (temp.lowercase().startsWith(title.lowercase())) startsWith.add(title)
+            if (temp.lowercase().startsWith(title.lowercase()))
+                startsWith.add(title)
         }
 
         // Added redundancy to make sure we don't have any empty options.
@@ -28,10 +30,10 @@ class MythicMobsArmorDrop(config: MythicLineConfig, argument: String?) : IItemDr
     }
 
     override fun getDrop(dropMetadata: DropMetadata, v: Double): AbstractItemStack {
-        val item = ArmorMechanics.INSTANCE.armors[armorTitle]
+        val item = ArmorMechanics.getInstance().armorConfigurations.get<Armor>(armorTitle)!!
 
         // Just in case MythicMobs edits this item, we want to use a clone
         // to avoid possible modification.
-        return ItemComponentBukkitItemStack(item!!.clone())
+        return ItemComponentBukkitItemStack(item.generateItemStack())
     }
 }

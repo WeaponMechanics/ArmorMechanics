@@ -1,10 +1,14 @@
-# the debug level dictates what is printed to console
-#   0: No printing
-#   1: Errors/Info
-#   2: Warnings (Suggested)
-#   3: Debug
-Debug_Level: 2
-Print_Traces: false
+# Controls what gets printed to console
+# Valid levels are: OFF, SEVERE, WARNING, INFO, CONFIG, FINE, FINER, FINEST, ALL
+# Generally, for testing, you might set Print_Level: FINEST to get more information
+# A dev might ask you to set Stack_Traces_Level: WARNING to get information
+# Alerts are used to warn admins in game when an error occurs... you can set that to OFF or SEVERE to limit alerts
+Logger_Config:
+  Print_Level: "CONFIG"
+  Stack_Traces_Level: "OFF"
+  Alert_Level: "WARNING"
+  Max_Alerts_To_Show: 5
+  Alert_Interval: 300  # 15 seconds * 20 ticks per second
 
 # Setting this to false will allow players to place heads on the ground
 Prevent_Armor_Place: true
