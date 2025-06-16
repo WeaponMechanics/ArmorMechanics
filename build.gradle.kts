@@ -232,7 +232,7 @@ jreleaser {
             active.set(Active.ALWAYS)
             distributionType.set(org.jreleaser.model.Distribution.DistributionType.SINGLE_JAR)
             artifact {
-                path.set(file("/build/libs/ArmorMechanics-${findProperty("version")}.jar"))
+                path.set(file("build/libs/ArmorMechanics-${findProperty("version")}.jar"))
             }
         }
     }
