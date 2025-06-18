@@ -1,0 +1,33 @@
+[versions]
+# Core Minecraft dependencies
+spigotApi = "1.21.4-R0.1-SNAPSHOT"
+
+# External "hooks" or plugins that we might interact with
+mechanicsCore = "4.1.1-SNAPSHOT"
+mythicMobs = "5.8.2"
+weaponMechanics = "4.1.1"
+
+# Shaded dependencies
+adventureApi = "4.21.0"
+bstats = "3.1.0"
+commandApi = "9.7.0"
+foliaScheduler = "0.6.3"
+spigotUpdateChecker = "3.0.4"
+
+
+[libraries]
+# Core Minecraft dependencies
+spigotApi      = { module = "org.spigotmc:spigot-api", version.ref = "spigotApi" }
+
+# External "hooks" or plugins that we might interact with
+mechanicsCore   = { module = "com.cjcrafter:mechanicscore", version.ref = "mechanicsCore" }
+mythicMobs      = { module = "io.lumine:Mythic-Dist", version.ref = "mythicMobs" }
+weaponMechanics = { module = "com.cjcrafter:weaponmechanics", version.ref = "weaponMechanics" }
+
+# Shaded dependencies
+adventureApi             = { module = "net.kyori:adventure-api", version.ref = "adventureApi" }
+bstats                   = { module = "org.bstats:bstats-bukkit", version.ref = "bstats" }
+commandApi               = { module = "dev.jorel:commandapi-bukkit-core", version.ref = "commandApi" }
+commandApiKotlin         = { module = "dev.jorel:commandapi-bukkit-kotlin", version.ref = "commandApi" }
+foliaScheduler           = { module = "com.cjcrafter:foliascheduler", version.ref = "foliaScheduler" }
+spigotUpdateChecker      = { module = "com.jeff_media:SpigotUpdateChecker", version.ref = "spigotUpdateChecker" }

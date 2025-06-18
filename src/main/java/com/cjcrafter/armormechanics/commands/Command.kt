@@ -2,8 +2,10 @@
 
 package com.cjcrafter.armormechanics.commands
 
+import com.cjcrafter.armormechanics.Armor
 import com.cjcrafter.armormechanics.ArmorMechanics
 import com.cjcrafter.armormechanics.ArmorMechanicsAPI
+import com.cjcrafter.armormechanics.ArmorSet
 import com.cjcrafter.armormechanics.events.ArmorGenerateEvent
 import dev.jorel.commandapi.arguments.ArgumentSuggestions
 import dev.jorel.commandapi.kotlindsl.anyExecutor
@@ -56,7 +58,7 @@ object Command {
                 stringArgument("armor") {
                     replaceSuggestions(
                         ArgumentSuggestions.strings {
-                            val options = ArmorMechanics.INSTANCE.armors.keys
+                            val options = ArmorMechanics.getInstance().armorConfigurations.keys(deep=false)
                             options.toTypedArray()
                         }
                     )
@@ -79,7 +81,7 @@ object Command {
                 stringArgument("armor") {
                     replaceSuggestions(
                         ArgumentSuggestions.strings {
-                            val options = ArmorMechanics.INSTANCE.armors.keys
+                            val options = ArmorMechanics.getInstance().armorConfigurations.keys(deep=false)
                             options.toTypedArray()
                         }
                     )
@@ -102,7 +104,7 @@ object Command {
                 stringArgument("set") {
                     replaceSuggestions(
                         ArgumentSuggestions.strings {
-                            val options = ArmorMechanics.INSTANCE.sets.keys
+                            val options = ArmorMechanics.getInstance().setConfigurations.keys(deep=false)
                             options.toTypedArray()
                         }
                     )
@@ -114,7 +116,7 @@ object Command {
                     val setTitle = args["set"] as String
                     val data = args["data"] as? Map<String, Any> ?: mutableMapOf()
 
-                    val set = ArmorMechanics.INSTANCE.sets[setTitle]
+                    val set = ArmorMechanics.getInstance().setConfigurations.get<ArmorSet>(setTitle)
                     if (set == null) {
                         sender.sendMessage("${ChatColor.RED}Unknown set '$setTitle'")
                         return@anyExecutor
@@ -145,7 +147,7 @@ object Command {
                     val targets = args["targets"] as List<Entity>
                     val slots = args["slots"] as? String
 
-                    clear(sender, targets, slots)
+                    clear(sender, targets, slots?.let { EquipmentSlot.valueOf(it) })
                 }
             }
 
@@ -154,7 +156,7 @@ object Command {
                 withShortDescription("Reloads ArmorMechanics configuration")
 
                 anyExecutor { sender, args ->
-                    ArmorMechanics.INSTANCE.reload().thenRun {
+                    ArmorMechanics.getInstance().reload().thenRun {
                         sender.sendMessage("${ChatColor.GREEN}Reloaded ArmorMechanics")
                     }
                 }
@@ -171,30 +173,32 @@ object Command {
         // make sure the given 'title' matches to an actual armor-title.
         var title = title
         val startsWith: MutableList<String> = ArrayList()
-        val options: Set<String> = ArmorMechanics.INSTANCE.armors.keys
+        val options: Set<String> = ArmorMechanics.getInstance().armorConfigurations.keys(deep=false)
         for (temp in options) {
-            if (temp.lowercase().startsWith(title.lowercase())) startsWith.add(title)
+            if (temp.lowercase().startsWith(title.lowercase()))
+                startsWith.add(title)
         }
         title = StringUtil.didYouMean(title, if (startsWith.isEmpty()) options else startsWith)
-        val armor = ArmorMechanics.INSTANCE.armors[title]
+        val armor = ArmorMechanics.getInstance().armorConfigurations.get<Armor>(title)
         if (armor == null) {
             sender.sendMessage(ChatColor.RED.toString() + "Couldn't find armor '" + title + "'... Choose from " + options)
             return
         }
 
-        val slot = ArmorMechanicsAPI.guessEquipmentSlot(armor)!!
+        val slot = ArmorMechanicsAPI.guessEquipmentSlot(armor.generateItemStack())!!
         val dontEquip = data["dontEquip"] as? Boolean ?: false
         val force = data["forceEquip"] as? Boolean ?: false
         val preventRemove = data["preventRemove"] as? Boolean ?: false
         if (!force && preventRemove) {
             sender.sendMessage(ChatColor.RED.toString() + "When using preventRemove, forceEquip must also be enabled!")
         }
+
         for (entity in entities) {
             if (entity !is LivingEntity) continue
             val equipment = entity.equipment ?: continue
 
             // Let other plugins modify generated armor
-            val clone = armor.clone()
+            val clone = armor.generateItemStack()
             val event = ArmorGenerateEvent(sender, entity, clone, title, data)
             Bukkit.getPluginManager().callEvent(event)
 
