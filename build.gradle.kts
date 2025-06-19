@@ -7,7 +7,7 @@ version = "4.1.1-SNAPSHOT"
 
 plugins {
     `java-library`
-    kotlin("jvm") version "1.9.21"
+    kotlin("jvm") version "2.1.21"
     id("com.gradleup.shadow") version "8.3.5"
     id("xyz.jpenilla.resource-factory-bukkit-convention") version "1.3.0"
     `maven-publish`
