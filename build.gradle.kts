@@ -61,7 +61,10 @@ tasks.shadowJar {
     archiveFileName.set("ArmorMechanics-${project.version}.jar")
 
     // the kotlin plugin adds kotlin-stdlib to the classpath, but we don't want it in the shadow jar
-    exclude("org/jetbrains/kotlin/**")
+    exclude("kotlin/**")
+    exclude("META-INF/*.kotlin_module")
+    exclude("org/jetbrains/annotations/**")
+    exclude("META-INF/annotations/**")
 
     val libPackage = "me.deecaad.core.lib"
 
