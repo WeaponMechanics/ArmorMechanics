@@ -1,6 +1,6 @@
 [versions]
 # Core Minecraft dependencies
-spigotApi = "1.21.4-R0.1-SNAPSHOT"
+spigotApi = "1.21.7-R0.1-SNAPSHOT"
 
 # External "hooks" or plugins that we might interact with
 mechanicsCore = "4.1.1-SNAPSHOT"
