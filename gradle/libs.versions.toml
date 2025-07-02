@@ -4,7 +4,7 @@ spigotApi = "1.21.4-R0.1-SNAPSHOT"
 
 # External "hooks" or plugins that we might interact with
 mechanicsCore = "4.1.1-SNAPSHOT"
-mythicMobs = "5.8.2"
+mythicMobs = "5.9.3"
 weaponMechanics = "4.1.1"
 
 # Shaded dependencies
