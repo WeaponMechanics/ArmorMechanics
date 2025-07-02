@@ -11,7 +11,7 @@ weaponMechanics = "4.1.1"
 adventureApi = "4.21.0"
 bstats = "3.1.0"
 commandApi = "9.7.0"
-foliaScheduler = "0.6.3"
+foliaScheduler = "0.7.1"
 spigotUpdateChecker = "3.0.4"
 
 
