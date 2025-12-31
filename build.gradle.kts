@@ -1,27 +1,30 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jreleaser.model.Active
 import xyz.jpenilla.resourcefactory.bukkit.Permission
+import xyz.jpenilla.resourcefactory.paper.PaperPluginYaml
 
 group = "com.cjcrafter"
-version = "4.1.1-SNAPSHOT"
+version = "4.2.0"
 
 plugins {
     `java-library`
     kotlin("jvm") version "1.9.21"
     id("com.gradleup.shadow") version "8.3.5"
-    id("xyz.jpenilla.resource-factory-bukkit-convention") version "1.3.0"
+    id("xyz.jpenilla.resource-factory-paper-convention") version "1.3.1"
     `maven-publish`
     id("org.jreleaser") version "1.18.0"
 }
 
-bukkitPluginYaml {
+paperPluginYaml {
     main = "com.cjcrafter.armormechanics.ArmorMechanics"
-    apiVersion = "1.13"
+    apiVersion = "1.21"
     foliaSupported = true
 
     authors = listOf("CJCrafter")
-    depend = listOf("MechanicsCore")
-    softDepend = listOf("WeaponMechanics")
+    dependencies {
+        server("MechanicsCore", required = true, load = PaperPluginYaml.Load.BEFORE)
+        server("WeaponMechanics", required = false, load = PaperPluginYaml.Load.BEFORE)
+    }
 
     permissions {
         register("armormechanics.preventremovebypass") {
@@ -34,14 +37,13 @@ bukkitPluginYaml {
 repositories {
     mavenCentral()
     maven(url = "https://central.sonatype.com/repository/maven-snapshots/") // MechanicsCore Snapshots
-    maven(url = "https://hub.spigotmc.org/nexus/content/repositories/snapshots/") // Spigot
+    maven(url = "https://repo.papermc.io/repository/maven-public/") // Paper
     maven(url = "https://mvn.lumine.io/repository/maven-public/") // MythicMobs
-    maven(url = "https://repo.jeff-media.com/public/") // SpigotUpdateChecker
 }
 
 dependencies {
     // Core Minecraft dependencies
-    compileOnly(libs.spigotApi)
+    compileOnly(libs.paper)
     compileOnly(libs.mechanicsCore)
     compileOnly(libs.weaponMechanics)
 
@@ -49,12 +51,10 @@ dependencies {
     compileOnly(libs.mythicMobs)
 
     // Shaded dependencies
-    compileOnly(libs.adventureApi)
     compileOnly(libs.bstats)
     compileOnly(libs.commandApi)
     compileOnly(libs.commandApiKotlin)
     compileOnly(libs.foliaScheduler)
-    compileOnly(libs.spigotUpdateChecker)
 }
 
 tasks.shadowJar {
@@ -69,8 +69,6 @@ tasks.shadowJar {
     val libPackage = "me.deecaad.core.lib"
 
     relocate("org.bstats", "$libPackage.bstats")
-    relocate("net.kyori", "$libPackage.kyori")
-    relocate("com.jeff_media.updatechecker", "$libPackage.updatechecker")
     relocate("dev.jorel.commandapi", "$libPackage.commandapi")
     relocate("com.cjcrafter.foliascheduler", "$libPackage.scheduler")
     relocate("kotlin.", "$libPackage.kotlin.")
@@ -212,6 +210,7 @@ jreleaser {
                     stagingRepository("build/staging-deploy")
                     // Credentials (JRELEASER_MAVENCENTRAL_USERNAME, JRELEASER_MAVENCENTRAL_PASSWORD or JRELEASER_MAVENCENTRAL_TOKEN)
                     // will be picked up from ~/.jreleaser/config.toml
+                    maxRetries = 200
                 }
             }
 
