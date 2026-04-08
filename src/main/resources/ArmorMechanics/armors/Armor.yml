@@ -85,6 +85,9 @@ Scuba_Boots:
 
 Tactical_Helmet:
   Type: LEATHER_HELMET
+  # Item_Model overrides the visual model of the item using a resource pack.
+  # Requires Paper 1.21.4+. Format: 'namespace:key' (e.g. 'myplugin:tactical_helmet').
+  Item_Model:
   Name: "<yellow>Tactical Helmet"
   Lore:
     - "<gray>Now with night vision goggles!"
@@ -124,6 +127,7 @@ Tactical_Chestplate:
 
 Tactical_Leggings:
   Type: LEATHER_LEGGINGS
+  Item_Model:
   Name: "<yellow>Tactical Leggings"
   Lore:
     - "<gray>Getting shot in the leg hurts, so wear this"
